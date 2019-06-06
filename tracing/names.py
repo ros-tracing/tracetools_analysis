@@ -35,7 +35,7 @@ DEFAULT_EVENTS_KERNEL=[
 ]
 
 DEFAULT_EVENTS_ROS=[
-    'ros2:rcl_init'
+    'ros2:rcl_init',
     'ros2:rcl_node_init',
     'ros2:rcl_publisher_init',
     'ros2:rcl_subscription_init',

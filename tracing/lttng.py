@@ -1,13 +1,17 @@
 # LTTng tracing interface
 
+# Temporary workaround
+import sys
+sys.path = ['/usr/local/lib/python3.6/site-packages'] + sys.path
+
 from lttng import *
 from .names import DEFAULT_EVENTS_ROS, DEFAULT_EVENTS_KERNEL, DEFAULT_CONTEXT
 
-def lttng_setup(session_name, path, ros_events=DEFAULT_EVENTS_ROS, kernel_events=DEFAULT_EVENTS_KERNEL, context_names=DEFAULT_CONTEXT):
+def lttng_setup(session_name, directory, ros_events=DEFAULT_EVENTS_ROS, kernel_events=DEFAULT_EVENTS_KERNEL, context_names=DEFAULT_CONTEXT):
     """
     Setup LTTng session, with events and context
     :param session_name (str): the name of the session
-    :param path (str): the path to write trace data to
+    :param directory (str): the path of the main directory to write trace data to
     :param ros_events (list(str)): list of ROS events to enable
     :param kernel_events (list(str)): list of kernel events to enable
     :param context_names (list(str)): list of context elements to enable
@@ -21,10 +25,11 @@ def lttng_setup(session_name, path, ros_events=DEFAULT_EVENTS_ROS, kernel_events
     if ust_enabled:
         domain_ust = Domain()
         domain_ust.type = DOMAIN_UST
+        domain_ust.buf_type = BUFFER_PER_UID
         channel_ust = Channel()
         channel_ust.name = 'ros2'
         channel_ust.attr.overwrite = 0
-        channel_ust.attr.subbuf_size = 4096
+        channel_ust.attr.subbuf_size = 2*4096
         channel_ust.attr.num_subbuf = 8
         channel_ust.attr.switch_timer_interval = 0
         channel_ust.attr.read_timer_interval = 200
@@ -33,19 +38,19 @@ def lttng_setup(session_name, path, ros_events=DEFAULT_EVENTS_ROS, kernel_events
     if kernel_enabled:
         domain_kernel = Domain()
         domain_kernel.type = DOMAIN_KERNEL
+        domain_kernel.buf_type = BUFFER_GLOBAL
         channel_kernel = Channel()
         channel_kernel.name = 'kchan'
-        # TODO fix kernel tracing
-        # channel_kernel.attr.overwrite = 0
-        # channel_kernel.attr.subbuf_size = 4096
-        # channel_kernel.attr.num_subbuf = 8
-        # channel_kernel.attr.switch_timer_interval = 0
-        # channel_kernel.attr.read_timer_interval = 200
-        # channel_kernel.attr.output = EVENT_MMAP
+        channel_kernel.attr.overwrite = 0
+        channel_kernel.attr.subbuf_size = 8*4096
+        channel_kernel.attr.num_subbuf = 8
+        channel_kernel.attr.switch_timer_interval = 0
+        channel_kernel.attr.read_timer_interval = 200
+        channel_kernel.attr.output = EVENT_MMAP
         events_list_kernel = _create_events(kernel_events)
 
     # Session
-    _create_session(session_name, path)
+    _create_session(session_name, directory)
 
     # Handles, channels, events
     handle_ust = None
@@ -101,17 +106,17 @@ def _create_events(event_names_list):
         events_list.append(e)
     return events_list
 
-def _create_session(session_name, path):
+def _create_session(session_name, directory):
     """
-    Create session from name and path, and check for errors
+    Create session from name and directory path, and check for errors
     """
-    result = create(session_name, path)
+    result = create(session_name, directory)
     LTTNG_ERR_EXIST_SESS = -28
     if result == LTTNG_ERR_EXIST_SESS:
         # Sessions seem to persist, so if it already exists,
         # just destroy it and try again
         lttng_destroy(session_name)
-        result = create(session_name, path)
+        result = create(session_name, directory)
     if result < 0:
         raise RuntimeError(f'session creation failed: {strerror(result)}')
 

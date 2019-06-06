@@ -12,11 +12,10 @@ def main(argv=sys.argv):
         exit(1)
 
     session_name = argv[1]
-    path = argv[2]
-    # TODO fix kernel tracing
-    lttng_setup(session_name, path, kernel_events=None)
+    path = argv[2] + '/' + session_name
+    lttng_setup(session_name, path)
     lttng_start(session_name)
-    print('tracing session started')
+    print(f'tracing session started: {path}')
 
     # TODO integrate this with launch + ROS shutdown
     input('press enter to stop...')

@@ -19,7 +19,7 @@ def ctf_to_pickle(trace_directory, target):
     """
     # add traces
     tc = babeltrace.TraceCollection()
-    print(f'Importing {trace_directory}')
+    print(f'Importing trace directory: {trace_directory}')
     tc.add_traces_recursive(trace_directory, 'ctf')
 
     count = 0
@@ -40,11 +40,11 @@ def ctf_to_pickle(trace_directory, target):
 
         # Write all for now
         pod = _ctf_event_to_pod(event)
-        print(f'dumping pod: {str(pod)}')
         target.dump(pod)
         count_written += 1
 
-    print(f'{count_written} events in {time.time() - start_time}')
+    time_diff = time.time() - start_time
+    print(f'{count_written} events in {time_diff * 1000:.2f} ms')
 
 
 def _ctf_event_to_pod(ctf_event):

@@ -4,9 +4,11 @@ import babeltrace
 from pickle import Pickler
 import time
 
-# TODO
-_IGNORED_FIELDS = []
-_DISCARD = "events_discarded"
+_IGNORED_FIELDS = [
+    'content_size', 'cpu_id', 'events_discarded', 'id', 'packet_size', 'packet_seq_num',
+    'stream_id', 'stream_instance_id', 'timestamp_end', 'timestamp_begin', 'magic', 'uuid', 'v'
+]
+_DISCARD = 'events_discarded'
 
 def ctf_to_pickle(trace_directory, target):
     """

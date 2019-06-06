@@ -4,9 +4,9 @@
   <name>tracetools_analysis</name>
   <version>0.1.0</version>
   <description>Tools for analysing trace data</description>
-
-  <maintainer email="ingo.luetkebohle@de.bosch.com">Ingo Luetkebohle</maintainer>
+  <maintainer email="fixed-term.christophe.bourquebedard@de.bosch.com">Christophe Bedard</maintainer>
   <author email="ingo.luetkebohle@de.bosch.com">Ingo Luetkebohle</author>
+  <author email="fixed-term.christophe.bourquebedard@de.bosch.com">Christophe Bedard</author>
   <license>GPLv3</license>
 
   <exec_depend>python3-babeltrace</exec_depend>

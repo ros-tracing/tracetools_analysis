@@ -9,6 +9,8 @@
   <author email="ingo.luetkebohle@de.bosch.com">Ingo Luetkebohle</author>
   <license>GPLv3</license>
 
+  <!-- TODO add python3-babeltrace? -->
+
   <export>
     <build_type>ament_python</build_type>
   </export>

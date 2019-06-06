@@ -2,7 +2,6 @@
 
 import subprocess
 import babeltrace
-from ..trace import *
 
 def get_trace_event_names(trace_directory):
     """

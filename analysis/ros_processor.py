@@ -1,5 +1,6 @@
 # Process trace events and create ROS model
 
+import sys
 from .lttng_models import EventMetadata, get_field, get_name
 
 def ros_process(events):
@@ -41,15 +42,17 @@ class RosProcessor():
             self._handle(event)
 
     def _handle(self, event):
-        handler_function = self._handler_map.get(get_name(event), None)
+        event_name = get_name(event)
+        handler_function = self._handler_map.get(event_name, None)
         if handler_function is not None:
-            name = get_name(event)
             pid = get_field(event, 'vpid', default=get_field(event, 'pid'))
             tid = get_field(event, 'vtid', default=get_field(event, 'tid'))
             timestamp = get_field(event, '_timestamp')
             procname = get_field(event, 'procname')
-            metadata = EventMetadata(name, pid, tid, timestamp, procname)
+            metadata = EventMetadata(event_name, pid, tid, timestamp, procname)
             handler_function(event, metadata)
+        else:
+            print(f'unhandled event name: {event_name}', file=sys.stderr)
 
     def _handle_subscription_init(self, event, metadata):
         # TODO

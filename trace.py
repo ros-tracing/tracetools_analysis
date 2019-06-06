@@ -19,7 +19,7 @@ def main(argv=sys.argv):
     print('tracing session started')
 
     # TODO integrate this with launch + ROS shutdown
-    time.sleep(5)
+    input('press enter to stop...')
 
     print('stopping & destroying tracing session')
     lttng_stop(session_name)

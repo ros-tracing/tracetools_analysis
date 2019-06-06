@@ -24,5 +24,6 @@ setup(
             f'process = {package_name}.process:main',
         ],
     },
+    license='TODO',
     tests_require=['pytest'],
 )

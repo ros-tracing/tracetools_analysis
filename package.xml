@@ -9,9 +9,7 @@
   <author email="ingo.luetkebohle@de.bosch.com">Ingo Luetkebohle</author>
   <license>GPLv3</license>
 
-  <!-- TODO consider adding python3-babeltrace to rosdep/python
-    https://github.com/ros/rosdistro/blob/master/rosdep/python.yaml
-  -->
+  <exec_depend>python3-babeltrace</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

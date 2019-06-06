@@ -111,8 +111,8 @@ def _create_session(session_name, directory):
     Create session from name and directory path, and check for errors
     """
     result = create(session_name, directory)
-    LTTNG_ERR_EXIST_SESS = -28
-    if result == LTTNG_ERR_EXIST_SESS:
+    LTTNG_ERR_EXIST_SESS = 28
+    if result == -LTTNG_ERR_EXIST_SESS:
         # Sessions seem to persist, so if it already exists,
         # just destroy it and try again
         lttng_destroy(session_name)

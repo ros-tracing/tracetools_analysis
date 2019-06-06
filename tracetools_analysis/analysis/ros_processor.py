@@ -3,9 +3,11 @@
 import sys
 from .lttng_models import EventMetadata, get_field, get_name
 
+
 def ros_process(events):
     """
-    Process unpickled events and create ROS model
+    Process unpickled events and create ROS model.
+
     :param events (list(dict(str:str:))): the list of events
     :return the processor object
     """
@@ -13,11 +15,14 @@ def ros_process(events):
     processor.process_events(events)
     return processor
 
+
 class RosProcessor():
     """
     ROS-aware event processing/handling class.
+
     Handles a trace's events and builds a model with the data.
     """
+
     def __init__(self):
         # TODO add other stuff
         # Instances of callback_start for eventual matching
@@ -35,7 +40,8 @@ class RosProcessor():
 
     def process_events(self, events):
         """
-        Process events
+        Process events.
+
         :param events (list(dict(str:str))): the events to process
         """
         for event in events:

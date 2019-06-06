@@ -13,7 +13,8 @@ _DISCARD = 'events_discarded'
 
 def ctf_to_pickle(trace_directory, target):
     """
-    Load CTF trace and convert to a pickle file
+    Load CTF trace and convert to a pickle file.
+
     :param trace_directory (str): the main/top trace directory
     :param target (Pickler): the target pickle file to write to
     """
@@ -50,6 +51,7 @@ def ctf_to_pickle(trace_directory, target):
 def _ctf_event_to_pod(ctf_event):
     """
     Convert name, timestamp, and all other keys except those in IGNORED_FIELDS into a dictionary.
+
     :param ctf_element: The element to convert
     :type ctf_element: babeltrace.Element
     :return:

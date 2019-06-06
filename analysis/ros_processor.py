@@ -13,6 +13,10 @@ def ros_process(events):
         processor.handle(event)
 
 class RosProcessor():
+    """
+    ROS-aware event processing/handling class.
+    Handles a trace's events and builds a model with the data.
+    """
     def __init__(self):
         # TODO add other stuff
         self.callbacks = []

@@ -6,12 +6,15 @@ from .ros_processor import RosProcessor
 def callback_durations_to_df(ros_processor):
     callback_addresses = []
     durations = []
+    start_timestamps = []
     for addr in ros_processor.callbacks_instances:
-        for d in ros_processor.callbacks_instances[addr]:
+        for duration, start in ros_processor.callbacks_instances[addr]:
             callback_addresses.append(addr)
-            durations.append(d)
+            durations.append(duration)
+            start_timestamps.append(start)
 
     return pd.DataFrame(data={
         'callback_address': callback_addresses,
         'duration': durations,
+        'start_timestamp': start_timestamps
     })

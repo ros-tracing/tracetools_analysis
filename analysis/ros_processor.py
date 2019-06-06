@@ -22,7 +22,7 @@ class RosProcessor():
         # TODO add other stuff
         # Instances of callback_start for eventual matching
         self._callback_starts = {}
-        # Callback instances, callback_address: end - start
+        # Callback instances, callback_address: (end - start, start)
         self.callbacks_instances = {}
 
         # Link a ROS trace event to its corresponding handling method
@@ -72,4 +72,4 @@ class RosProcessor():
         start_timestamp = self._callback_starts.pop(callback_addr, None)
         if start_timestamp is not None:
             duration = metadata.timestamp - start_timestamp
-            self.callbacks_instances[callback_addr].append(duration)
+            self.callbacks_instances[callback_addr].append((duration, start_timestamp))

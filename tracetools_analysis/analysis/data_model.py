@@ -22,3 +22,16 @@ class DataModel():
 
         # Events
         # TODO
+
+
+    def print(self):
+        """Debug method to print every contained df."""
+        print('====================DATA MODEL====================')
+        print(f'Contexts:\n{self._contexts.to_string()}')
+        print(f'Nodes:\n{self._nodes.to_string()}')
+        print(f'Publishers:\n{self._publishers.to_string()}')
+        print(f'Subscription:\n{self._subscriptions.to_string()}')
+        print(f'Services:\n{self._services.to_string()}')
+        print(f'Clients:\n{self._clients.to_string()}')
+        print(f'Timers:\n{self._timers.to_string()}')
+        print('==================================================')

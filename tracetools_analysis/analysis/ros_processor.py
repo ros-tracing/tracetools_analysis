@@ -18,25 +18,26 @@ def ros_process(events):
 
 class RosProcessor(EventHandler):
     """
-    ROS-aware event processing/handling class.
+    ROS-aware event processing/handling class implementation.
 
     Handles a trace's events and builds a model with the data.
     """
 
     def __init__(self):
-        # TODO add other stuff
-        # Instances of callback_start for eventual matching
-        self._callback_starts = {}
-        # Callback instances, callback_address: (end - start, start)
-        self.callbacks_instances = {}
-
         # Link a ROS trace event to its corresponding handling method
-        self._handler_map = {
+        handler_map = {
             'ros2:rcl_subscription_init': self._handle_subscription_init,
             'ros2:rclcpp_subscription_callback_added': self._handle_subscription_callback_added,
             'ros2:rclcpp_subscription_callback_start': self._handle_subscription_callback_start,
             'ros2:rclcpp_subscription_callback_end': self._handle_subscription_callback_end,
         }
+        super().__init__(handler_map)
+
+        # TODO add other stuff
+        # Instances of callback_start for eventual matching
+        self._callback_starts = {}
+        # Callback instances, callback_address: (end - start, start)
+        self.callbacks_instances = {}
 
     def _handle_subscription_init(self, event, metadata):
         # TODO

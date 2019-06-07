@@ -16,9 +16,9 @@ class EventHandler():
         """
         self._handler_map = handler_map
 
-    def process_events(self, events):
+    def handle_events(self, events):
         """
-        Process events by calling their handlers.
+        Handle events by calling their handlers.
 
         :param events (list(dict(str:str))): the events to process
         """

@@ -12,7 +12,7 @@ def ros_process(events):
     :return the processor object
     """
     processor = RosProcessor()
-    processor.process_events(events)
+    processor.handle_events(events)
     return processor
 
 

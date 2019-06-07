@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # Entrypoint/script to convert CTF trace data to a pickle file
-# TODO
 
 import argparse
 from pickle import Pickler

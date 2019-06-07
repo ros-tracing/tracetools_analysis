@@ -7,11 +7,15 @@ import pickle
 from tracetools_analysis.analysis import ros_processor, to_pandas
 
 
-def main():
+def parse_args():
     parser = argparse.ArgumentParser(description='Process a pickle file generated from tracing and analyze the data.')
     parser.add_argument('pickle_file',
                         help='the pickle file to import')
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
 
     pickle_filename = args.pickle_file
     with open(pickle_filename, 'rb') as f:

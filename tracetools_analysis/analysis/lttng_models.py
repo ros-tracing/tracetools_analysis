@@ -1,13 +1,17 @@
 # Model objects for LTTng traces/events
 
+
 def get_field(event, field_name, default=None):
     return event.get(field_name, default)
+
 
 def get_name(event):
     return get_field(event, '_name')
 
 
 class EventMetadata():
+    """Container for event metadata."""
+
     def __init__(self, event_name, pid, tid, timestamp, procname):
         self._event_name = event_name
         self._pid = pid

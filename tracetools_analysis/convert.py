@@ -2,13 +2,15 @@
 # Entrypoint/script to convert CTF trace data to a pickle file
 # TODO
 
-import sys
 from pickle import Pickler
+import sys
+
 from tracetools_analysis.conversion import ctf
+
 
 def main(argv=sys.argv):
     if len(argv) != 3:
-        print("usage: /trace/directory pickle_target_file")
+        print('usage: /trace/directory pickle_target_file')
         exit(1)
 
     trace_directory = sys.argv[1]

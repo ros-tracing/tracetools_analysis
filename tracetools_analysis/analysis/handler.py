@@ -1,6 +1,7 @@
 # Event handler
 
 import sys
+
 from . import lttng_models
 
 

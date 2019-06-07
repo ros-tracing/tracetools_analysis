@@ -1,8 +1,8 @@
 # Process trace events and create ROS model
 
-import sys
-from .lttng_models import get_field
 from .handler import EventHandler
+from .lttng_models import get_field
+
 
 def ros_process(events):
     """

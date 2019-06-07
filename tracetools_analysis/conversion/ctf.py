@@ -1,8 +1,8 @@
 # CTF to pickle conversion
 
-import babeltrace
-from pickle import Pickler
 import time
+
+import babeltrace
 
 # List of ignored CTF fields
 _IGNORED_FIELDS = [
@@ -10,6 +10,7 @@ _IGNORED_FIELDS = [
     'stream_id', 'stream_instance_id', 'timestamp_end', 'timestamp_begin', 'magic', 'uuid', 'v'
 ]
 _DISCARD = 'events_discarded'
+
 
 def ctf_to_pickle(trace_directory, target):
     """

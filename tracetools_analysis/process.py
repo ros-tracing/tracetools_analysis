@@ -4,8 +4,7 @@
 import sys
 import pickle
 import pandas as pd
-from tracetools_analysis.analysis.ros_processor import *
-from tracetools_analysis.analysis.to_pandas import *
+from tracetools_analysis.analysis import ros_processor, to_pandas
 
 def main(argv=sys.argv):
     if len(argv) != 2:
@@ -16,9 +15,9 @@ def main(argv=sys.argv):
     with open(pickle_filename, 'rb') as f:
         events = _get_events_from_pickled_file(f)
         print(f'imported {len(events)} events')
-        processor = ros_process(events)
+        processor = ros_processor.ros_process(events)
 
-    df = callback_durations_to_df(processor)
+    df = to_pandas.callback_durations_to_df(processor)
     print(df.to_string())
 
 

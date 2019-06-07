@@ -4,7 +4,7 @@
 
 import sys
 from pickle import Pickler
-from tracetools_analysis.conversion.ctf import *
+from tracetools_analysis.conversion import ctf
 
 def main(argv=sys.argv):
     if len(argv) != 3:
@@ -16,4 +16,4 @@ def main(argv=sys.argv):
 
     with open(pickle_target_file, 'wb') as f:
         p = Pickler(f, protocol=4)
-        ctf_to_pickle(trace_directory, p)
+        ctf.ctf_to_pickle(trace_directory, p)

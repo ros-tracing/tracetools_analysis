@@ -55,11 +55,11 @@ class RosProcessor(EventHandler):
     def _handle_rcl_init(self, event, metadata):
         # TODO
         pass
-    
+
     def _handle_rcl_node_init(self, event, metadata):
         # TODO
         pass
-    
+
     def _handle_rcl_publisher_init(self, event, metadata):
         # TODO
         pass

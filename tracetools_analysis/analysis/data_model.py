@@ -29,11 +29,11 @@ class DataModel():
 
         self._callback_objects = pd.DataFrame(columns=['handle', 'timestamp', 'callback_object'])
         self._callback_objects.set_index(['handle'], inplace=True, drop=True)
-        self._callbacks = pd.DataFrame(columns=['callback_object', 'timestamp', 'symbol'])
-        self._callbacks.set_index(['callback_object'], inplace=True, drop=True)
+        self._callback_symbols = pd.DataFrame(columns=['callback_object', 'timestamp', 'symbol'])
+        self._callback_symbols.set_index(['callback_object'], inplace=True, drop=True)
 
         # Events (multiple instances, may not have a meaningful index)
-        self._subscription_callbacks = pd.DataFrame(columns=['callback_object', 'timestamp', 'duration', 'intra_process'])
+        self._callbacks_instances = pd.DataFrame(columns=['callback_object', 'timestamp', 'duration', 'intra_process'])
 
     def add_context(self, context_handle, timestamp, pid):
         self._contexts.loc[context_handle] = [timestamp, pid]
@@ -51,10 +51,10 @@ class DataModel():
         self._callback_objects.loc[subscription_handle] = [timestamp, callback_object]
 
     def add_callback(self, callback_object, timestamp, symbol):
-        self._callbacks.loc[callback_object] = [timestamp, symbol]
+        self._callback_symbols.loc[callback_object] = [timestamp, symbol]
     
-    def add_subscription_callback_instance(self, callback_object, timestamp, duration, intra_process):
-        self._subscription_callbacks = self._subscription_callbacks.append({'callback_object': callback_object, 'timestamp': timestamp, 'duration': duration, 'intra_process': intra_process}, ignore_index=True)
+    def add_callback_instance(self, callback_object, timestamp, duration, intra_process):
+        self._callbacks_instances = self._callbacks_instances.append({'callback_object': callback_object, 'timestamp': timestamp, 'duration': duration, 'intra_process': intra_process}, ignore_index=True)
 
     def print(self):
         """Debug method to print every contained df."""
@@ -67,7 +67,7 @@ class DataModel():
         print()
         print(f'Subscriptions:\n{self._subscriptions.to_string()}')
         print()
-        print(f'Subscription callback instances:\n{self._subscription_callbacks.to_string()}')
+        print(f'Callback instances:\n{self._callbacks_instances.to_string()}')
         print()
         print(f'Services:\n{self._services.to_string()}')
         print()
@@ -77,5 +77,5 @@ class DataModel():
         print()
         print(f'Callback objects:\n{self._callback_objects.to_string()}')
         print()
-        print(f'Callbacks:\n{self._callbacks.to_string()}')
+        print(f'Callback symbols:\n{self._callback_symbols.to_string()}')
         print('==================================================')

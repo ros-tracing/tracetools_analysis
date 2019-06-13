@@ -22,14 +22,15 @@ class DataModel():
         self._publishers.set_index(['publisher_handle'], inplace=True, drop=True)
         self._subscriptions = pd.DataFrame(columns=['subscription_handle', 'timestamp', 'node_handle', 'rmw_handle', 'topic_name', 'depth'])
         self._subscriptions.set_index(['subscription_handle'], inplace=True, drop=True)
-        self._subscription_callback_objects = pd.DataFrame(columns=['subscription_handle', 'timestamp', 'callback_object'])
-        self._subscription_callback_objects.set_index(['subscription_handle'], inplace=True, drop=True)
         self._callbacks = pd.DataFrame(columns=['callback_object', 'timestamp', 'symbol'])
         self._callbacks.set_index(['callback_object'], inplace=True, drop=True)
 
         self._services = pd.DataFrame(columns=[])
         self._clients = pd.DataFrame(columns=[])
         self._timers = pd.DataFrame(columns=[])
+
+        self._callback_objects = pd.DataFrame(columns=['handle', 'timestamp', 'callback_object'])
+        self._callback_objects.set_index(['handle'], inplace=True, drop=True)
 
         # Events (multiple instances, may not have a meaningful index)
         self._subscription_callbacks = pd.DataFrame(columns=['callback_object', 'timestamp', 'duration', 'intra_process'])
@@ -47,7 +48,7 @@ class DataModel():
         self._subscriptions.loc[subscription_handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
 
     def add_subscription_callback_object(self, subscription_handle, timestamp, callback_object):
-        self._subscription_callback_objects.loc[subscription_handle] = [timestamp, callback_object]
+        self._callback_objects.loc[subscription_handle] = [timestamp, callback_object]
 
     def add_callback(self, callback_object, timestamp, symbol):
         self._callbacks.loc[callback_object] = [timestamp, symbol]
@@ -66,8 +67,6 @@ class DataModel():
         print()
         print(f'Subscriptions:\n{self._subscriptions.to_string()}')
         print()
-        print(f'Subscription callbacks:\n{self._subscription_callback_objects.to_string()}')
-        print()
         print(f'Subscription callback instances:\n{self._subscription_callbacks.to_string()}')
         print()
         print(f'Services:\n{self._services.to_string()}')
@@ -75,6 +74,8 @@ class DataModel():
         print(f'Clients:\n{self._clients.to_string()}')
         print()
         print(f'Timers:\n{self._timers.to_string()}')
+        print()
+        print(f'Callback objects:\n{self._callback_objects.to_string()}')
         print()
         print(f'Callbacks:\n{self._callbacks.to_string()}')
         print('==================================================')

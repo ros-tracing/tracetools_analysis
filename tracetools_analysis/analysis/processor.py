@@ -2,6 +2,7 @@
 
 from .handler import EventHandler
 from .lttng_models import get_field
+from .data_model import DataModel
 
 
 def ros_process(events):
@@ -63,43 +64,59 @@ class RosProcessor(EventHandler):
         }
         super().__init__(handler_map)
 
-        # TODO add other stuff
-        # Instances of callback_start for eventual matching
-        self._callback_starts = {}
-        # Callback instances, callback_address: (end - start, start)
-        self.callbacks_instances = {}
+        self._data = DataModel()
+    
+    def get_data_model(self):
+        return self._data
 
     def _handle_rcl_init(self, event, metadata):
-        # TODO
-        pass
+        context_handle = get_field(event, 'context_handle')
+        self._data.add_context(context_handle, metadata.timestamp, metadata.pid)
 
     def _handle_rcl_node_init(self, event, metadata):
-        # TODO
-        pass
+        node_handle = get_field(event, 'node_handle')
+        rmw_handle = get_field(event, 'rmw_handle')
+        name = get_field(event, 'node_name')
+        namespace = get_field(event, 'namespace')
+        self._data.add_node(node_handle, metadata.timestamp, metadata.tid, rmw_handle, name, namespace)
 
     def _handle_rcl_publisher_init(self, event, metadata):
-        # TODO
-        pass
+        pub_handle = get_field(event, 'publisher_handle')
+        node_handle = get_field(event, 'node_handle')
+        rmw_handle = get_field(event, 'rmw_publisher_handle')
+        topic_name = get_field(event, 'topic_name')
+        depth = get_field(event, 'depth')
+        self._data.add_publisher(pub_handle, metadata.timestamp, node_handle, rmw_handle, topic_name, depth)
 
     def _handle_subscription_init(self, event, metadata):
-        # TODO
-        pass
+        sub_handle = get_field(event, 'subscription_handle')
+        node_handle = get_field(event, 'node_handle')
+        rmw_handle = get_field(event, 'rmw_subscription_handle')
+        topic_name = get_field(event, 'topic_name')
+        depth = get_field(event, 'depth')
+        self._data.add_subscription(sub_handle, metadata.timestamp, node_handle, rmw_handle, topic_name, depth)
 
     def _handle_rclcpp_subscription_callback_added(self, event, metadata):
+        # TODO
+        pass
         # Add the callback address key and create an empty list
-        callback_addr = get_field(event, 'callback')
-        self.callbacks_instances[callback_addr] = []
+        # callback_addr = get_field(event, 'callback')
+        # self.callbacks_instances[callback_addr] = []
 
     def _handle_rclcpp_subscription_callback_start(self, event, metadata):
-        callback_addr = get_field(event, 'callback')
-        self._callback_starts[callback_addr] = metadata.timestamp
+        # TODO
+        pass
+        # callback_addr = get_field(event, 'callback')
+        # self._callback_starts[callback_addr] = metadata.timestamp
 
     def _handle_rclcpp_subscription_callback_end(self, event, metadata):
-        callback_addr = get_field(event, 'callback')
-        start_timestamp = self._callback_starts.pop(callback_addr, None)
-        if start_timestamp is not None:
-            duration = metadata.timestamp - start_timestamp
-            self.callbacks_instances[callback_addr].append((duration, start_timestamp))
+        # TODO
+        pass
+        # callback_addr = get_field(event, 'callback')
+        # start_timestamp = self._callback_starts.pop(callback_addr, None)
+        # if start_timestamp is not None:
+        #     duration = metadata.timestamp - start_timestamp
+        #     self.callbacks_instances[callback_addr].append((duration, start_timestamp))
 
     def _handle_rcl_service_init(self, event, metadata):
         # TODO

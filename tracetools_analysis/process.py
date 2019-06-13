@@ -4,8 +4,8 @@
 import argparse
 import pickle
 
-from tracetools_analysis.analysis import ros_processor, to_pandas
-
+from tracetools_analysis.analysis import processor, to_pandas
+from tracetools_analysis.analysis import data_model
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Process a pickle file generated from tracing and analyze the data.')
@@ -21,11 +21,9 @@ def main():
     with open(pickle_filename, 'rb') as f:
         events = _get_events_from_pickled_file(f)
         print(f'imported {len(events)} events')
-        processor = ros_processor.ros_process(events)
+        p = processor.ros_process(events)
 
-    df = to_pandas.callback_durations_to_df(processor)
-    print(df.to_string())
-
+    p.get_data_model().print()
 
 def _get_events_from_pickled_file(file):
     p = pickle.Unpickler(file)

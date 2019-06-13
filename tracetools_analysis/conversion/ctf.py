@@ -40,7 +40,7 @@ def ctf_to_pickle(trace_directory, target):
         pod = _ctf_event_to_pod(event)
         target.dump(pod)
         count_written += 1
-    
+
     return count_written
 
 

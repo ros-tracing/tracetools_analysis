@@ -6,10 +6,11 @@ import pickle
 import time
 
 from tracetools_analysis.analysis import ros2_processor
-from tracetools_analysis.analysis import data_model
+
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Process a pickle file generated from tracing and analyze the data.')
+    parser = argparse.ArgumentParser(description='Process a pickle file generated '
+                                                 'from tracing and analyze the data.')
     parser.add_argument('pickle_file',
                         help='the pickle file to import')
     return parser.parse_args()
@@ -27,7 +28,8 @@ def main():
         time_diff = time.time() - start_time
         print(f'processed {len(events)} events in {time_diff * 1000:.2f} ms')
 
-    p.get_data_model().print()
+    p.get_data_model().print_model()
+
 
 def _get_events_from_pickled_file(file):
     p = pickle.Unpickler(file)

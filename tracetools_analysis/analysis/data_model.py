@@ -14,28 +14,62 @@ class DataModel():
 
     def __init__(self):
         # Objects (one-time events, usually when something is created)
-        self._contexts = pd.DataFrame(columns=['context_handle', 'timestamp', 'pid'])
+        self._contexts = pd.DataFrame(columns=['context_handle',
+                                               'timestamp',
+                                               'pid'])
         self._contexts.set_index(['context_handle'], inplace=True, drop=True)
-        self._nodes = pd.DataFrame(columns=['node_handle', 'timestamp', 'tid', 'rmw_handle', 'name', 'namespace'])
+        self._nodes = pd.DataFrame(columns=['node_handle',
+                                            'timestamp',
+                                            'tid',
+                                            'rmw_handle',
+                                            'name',
+                                            'namespace'])
         self._nodes.set_index(['node_handle'], inplace=True, drop=True)
-        self._publishers = pd.DataFrame(columns=['publisher_handle', 'timestamp', 'node_handle', 'rmw_handle', 'topic_name', 'depth'])
+        self._publishers = pd.DataFrame(columns=['publisher_handle',
+                                                 'timestamp',
+                                                 'node_handle',
+                                                 'rmw_handle',
+                                                 'topic_name',
+                                                 'depth'])
         self._publishers.set_index(['publisher_handle'], inplace=True, drop=True)
-        self._subscriptions = pd.DataFrame(columns=['subscription_handle', 'timestamp', 'node_handle', 'rmw_handle', 'topic_name', 'depth'])
+        self._subscriptions = pd.DataFrame(columns=['subscription_handle',
+                                                    'timestamp',
+                                                    'node_handle',
+                                                    'rmw_handle',
+                                                    'topic_name',
+                                                    'depth'])
         self._subscriptions.set_index(['subscription_handle'], inplace=True, drop=True)
-        self._services = pd.DataFrame(columns=['service_handle', 'timestamp', 'node_handle', 'rmw_handle', 'service_name'])
+        self._services = pd.DataFrame(columns=['service_handle',
+                                               'timestamp',
+                                               'node_handle',
+                                               'rmw_handle',
+                                               'service_name'])
         self._services.set_index(['service_handle'], inplace=True, drop=True)
-        self._clients = pd.DataFrame(columns=['client_handle', 'timestamp', 'node_handle', 'rmw_handle', 'service_name'])
+        self._clients = pd.DataFrame(columns=['client_handle',
+                                              'timestamp',
+                                              'node_handle',
+                                              'rmw_handle',
+                                              'service_name'])
         self._clients.set_index(['client_handle'], inplace=True, drop=True)
-        self._timers = pd.DataFrame(columns=['timer_handle', 'timestamp', 'period'])
+        self._timers = pd.DataFrame(columns=['timer_handle',
+                                             'timestamp',
+                                             'period'])
         self._timers.set_index(['timer_handle'], inplace=True, drop=True)
 
-        self._callback_objects = pd.DataFrame(columns=['handle', 'timestamp', 'callback_object'])
+        self._callback_objects = pd.DataFrame(columns=['handle',
+                                                       'timestamp',
+                                                       'callback_object'])
         self._callback_objects.set_index(['handle'], inplace=True, drop=True)
-        self._callback_symbols = pd.DataFrame(columns=['callback_object', 'timestamp', 'symbol'])
+        self._callback_symbols = pd.DataFrame(columns=['callback_object',
+                                                       'timestamp',
+                                                       'symbol'])
         self._callback_symbols.set_index(['callback_object'], inplace=True, drop=True)
 
         # Events (multiple instances, may not have a meaningful index)
-        self._callbacks_instances = pd.DataFrame(columns=['callback_object', 'timestamp', 'duration', 'intra_process'])
+        self._callbacks_instances = pd.DataFrame(columns=['callback_object',
+                                                          'timestamp',
+                                                          'duration',
+                                                          'intra_process'])
 
     def add_context(self, context_handle, timestamp, pid):
         self._contexts.loc[context_handle] = [timestamp, pid]
@@ -43,31 +77,37 @@ class DataModel():
     def add_node(self, node_handle, timestamp, tid, rmw_handle, name, namespace):
         self._nodes.loc[node_handle] = [timestamp, tid, rmw_handle, name, namespace]
 
-    def add_publisher(self, publisher_handle, timestamp, node_handle, rmw_handle, topic_name, depth):
-        self._publishers.loc[publisher_handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
+    def add_publisher(self, handle, timestamp, node_handle, rmw_handle, topic_name, depth):
+        self._publishers.loc[handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
 
-    def add_subscription(self, subscription_handle, timestamp, node_handle, rmw_handle, topic_name, depth):
-        self._subscriptions.loc[subscription_handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
+    def add_subscription(self, handle, timestamp, node_handle, rmw_handle, topic_name, depth):
+        self._subscriptions.loc[handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
 
-    def add_service(self, service_handle, timestamp, node_handle, rmw_handle, service_name):
-        self._services.loc[service_handle] = [timestamp, node_handle, rmw_handle, service_name]
+    def add_service(self, handle, timestamp, node_handle, rmw_handle, service_name):
+        self._services.loc[handle] = [timestamp, node_handle, rmw_handle, service_name]
 
-    def add_client(self, client_handle, timestamp, node_handle, rmw_handle, service_name):
-        self._clients.loc[client_handle] = [timestamp, node_handle, rmw_handle, service_name]
+    def add_client(self, handle, timestamp, node_handle, rmw_handle, service_name):
+        self._clients.loc[handle] = [timestamp, node_handle, rmw_handle, service_name]
 
-    def add_timer(self, timer_handle, timestamp, period):
-        self._timers.loc[timer_handle] = [timestamp, period]
+    def add_timer(self, handle, timestamp, period):
+        self._timers.loc[handle] = [timestamp, period]
 
     def add_callback_object(self, handle, timestamp, callback_object):
         self._callback_objects.loc[handle] = [timestamp, callback_object]
 
     def add_callback_symbol(self, callback_object, timestamp, symbol):
         self._callback_symbols.loc[callback_object] = [timestamp, symbol]
-    
-    def add_callback_instance(self, callback_object, timestamp, duration, intra_process):
-        self._callbacks_instances = self._callbacks_instances.append({'callback_object': callback_object, 'timestamp': timestamp, 'duration': duration, 'intra_process': intra_process}, ignore_index=True)
 
-    def print(self):
+    def add_callback_instance(self, callback_object, timestamp, duration, intra_process):
+        data = {
+            'callback_object': callback_object,
+            'timestamp': timestamp,
+            'duration': duration,
+            'intra_process': intra_process,
+        }
+        self._callbacks_instances = self._callbacks_instances.append(data, ignore_index=True)
+
+    def print_model(self):
         """Debug method to print every contained df."""
         print('====================DATA MODEL====================')
         print(f'Contexts:\n{self._contexts.to_string()}')

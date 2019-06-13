@@ -111,40 +111,45 @@ class RosProcessor(EventHandler):
         self.__handle_callback_end(event, metadata)
 
     def _handle_rcl_service_init(self, event, metadata):
-        # TODO
-        pass
+        service_handle = get_field(event, 'service_handle')
+        node_handle = get_field(event, 'node_handle')
+        rmw_handle = get_field(event, 'rmw_service_handle')
+        service_name = get_field(event, 'service_name')
+        self._data.add_service(service_handle, metadata.timestamp, node_handle, rmw_handle, service_name)
 
     def _handle_rclcpp_service_callback_added(self, event, metadata):
-        # TODO
-        pass
+        service_handle = get_field(event, 'service_handle')
+        callback_object = get_field(event, 'callback')
+        self._data.add_callback_object(service_handle, metadata.timestamp, callback_object)
 
     def _handle_rclcpp_service_callback_start(self, event, metadata):
-        # TODO
-        pass
+        self.__handle_callback_start(event, metadata)
 
     def _handle_rclcpp_service_callback_end(self, event, metadata):
-        # TODO
-        pass
+        self.__handle_callback_end(event, metadata)
 
     def _handle_rcl_client_init(self, event, metadata):
-        # TODO
-        pass
+        client_handle = get_field(event, 'client_handle')
+        node_handle = get_field(event, 'node_handle')
+        rmw_handle = get_field(event, 'rmw_client_handle')
+        service_name = get_field(event, 'service_name')
+        self._data.add_client(client_handle, metadata.timestamp, node_handle, rmw_handle, service_name)
 
     def _handle_rcl_timer_init(self, event, metadata):
-        # TODO
-        pass
+        timer_handle = get_field(event, 'timer_handle')
+        period = get_field(event, 'period')
+        self._data.add_timer(timer_handle, metadata.timestamp, period)
 
     def _handle_rclcpp_timer_callback_added(self, event, metadata):
-        # TODO
-        pass
+        timer_handle = get_field(event, 'timer_handle')
+        callback_object = get_field(event, 'callback')
+        self._data.add_callback_object(timer_handle, metadata.timestamp, callback_object)
 
     def _handle_rclcpp_timer_callback_start(self, event, metadata):
-        # TODO
-        pass
+        self.__handle_callback_start(event, metadata)
 
     def _handle_rclcpp_timer_callback_end(self, event, metadata):
-        # TODO
-        pass
+        self.__handle_callback_end(event, metadata)
 
     def _handle_rclcpp_callback_register(self, event, metadata):
         callback_object = get_field(event, 'callback')

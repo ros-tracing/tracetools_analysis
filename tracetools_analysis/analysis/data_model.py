@@ -22,10 +22,12 @@ class DataModel():
         self._publishers.set_index(['publisher_handle'], inplace=True, drop=True)
         self._subscriptions = pd.DataFrame(columns=['subscription_handle', 'timestamp', 'node_handle', 'rmw_handle', 'topic_name', 'depth'])
         self._subscriptions.set_index(['subscription_handle'], inplace=True, drop=True)
-
-        self._services = pd.DataFrame(columns=[])
-        self._clients = pd.DataFrame(columns=[])
-        self._timers = pd.DataFrame(columns=[])
+        self._services = pd.DataFrame(columns=['service_handle', 'timestamp', 'node_handle', 'rmw_handle', 'service_name'])
+        self._services.set_index(['service_handle'], inplace=True, drop=True)
+        self._clients = pd.DataFrame(columns=['client_handle', 'timestamp', 'node_handle', 'rmw_handle', 'service_name'])
+        self._clients.set_index(['client_handle'], inplace=True, drop=True)
+        self._timers = pd.DataFrame(columns=['timer_handle', 'timestamp', 'period'])
+        self._timers.set_index(['timer_handle'], inplace=True, drop=True)
 
         self._callback_objects = pd.DataFrame(columns=['handle', 'timestamp', 'callback_object'])
         self._callback_objects.set_index(['handle'], inplace=True, drop=True)
@@ -46,6 +48,15 @@ class DataModel():
 
     def add_subscription(self, subscription_handle, timestamp, node_handle, rmw_handle, topic_name, depth):
         self._subscriptions.loc[subscription_handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
+
+    def add_service(self, service_handle, timestamp, node_handle, rmw_handle, service_name):
+        self._services.loc[service_handle] = [timestamp, node_handle, rmw_handle, service_name]
+
+    def add_client(self, client_handle, timestamp, node_handle, rmw_handle, service_name):
+        self._clients.loc[client_handle] = [timestamp, node_handle, rmw_handle, service_name]
+
+    def add_timer(self, timer_handle, timestamp, period):
+        self._timers.loc[timer_handle] = [timestamp, period]
 
     def add_callback_object(self, handle, timestamp, callback_object):
         self._callback_objects.loc[handle] = [timestamp, callback_object]

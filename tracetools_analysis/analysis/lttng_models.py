@@ -1,8 +1,12 @@
 # Model objects for LTTng traces/events
 
 
-def get_field(event, field_name, default=None):
-    return event.get(field_name, default)
+def get_field(event, field_name, default=None, raise_if_not_found=True):
+    field_value = event.get(field_name, default)
+    # If enabled, raise exception as soon as possible to avoid headaches
+    if raise_if_not_found and field_value is None:
+        raise AttributeError(f'event field "{field_name}" not found!')
+    return field_value
 
 
 def get_name(event):

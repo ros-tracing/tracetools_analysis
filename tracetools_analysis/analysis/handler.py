@@ -31,10 +31,14 @@ class EventHandler():
         if handler_function is not None:
             pid = lttng_models.get_field(event,
                                          'vpid',
-                                         default=lttng_models.get_field(event, 'pid'))
+                                         default=lttng_models.get_field(event,
+                                                                        'pid',
+                                                                        raise_if_not_found=False))
             tid = lttng_models.get_field(event,
                                          'vtid',
-                                         default=lttng_models.get_field(event, 'tid'))
+                                         default=lttng_models.get_field(event,
+                                                                        'tid',
+                                                                        raise_if_not_found=False))
             timestamp = lttng_models.get_field(event, '_timestamp')
             procname = lttng_models.get_field(event, 'procname')
             metadata = lttng_models.EventMetadata(event_name, pid, tid, timestamp, procname)

@@ -1,7 +1,5 @@
 # CTF to pickle conversion
 
-import time
-
 import babeltrace
 
 # List of ignored CTF fields
@@ -29,8 +27,6 @@ def ctf_to_pickle(trace_directory, target):
     # count_pid_matched = 0
     # traced = set()
 
-    start_time = time.time()
-
     # PID_KEYS = ['vpid', 'pid']
     for event in tc.events:
         count += 1
@@ -44,9 +40,8 @@ def ctf_to_pickle(trace_directory, target):
         pod = _ctf_event_to_pod(event)
         target.dump(pod)
         count_written += 1
-
-    time_diff = time.time() - start_time
-    print(f'{count_written} events in {time_diff * 1000:.2f} ms')
+    
+    return count_written
 
 
 def _ctf_event_to_pod(ctf_event):

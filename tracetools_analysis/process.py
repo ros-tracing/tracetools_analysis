@@ -5,7 +5,7 @@ import argparse
 import pickle
 import time
 
-from tracetools_analysis.analysis import ros2_processor, to_pandas
+from tracetools_analysis.analysis import ros2_processor
 from tracetools_analysis.analysis import data_model
 
 def parse_args():

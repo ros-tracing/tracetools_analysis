@@ -5,21 +5,21 @@ from .lttng_models import get_field
 from .data_model import DataModel
 
 
-def ros_process(events):
+def ros2_process(events):
     """
-    Process unpickled events and create ROS model.
+    Process unpickled events and create ROS 2 model.
 
     :param events (list(dict(str:str:))): the list of events
     :return the processor object
     """
-    processor = RosProcessor()
+    processor = Ros2Processor()
     processor.handle_events(events)
     return processor
 
 
-class RosProcessor(EventHandler):
+class Ros2Processor(EventHandler):
     """
-    ROS-aware event processing/handling class implementation.
+    ROS 2-aware event processing/handling class implementation.
 
     Handles a trace's events and builds a model with the data.
     """

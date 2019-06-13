@@ -5,7 +5,7 @@ import argparse
 import pickle
 import time
 
-from tracetools_analysis.analysis import processor, to_pandas
+from tracetools_analysis.analysis import ros2_processor, to_pandas
 from tracetools_analysis.analysis import data_model
 
 def parse_args():
@@ -23,7 +23,7 @@ def main():
     start_time = time.time()
     with open(pickle_filename, 'rb') as f:
         events = _get_events_from_pickled_file(f)
-        p = processor.ros_process(events)
+        p = ros2_processor.ros2_process(events)
         time_diff = time.time() - start_time
         print(f'processed {len(events)} events in {time_diff * 1000:.2f} ms')
 

@@ -22,8 +22,6 @@ class DataModel():
         self._publishers.set_index(['publisher_handle'], inplace=True, drop=True)
         self._subscriptions = pd.DataFrame(columns=['subscription_handle', 'timestamp', 'node_handle', 'rmw_handle', 'topic_name', 'depth'])
         self._subscriptions.set_index(['subscription_handle'], inplace=True, drop=True)
-        self._callbacks = pd.DataFrame(columns=['callback_object', 'timestamp', 'symbol'])
-        self._callbacks.set_index(['callback_object'], inplace=True, drop=True)
 
         self._services = pd.DataFrame(columns=[])
         self._clients = pd.DataFrame(columns=[])
@@ -31,6 +29,8 @@ class DataModel():
 
         self._callback_objects = pd.DataFrame(columns=['handle', 'timestamp', 'callback_object'])
         self._callback_objects.set_index(['handle'], inplace=True, drop=True)
+        self._callbacks = pd.DataFrame(columns=['callback_object', 'timestamp', 'symbol'])
+        self._callbacks.set_index(['callback_object'], inplace=True, drop=True)
 
         # Events (multiple instances, may not have a meaningful index)
         self._subscription_callbacks = pd.DataFrame(columns=['callback_object', 'timestamp', 'duration', 'intra_process'])

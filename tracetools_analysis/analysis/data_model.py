@@ -47,10 +47,10 @@ class DataModel():
     def add_subscription(self, subscription_handle, timestamp, node_handle, rmw_handle, topic_name, depth):
         self._subscriptions.loc[subscription_handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
 
-    def add_subscription_callback_object(self, subscription_handle, timestamp, callback_object):
-        self._callback_objects.loc[subscription_handle] = [timestamp, callback_object]
+    def add_callback_object(self, handle, timestamp, callback_object):
+        self._callback_objects.loc[handle] = [timestamp, callback_object]
 
-    def add_callback(self, callback_object, timestamp, symbol):
+    def add_callback_symbol(self, callback_object, timestamp, symbol):
         self._callback_symbols.loc[callback_object] = [timestamp, symbol]
     
     def add_callback_instance(self, callback_object, timestamp, duration, intra_process):
@@ -67,8 +67,6 @@ class DataModel():
         print()
         print(f'Subscriptions:\n{self._subscriptions.to_string()}')
         print()
-        print(f'Callback instances:\n{self._callbacks_instances.to_string()}')
-        print()
         print(f'Services:\n{self._services.to_string()}')
         print()
         print(f'Clients:\n{self._clients.to_string()}')
@@ -78,4 +76,6 @@ class DataModel():
         print(f'Callback objects:\n{self._callback_objects.to_string()}')
         print()
         print(f'Callback symbols:\n{self._callback_symbols.to_string()}')
+        print()
+        print(f'Callback instances:\n{self._callbacks_instances.to_string()}')
         print('==================================================')

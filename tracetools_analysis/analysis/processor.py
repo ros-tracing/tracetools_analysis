@@ -102,27 +102,13 @@ class RosProcessor(EventHandler):
     def _handle_rclcpp_subscription_callback_added(self, event, metadata):
         subscription_handle = get_field(event, 'subscription_handle')
         callback_object = get_field(event, 'callback')
-        self._data.add_subscription_callback_object(subscription_handle, metadata.timestamp, callback_object)
+        self._data.add_callback_object(subscription_handle, metadata.timestamp, callback_object)
 
     def _handle_rclcpp_subscription_callback_start(self, event, metadata):
-        # Add to dict
-        callback_addr = get_field(event, 'callback')
-        self._callback_instances[callback_addr] = (event, metadata)
+        self.__handle_callback_start(event, metadata)
 
     def _handle_rclcpp_subscription_callback_end(self, event, metadata):
-        # Fetch from dict
-        callback_object = get_field(event, 'callback')
-        (event_start, metadata_start) = self._callback_instances.get(callback_object)
-        if event_start is not None and metadata_start is not None:
-            del self._callback_instances[callback_object]
-            duration = metadata.timestamp - metadata_start.timestamp
-            is_intra_process = get_field(event_start, 'is_intra_process')
-            self._data.add_subscription_callback_instance(callback_object,
-                                                          metadata_start.timestamp,
-                                                          duration,
-                                                          bool(is_intra_process))
-        else:
-            print(f'No matching callback start for callback object "{callback_object}"')
+        self.__handle_callback_end(event, metadata)
 
     def _handle_rcl_service_init(self, event, metadata):
         # TODO
@@ -163,4 +149,24 @@ class RosProcessor(EventHandler):
     def _handle_rclcpp_callback_register(self, event, metadata):
         callback_object = get_field(event, 'callback')
         symbol = get_field(event, 'symbol')
-        self._data.add_callback(callback_object, metadata.timestamp, symbol)
+        self._data.add_callback_symbol(callback_object, metadata.timestamp, symbol)
+
+    def __handle_callback_start(self, event, metadata):
+        # Add to dict
+        callback_addr = get_field(event, 'callback')
+        self._callback_instances[callback_addr] = (event, metadata)
+
+    def __handle_callback_end(self, event, metadata):
+        # Fetch from dict
+        callback_object = get_field(event, 'callback')
+        (event_start, metadata_start) = self._callback_instances.get(callback_object)
+        if event_start is not None and metadata_start is not None:
+            del self._callback_instances[callback_object]
+            duration = metadata.timestamp - metadata_start.timestamp
+            is_intra_process = get_field(event_start, 'is_intra_process', raise_if_not_found=False)
+            self._data.add_callback_instance(callback_object,
+                                             metadata_start.timestamp,
+                                             duration,
+                                             bool(is_intra_process))
+        else:
+            print(f'No matching callback start for callback object "{callback_object}"')

@@ -5,9 +5,11 @@ import pandas as pd
 
 class DataModel():
     """
-    Container to model processed data.
+    Container to model pre-processed data for analysis.
 
-    Contains data for an analysis to use.
+    Contains data for an analysis to use. This is a middleground between trace events data and the
+    output data of an analysis. This aims to represent the data in a ROS-aware way.
+    It uses pandas DataFrames directly.
     """
 
     def __init__(self):

@@ -22,17 +22,20 @@ class DataModel():
         self._publishers.set_index(['publisher_handle'], inplace=True, drop=True)
         self._subscriptions = pd.DataFrame(columns=['subscription_handle', 'timestamp', 'node_handle', 'rmw_handle', 'topic_name', 'depth'])
         self._subscriptions.set_index(['subscription_handle'], inplace=True, drop=True)
+        self._subscription_callback_objects = pd.DataFrame(columns=['subscription_handle', 'timestamp', 'callback_object'])
+        self._subscription_callback_objects.set_index(['subscription_handle'], inplace=True, drop=True)
+        self._callbacks = pd.DataFrame(columns=['callback_object', 'timestamp', 'symbol'])
+        self._callbacks.set_index(['callback_object'], inplace=True, drop=True)
 
         self._services = pd.DataFrame(columns=[])
         self._clients = pd.DataFrame(columns=[])
         self._timers = pd.DataFrame(columns=[])
 
-        # Events
-        # TODO
+        # Events (multiple instances, may not have a meaningful index)
+        self._subscription_callbacks = pd.DataFrame(columns=['callback_object', 'timestamp', 'duration', 'intra_process'])
 
     def add_context(self, context_handle, timestamp, pid):
         self._contexts.loc[context_handle] = [timestamp, pid]
-        # self._contexts = self._contexts.append({'context_handle': context_handle, 'timestamp': timestamp, 'pid': pid}, ignore_index=True)
 
     def add_node(self, node_handle, timestamp, tid, rmw_handle, name, namespace):
         self._nodes.loc[node_handle] = [timestamp, tid, rmw_handle, name, namespace]
@@ -43,6 +46,15 @@ class DataModel():
     def add_subscription(self, subscription_handle, timestamp, node_handle, rmw_handle, topic_name, depth):
         self._subscriptions.loc[subscription_handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
 
+    def add_subscription_callback_object(self, subscription_handle, timestamp, callback_object):
+        self._subscription_callback_objects.loc[subscription_handle] = [timestamp, callback_object]
+
+    def add_callback(self, callback_object, timestamp, symbol):
+        self._callbacks.loc[callback_object] = [timestamp, symbol]
+    
+    def add_subscription_callback_instance(self, callback_object, timestamp, duration, intra_process):
+        self._subscription_callbacks = self._subscription_callbacks.append({'callback_object': callback_object, 'timestamp': timestamp, 'duration': duration, 'intra_process': intra_process}, ignore_index=True)
+
     def print(self):
         """Debug method to print every contained df."""
         print('====================DATA MODEL====================')
@@ -52,11 +64,17 @@ class DataModel():
         print()
         print(f'Publishers:\n{self._publishers.to_string()}')
         print()
-        print(f'Subscription:\n{self._subscriptions.to_string()}')
+        print(f'Subscriptions:\n{self._subscriptions.to_string()}')
+        print()
+        print(f'Subscription callbacks:\n{self._subscription_callback_objects.to_string()}')
+        print()
+        print(f'Subscription callback instances:\n{self._subscription_callbacks.to_string()}')
         print()
         print(f'Services:\n{self._services.to_string()}')
         print()
         print(f'Clients:\n{self._clients.to_string()}')
         print()
         print(f'Timers:\n{self._timers.to_string()}')
+        print()
+        print(f'Callbacks:\n{self._callbacks.to_string()}')
         print('==================================================')

@@ -37,30 +37,22 @@ class Ros2Processor(EventHandler):
                 self._handle_subscription_init,
             'ros2:rclcpp_subscription_callback_added':
                 self._handle_rclcpp_subscription_callback_added,
-            'ros2:rclcpp_subscription_callback_start':
-                self._handle_rclcpp_subscription_callback_start,
-            'ros2:rclcpp_subscription_callback_end':
-                self._handle_rclcpp_subscription_callback_end,
             'ros2:rcl_service_init':
                 self._handle_rcl_service_init,
             'ros2:rclcpp_service_callback_added':
                 self._handle_rclcpp_service_callback_added,
-            'ros2:rclcpp_service_callback_start':
-                self._handle_rclcpp_service_callback_start,
-            'ros2:rclcpp_service_callback_end':
-                self._handle_rclcpp_service_callback_end,
             'ros2:rcl_client_init':
                 self._handle_rcl_client_init,
             'ros2:rcl_timer_init':
                 self._handle_rcl_timer_init,
             'ros2:rclcpp_timer_callback_added':
                 self._handle_rclcpp_timer_callback_added,
-            'ros2:rclcpp_timer_callback_start':
-                self._handle_rclcpp_timer_callback_start,
-            'ros2:rclcpp_timer_callback_end':
-                self._handle_rclcpp_timer_callback_end,
             'ros2:rclcpp_callback_register':
                 self._handle_rclcpp_callback_register,
+            'ros2:callback_start':
+                self._handle_callback_start,
+            'ros2:callback_end':
+                self._handle_callback_end,
         }
         super().__init__(handler_map)
 
@@ -111,12 +103,6 @@ class Ros2Processor(EventHandler):
         callback_object = get_field(event, 'callback')
         self._data.add_callback_object(handle, timestamp, callback_object)
 
-    def _handle_rclcpp_subscription_callback_start(self, event, metadata):
-        self.__handle_callback_start(event, metadata)
-
-    def _handle_rclcpp_subscription_callback_end(self, event, metadata):
-        self.__handle_callback_end(event, metadata)
-
     def _handle_rcl_service_init(self, event, metadata):
         handle = get_field(event, 'service_handle')
         timestamp = metadata.timestamp
@@ -130,12 +116,6 @@ class Ros2Processor(EventHandler):
         timestamp = metadata.timestamp
         callback_object = get_field(event, 'callback')
         self._data.add_callback_object(handle, timestamp, callback_object)
-
-    def _handle_rclcpp_service_callback_start(self, event, metadata):
-        self.__handle_callback_start(event, metadata)
-
-    def _handle_rclcpp_service_callback_end(self, event, metadata):
-        self.__handle_callback_end(event, metadata)
 
     def _handle_rcl_client_init(self, event, metadata):
         handle = get_field(event, 'client_handle')
@@ -157,24 +137,18 @@ class Ros2Processor(EventHandler):
         callback_object = get_field(event, 'callback')
         self._data.add_callback_object(handle, timestamp, callback_object)
 
-    def _handle_rclcpp_timer_callback_start(self, event, metadata):
-        self.__handle_callback_start(event, metadata)
-
-    def _handle_rclcpp_timer_callback_end(self, event, metadata):
-        self.__handle_callback_end(event, metadata)
-
     def _handle_rclcpp_callback_register(self, event, metadata):
         callback_object = get_field(event, 'callback')
         timestamp = metadata.timestamp
         symbol = get_field(event, 'symbol')
         self._data.add_callback_symbol(callback_object, timestamp, symbol)
 
-    def __handle_callback_start(self, event, metadata):
+    def _handle_callback_start(self, event, metadata):
         # Add to dict
         callback_addr = get_field(event, 'callback')
         self._callback_instances[callback_addr] = (event, metadata)
 
-    def __handle_callback_end(self, event, metadata):
+    def _handle_callback_end(self, event, metadata):
         # Fetch from dict
         callback_object = get_field(event, 'callback')
         (event_start, metadata_start) = self._callback_instances.get(callback_object)

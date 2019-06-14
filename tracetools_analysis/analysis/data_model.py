@@ -66,7 +66,7 @@ class DataModel():
         self._callback_symbols.set_index(['callback_object'], inplace=True, drop=True)
 
         # Events (multiple instances, may not have a meaningful index)
-        self._callbacks_instances = pd.DataFrame(columns=['callback_object',
+        self._callback_instances = pd.DataFrame(columns=['callback_object',
                                                           'timestamp',
                                                           'duration',
                                                           'intra_process'])
@@ -105,7 +105,7 @@ class DataModel():
             'duration': duration,
             'intra_process': intra_process,
         }
-        self._callbacks_instances = self._callbacks_instances.append(data, ignore_index=True)
+        self._callback_instances = self._callback_instances.append(data, ignore_index=True)
 
     def print_model(self):
         """Debug method to print every contained df."""
@@ -128,5 +128,5 @@ class DataModel():
         print()
         print(f'Callback symbols:\n{self._callback_symbols.to_string()}')
         print()
-        print(f'Callback instances:\n{self._callbacks_instances.to_string()}')
+        print(f'Callback instances:\n{self._callback_instances.to_string()}')
         print('==================================================')

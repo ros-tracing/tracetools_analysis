@@ -1,20 +1,12 @@
 # Process trace events and create ROS model
 
+from typing import Dict
+from typing import List
+
 from .data_model import DataModel
 from .handler import EventHandler
 from .lttng_models import get_field
-
-
-def ros2_process(events):
-    """
-    Process unpickled events and create ROS 2 model.
-
-    :param events (list(dict(str:str:))): the list of events
-    :return the processor object
-    """
-    processor = Ros2Processor()
-    processor.handle_events(events)
-    return processor
+from .lttng_models import EventMetadata
 
 
 class Ros2Processor(EventHandler):
@@ -24,7 +16,7 @@ class Ros2Processor(EventHandler):
     Handles a trace's events and builds a model with the data.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         # Link a ROS trace event to its corresponding handling method
         handler_map = {
             'ros2:rcl_init':
@@ -61,16 +53,16 @@ class Ros2Processor(EventHandler):
         # Temporary buffers
         self._callback_instances = {}
 
-    def get_data_model(self):
+    def get_data_model(self) -> DataModel:
         return self._data
 
-    def _handle_rcl_init(self, event, metadata):
+    def _handle_rcl_init(self, event: Dict, metadata: EventMetadata) -> None:
         context_handle = get_field(event, 'context_handle')
         timestamp = metadata.timestamp
         pid = metadata.pid
         self._data.add_context(context_handle, timestamp, pid)
 
-    def _handle_rcl_node_init(self, event, metadata):
+    def _handle_rcl_node_init(self, event: Dict, metadata: EventMetadata) -> None:
         handle = get_field(event, 'node_handle')
         timestamp = metadata.timestamp
         tid = metadata.tid
@@ -79,7 +71,7 @@ class Ros2Processor(EventHandler):
         namespace = get_field(event, 'namespace')
         self._data.add_node(handle, timestamp, tid, rmw_handle, name, namespace)
 
-    def _handle_rcl_publisher_init(self, event, metadata):
+    def _handle_rcl_publisher_init(self, event: Dict, metadata: EventMetadata) -> None:
         handle = get_field(event, 'publisher_handle')
         timestamp = metadata.timestamp
         node_handle = get_field(event, 'node_handle')
@@ -88,7 +80,7 @@ class Ros2Processor(EventHandler):
         depth = get_field(event, 'depth')
         self._data.add_publisher(handle, timestamp, node_handle, rmw_handle, topic_name, depth)
 
-    def _handle_subscription_init(self, event, metadata):
+    def _handle_subscription_init(self, event: Dict, metadata: EventMetadata) -> None:
         handle = get_field(event, 'subscription_handle')
         timestamp = metadata.timestamp
         node_handle = get_field(event, 'node_handle')
@@ -97,13 +89,13 @@ class Ros2Processor(EventHandler):
         depth = get_field(event, 'depth')
         self._data.add_subscription(handle, timestamp, node_handle, rmw_handle, topic_name, depth)
 
-    def _handle_rclcpp_subscription_callback_added(self, event, metadata):
+    def _handle_rclcpp_subscription_callback_added(self, event: Dict, metadata: EventMetadata) -> None:
         handle = get_field(event, 'subscription_handle')
         timestamp = metadata.timestamp
         callback_object = get_field(event, 'callback')
         self._data.add_callback_object(handle, timestamp, callback_object)
 
-    def _handle_rcl_service_init(self, event, metadata):
+    def _handle_rcl_service_init(self, event: Dict, metadata: EventMetadata) -> None:
         handle = get_field(event, 'service_handle')
         timestamp = metadata.timestamp
         node_handle = get_field(event, 'node_handle')
@@ -111,13 +103,13 @@ class Ros2Processor(EventHandler):
         service_name = get_field(event, 'service_name')
         self._data.add_service(handle, timestamp, node_handle, rmw_handle, service_name)
 
-    def _handle_rclcpp_service_callback_added(self, event, metadata):
+    def _handle_rclcpp_service_callback_added(self, event: Dict, metadata: EventMetadata) -> None:
         handle = get_field(event, 'service_handle')
         timestamp = metadata.timestamp
         callback_object = get_field(event, 'callback')
         self._data.add_callback_object(handle, timestamp, callback_object)
 
-    def _handle_rcl_client_init(self, event, metadata):
+    def _handle_rcl_client_init(self, event: Dict, metadata: EventMetadata) -> None:
         handle = get_field(event, 'client_handle')
         timestamp = metadata.timestamp
         node_handle = get_field(event, 'node_handle')
@@ -125,30 +117,30 @@ class Ros2Processor(EventHandler):
         service_name = get_field(event, 'service_name')
         self._data.add_client(handle, timestamp, node_handle, rmw_handle, service_name)
 
-    def _handle_rcl_timer_init(self, event, metadata):
+    def _handle_rcl_timer_init(self, event: Dict, metadata: EventMetadata) -> None:
         handle = get_field(event, 'timer_handle')
         timestamp = metadata.timestamp
         period = get_field(event, 'period')
         self._data.add_timer(handle, timestamp, period)
 
-    def _handle_rclcpp_timer_callback_added(self, event, metadata):
+    def _handle_rclcpp_timer_callback_added(self, event: Dict, metadata: EventMetadata) -> None:
         handle = get_field(event, 'timer_handle')
         timestamp = metadata.timestamp
         callback_object = get_field(event, 'callback')
         self._data.add_callback_object(handle, timestamp, callback_object)
 
-    def _handle_rclcpp_callback_register(self, event, metadata):
+    def _handle_rclcpp_callback_register(self, event: Dict, metadata: EventMetadata) -> None:
         callback_object = get_field(event, 'callback')
         timestamp = metadata.timestamp
         symbol = get_field(event, 'symbol')
         self._data.add_callback_symbol(callback_object, timestamp, symbol)
 
-    def _handle_callback_start(self, event, metadata):
+    def _handle_callback_start(self, event: Dict, metadata: EventMetadata) -> None:
         # Add to dict
         callback_addr = get_field(event, 'callback')
         self._callback_instances[callback_addr] = (event, metadata)
 
-    def _handle_callback_end(self, event, metadata):
+    def _handle_callback_end(self, event: Dict, metadata: EventMetadata) -> None:
         # Fetch from dict
         callback_object = get_field(event, 'callback')
         (event_start, metadata_start) = self._callback_instances.get(callback_object)
@@ -162,3 +154,15 @@ class Ros2Processor(EventHandler):
                                              bool(is_intra_process))
         else:
             print(f'No matching callback start for callback object "{callback_object}"')
+
+
+def ros2_process(events: List[Dict[str, str]]) -> Ros2Processor:
+    """
+    Process unpickled events and create ROS 2 model.
+
+    :param events: the list of events
+    :return: the processor object
+    """
+    processor = Ros2Processor()
+    processor.handle_events(events)
+    return processor

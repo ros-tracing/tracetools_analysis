@@ -1,7 +1,10 @@
 # Model objects for LTTng traces/events
 
+from typing import Any
+from typing import Dict
 
-def get_field(event, field_name, default=None, raise_if_not_found=True):
+
+def get_field(event: Dict, field_name: str, default=None, raise_if_not_found=True) -> Any:
     field_value = event.get(field_name, default)
     # If enabled, raise exception as soon as possible to avoid headaches
     if raise_if_not_found and field_value is None:
@@ -9,14 +12,14 @@ def get_field(event, field_name, default=None, raise_if_not_found=True):
     return field_value
 
 
-def get_name(event):
+def get_name(event: Dict) -> str:
     return get_field(event, '_name')
 
 
 class EventMetadata():
     """Container for event metadata."""
 
-    def __init__(self, event_name, pid, tid, timestamp, procname):
+    def __init__(self, event_name, pid, tid, timestamp, procname) -> None:
         self._event_name = event_name
         self._pid = pid
         self._tid = tid

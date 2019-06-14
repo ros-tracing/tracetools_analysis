@@ -1,12 +1,14 @@
 import pickle
+from typing import Dict
+from typing import List
 
 
-def load_pickle(pickle_file_path):
+def load_pickle(pickle_file_path: str) -> List[Dict]:
     """
     Load pickle file containing converted trace events.
 
-    :param pickle_file_path (str): the path to the pickle file to load
-    :return list(dict): the list of events (dicts) read from the file
+    :param pickle_file_path: the path to the pickle file to load
+    :return: the list of events read from the file
     """
     events = []
     with open(pickle_file_path, 'rb') as f:

@@ -1,5 +1,7 @@
 # CTF to pickle conversion
 
+from pickle import Pickler
+
 import babeltrace
 
 # List of ignored CTF fields
@@ -10,12 +12,13 @@ _IGNORED_FIELDS = [
 _DISCARD = 'events_discarded'
 
 
-def ctf_to_pickle(trace_directory, target):
+def ctf_to_pickle(trace_directory: str, target: Pickler) -> int:
     """
     Load CTF trace and convert to a pickle file.
 
-    :param trace_directory (str): the main/top trace directory
-    :param target (Pickler): the target pickle file to write to
+    :param trace_directory: the main/top trace directory
+    :param target: the target pickle file to write to
+    :return: the number of events written
     """
     # add traces
     tc = babeltrace.TraceCollection()

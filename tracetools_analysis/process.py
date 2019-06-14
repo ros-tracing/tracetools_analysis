@@ -2,9 +2,9 @@
 # Entrypoint/script to process events from a pickle file to build a ROS model
 
 import argparse
-import pickle
 import time
 
+from tracetools_analysis.analysis import load
 from tracetools_analysis.analysis import ros2_processor
 
 
@@ -22,21 +22,9 @@ def main():
     pickle_filename = args.pickle_file
 
     start_time = time.time()
-    with open(pickle_filename, 'rb') as f:
-        events = _get_events_from_pickled_file(f)
-        p = ros2_processor.ros2_process(events)
-        time_diff = time.time() - start_time
-        print(f'processed {len(events)} events in {time_diff * 1000:.2f} ms')
+    events = load.load_pickle(pickle_filename)
+    processor = ros2_processor.ros2_process(events)
+    time_diff = time.time() - start_time
+    print(f'processed {len(events)} events in {time_diff * 1000:.2f} ms')
 
-    p.get_data_model().print_model()
-
-
-def _get_events_from_pickled_file(file):
-    p = pickle.Unpickler(file)
-    events = []
-    while True:
-        try:
-            events.append(p.load())
-        except EOFError:
-            break  # we're done
-    return events
+    processor.get_data_model().print_model()

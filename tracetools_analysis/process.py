@@ -11,8 +11,7 @@ from tracetools_analysis.analysis import ros2_processor
 def parse_args():
     parser = argparse.ArgumentParser(description='Process a pickle file generated '
                                                  'from tracing and analyze the data.')
-    parser.add_argument('pickle_file',
-                        help='the pickle file to import')
+    parser.add_argument('pickle_file', help='the pickle file to import')
     return parser.parse_args()
 
 

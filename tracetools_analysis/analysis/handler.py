@@ -34,16 +34,20 @@ class EventHandler():
         event_name = get_name(event)
         handler_function = self._handler_map.get(event_name, None)
         if handler_function is not None:
-            pid = get_field(event,
-                            'vpid',
-                            default=get_field(event,
-                                              'pid',
-                                              raise_if_not_found=False))
-            tid = get_field(event,
-                            'vtid',
-                            default=get_field(event,
-                                              'tid',
-                                              raise_if_not_found=False))
+            pid = get_field(
+                event,
+                'vpid',
+                default=get_field(
+                    event,
+                    'pid',
+                    raise_if_not_found=False))
+            tid = get_field(
+                event,
+                'vtid',
+                default=get_field(
+                    event,
+                    'tid',
+                    raise_if_not_found=False))
             timestamp = get_field(event, '_timestamp')
             procname = get_field(event, 'procname')
             metadata = EventMetadata(event_name, pid, tid, timestamp, procname)

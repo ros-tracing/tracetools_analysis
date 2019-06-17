@@ -10,10 +10,8 @@ from tracetools_analysis.conversion import ctf
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Convert CTF trace data to a pickle file.')
-    parser.add_argument('trace_directory',
-                        help='the path to the main CTF trace directory')
-    parser.add_argument('pickle_file',
-                        help='the target pickle file to generate')
+    parser.add_argument('trace_directory', help='the path to the main CTF trace directory')
+    parser.add_argument('pickle_file', help='the target pickle file to generate')
     return parser.parse_args()
 
 

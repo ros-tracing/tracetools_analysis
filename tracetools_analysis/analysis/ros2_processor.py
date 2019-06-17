@@ -148,10 +148,11 @@ class Ros2Processor(EventHandler):
             del self._callback_instances[callback_object]
             duration = metadata.timestamp - metadata_start.timestamp
             is_intra_process = get_field(event_start, 'is_intra_process', raise_if_not_found=False)
-            self._data.add_callback_instance(callback_object,
-                                             metadata_start.timestamp,
-                                             duration,
-                                             bool(is_intra_process))
+            self._data.add_callback_instance(
+                callback_object,
+                metadata_start.timestamp,
+                duration,
+                bool(is_intra_process))
         else:
             print(f'No matching callback start for callback object "{callback_object}"')
 

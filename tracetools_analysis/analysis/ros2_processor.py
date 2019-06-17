@@ -77,7 +77,7 @@ class Ros2Processor(EventHandler):
         node_handle = get_field(event, 'node_handle')
         rmw_handle = get_field(event, 'rmw_publisher_handle')
         topic_name = get_field(event, 'topic_name')
-        depth = get_field(event, 'depth')
+        depth = get_field(event, 'queue_depth')
         self._data.add_publisher(handle, timestamp, node_handle, rmw_handle, topic_name, depth)
 
     def _handle_subscription_init(self, event: Dict, metadata: EventMetadata) -> None:
@@ -86,7 +86,7 @@ class Ros2Processor(EventHandler):
         node_handle = get_field(event, 'node_handle')
         rmw_handle = get_field(event, 'rmw_subscription_handle')
         topic_name = get_field(event, 'topic_name')
-        depth = get_field(event, 'depth')
+        depth = get_field(event, 'queue_depth')
         self._data.add_subscription(handle, timestamp, node_handle, rmw_handle, topic_name, depth)
 
     def _handle_rclcpp_subscription_callback_added(self, event: Dict, metadata: EventMetadata) -> None:

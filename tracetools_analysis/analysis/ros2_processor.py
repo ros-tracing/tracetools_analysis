@@ -60,7 +60,8 @@ class Ros2Processor(EventHandler):
         context_handle = get_field(event, 'context_handle')
         timestamp = metadata.timestamp
         pid = metadata.pid
-        self._data.add_context(context_handle, timestamp, pid)
+        version = get_field(event, 'version')
+        self._data.add_context(context_handle, timestamp, pid, version)
 
     def _handle_rcl_node_init(self, event: Dict, metadata: EventMetadata) -> None:
         handle = get_field(event, 'node_handle')

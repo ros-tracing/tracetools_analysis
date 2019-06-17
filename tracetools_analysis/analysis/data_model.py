@@ -16,7 +16,8 @@ class DataModel():
         # Objects (one-time events, usually when something is created)
         self.contexts = pd.DataFrame(columns=['context_handle',
                                               'timestamp',
-                                              'pid'])
+                                              'pid',
+                                              'version'])
         self.contexts.set_index(['context_handle'], inplace=True, drop=True)
         self.nodes = pd.DataFrame(columns=['node_handle',
                                            'timestamp',
@@ -71,8 +72,8 @@ class DataModel():
                                                         'duration',
                                                         'intra_process'])
 
-    def add_context(self, context_handle, timestamp, pid) -> None:
-        self.contexts.loc[context_handle] = [timestamp, pid]
+    def add_context(self, context_handle, timestamp, pid, version) -> None:
+        self.contexts.loc[context_handle] = [timestamp, pid, version]
 
     def add_node(self, node_handle, timestamp, tid, rmw_handle, name, namespace) -> None:
         self.nodes.loc[node_handle] = [timestamp, tid, rmw_handle, name, namespace]

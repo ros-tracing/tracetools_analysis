@@ -11,10 +11,22 @@ setup(
         ('share/' + package_name, ['package.xml']),
     ],
     install_requires=['setuptools'],
-    maintainer='Christophe Bedard',
-    maintainer_email='fixed-term.christophe.bourquebedard@de.bosch.com',
-    author='Ingo Luetkebohle, Christophe Bedard',
-    author_email='ingo.luetkebohle@de.bosch.com, fixed-term.christophe.bourquebedard@de.bosch.com',
+    maintainer=(
+        'Christophe Bedard, '
+        'Ingo Lütkebohle'
+    ),
+    maintainer_email=(
+        'fixed-term.christophe.bourquebedard@de.bosch.com, '
+        'ingo.luetkebohle@de.bosch.com'
+    ),
+    author=(
+        'Christophe Bedard, '
+        'Ingo Lütkebohle'
+    ),
+    author_email=(
+        'fixed-term.christophe.bourquebedard@de.bosch.com, '
+        'ingo.luetkebohle@de.bosch.com'
+    ),
     # url='',
     keywords=['ROS'],
     description='Tools for analysing trace data',
@@ -24,6 +36,6 @@ setup(
             f'process = {package_name}.process:main',
         ],
     },
-    license='TODO',
+    license='Apache 2.0',
     tests_require=['pytest'],
 )

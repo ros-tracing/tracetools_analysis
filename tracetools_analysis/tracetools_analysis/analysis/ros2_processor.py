@@ -3,9 +3,10 @@
 from typing import Dict
 from typing import List
 
+from tracetools_read.utils import get_field
+
 from .data_model import DataModel
 from .handler import EventHandler
-from .lttng_models import get_field
 from .lttng_models import EventMetadata
 
 

@@ -5,9 +5,10 @@ from typing import Callable
 from typing import Dict
 from typing import List
 
+from tracetools_read.utils import get_event_name
+from tracetools_read.utils import get_field
+
 from .lttng_models import EventMetadata
-from .lttng_models import get_field
-from .lttng_models import get_name
 
 
 class EventHandler():
@@ -31,7 +32,7 @@ class EventHandler():
             self._handle(event)
 
     def _handle(self, event: Dict[str, str]) -> None:
-        event_name = get_name(event)
+        event_name = get_event_name(event)
         handler_function = self._handler_map.get(event_name, None)
         if handler_function is not None:
             pid = get_field(

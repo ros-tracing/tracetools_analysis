@@ -86,34 +86,54 @@ class DataModel():
                                                         'duration',
                                                         'intra_process'])
 
-    def add_context(self, context_handle, timestamp, pid, version) -> None:
+    def add_context(
+        self, context_handle, timestamp, pid, version
+    ) -> None:
         self.contexts.loc[context_handle] = [timestamp, pid, version]
 
-    def add_node(self, node_handle, timestamp, tid, rmw_handle, name, namespace) -> None:
+    def add_node(
+        self, node_handle, timestamp, tid, rmw_handle, name, namespace
+    ) -> None:
         self.nodes.loc[node_handle] = [timestamp, tid, rmw_handle, name, namespace]
 
-    def add_publisher(self, handle, timestamp, node_handle, rmw_handle, topic_name, depth) -> None:
+    def add_publisher(
+        self, handle, timestamp, node_handle, rmw_handle, topic_name, depth
+    ) -> None:
         self.publishers.loc[handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
 
-    def add_subscription(self, handle, timestamp, node_handle, rmw_handle, topic_name, depth) -> None:
+    def add_subscription(
+        self, handle, timestamp, node_handle, rmw_handle, topic_name, depth
+    ) -> None:
         self.subscriptions.loc[handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
 
-    def add_service(self, handle, timestamp, node_handle, rmw_handle, service_name) -> None:
+    def add_service(
+        self, handle, timestamp, node_handle, rmw_handle, service_name
+    ) -> None:
         self.services.loc[handle] = [timestamp, node_handle, rmw_handle, service_name]
 
-    def add_client(self, handle, timestamp, node_handle, rmw_handle, service_name) -> None:
+    def add_client(
+        self, handle, timestamp, node_handle, rmw_handle, service_name
+    ) -> None:
         self.clients.loc[handle] = [timestamp, node_handle, rmw_handle, service_name]
 
-    def add_timer(self, handle, timestamp, period) -> None:
+    def add_timer(
+        self, handle, timestamp, period
+    ) -> None:
         self.timers.loc[handle] = [timestamp, period]
 
-    def add_callback_object(self, handle, timestamp, callback_object) -> None:
+    def add_callback_object(
+        self, handle, timestamp, callback_object
+    ) -> None:
         self.callback_objects.loc[handle] = [timestamp, callback_object]
 
-    def add_callback_symbol(self, callback_object, timestamp, symbol) -> None:
+    def add_callback_symbol(
+        self, callback_object, timestamp, symbol
+    ) -> None:
         self.callback_symbols.loc[callback_object] = [timestamp, symbol]
 
-    def add_callback_instance(self, callback_object, timestamp, duration, intra_process) -> None:
+    def add_callback_instance(
+        self, callback_object, timestamp, duration, intra_process
+    ) -> None:
         data = {
             'callback_object': callback_object,
             'timestamp': timestamp,

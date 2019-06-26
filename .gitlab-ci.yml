@@ -1,0 +1,22 @@
+image: registry.gitlab.com/ros_tracing/ros2_tracing/ci-base:latest
+
+variables:
+  DOCKER_DRIVER: overlay2
+  PACKAGES_LIST: tracetools_analysis
+
+before_script:
+  - git clone https://gitlab.com/ros_tracing/ros2_tracing.git
+  - apt-get update
+  - rosdep update
+  - rosdep install --from-paths . --ignore-src --rosdistro dashing -y --skip-keys "console_bridge fastcdr fastrtps libopensplice67 libopensplice69 rti-connext-dds-5.3.1 urdfdom_headers"
+
+build:
+  script:
+    - colcon build --symlink-install --packages-up-to $PACKAGES_LIST
+    - colcon test --packages-select $PACKAGES_LIST
+  artifacts:
+    paths:
+      - install
+      - build/*/test_results/*/*.xunit.xml
+    reports:
+      junit: build/*/test_results/*/*.xunit.xml

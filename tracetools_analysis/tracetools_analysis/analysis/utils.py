@@ -111,14 +111,14 @@ class DataModelUtil():
         :param timer_handle: the timer handle value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        timers_info = self._data.timers.merge(self._data.nodes, on='tid', right_index=True)
-        if timer_handle not in timers_info.index:
+        # TODO find a way to link a timer to a specific node
+        if timer_handle not in self._data.timers.index:
             return None
 
-        tid = timers_info.loc[timer_handle, 'tid']
-        period_ns = timers_info.loc[timer_handle, 'period']
+        tid = self._data.timers.loc[timer_handle, 'tid']
+        period_ns = self._data.timers.loc[timer_handle, 'period']
         period_ms = period_ns / 1000000.0
-        return {'tid': tid, 'period': f'{period_ms} ms'}
+        return {'tid': tid, 'period': f'{period_ms:.0f} ms'}
 
     def get_publisher_handle_info(self, publisher_handle: int) -> Union[Mapping[str, Any], None]:
         """

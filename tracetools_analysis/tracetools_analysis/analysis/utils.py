@@ -15,6 +15,7 @@
 """Module for data model utility class."""
 
 from typing import Mapping
+
 from pandas import DataFrame
 
 from .data_model import DataModel

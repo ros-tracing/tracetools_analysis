@@ -33,7 +33,6 @@ def parse_args():
     args = parser.parse_args()
     if args.pickle_path is None:
         args.pickle_path = os.path.join(args.trace_directory, 'pickle')
-        print(args.pickle_path)
     return args
 
 
@@ -43,8 +42,9 @@ def main():
     trace_directory = args.trace_directory
     pickle_target_path = args.pickle_path
 
-    print(f'Importing trace directory: {trace_directory}')
+    print(f'importing trace directory: {trace_directory}')
     start_time = time.time()
     count = ctf.convert(trace_directory, pickle_target_path)
     time_diff = time.time() - start_time
     print(f'converted {count} events in {time_diff * 1000:.2f} ms')
+    print(f'pickle written to: {pickle_target_path}')

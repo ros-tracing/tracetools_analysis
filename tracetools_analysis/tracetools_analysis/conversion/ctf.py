@@ -21,9 +21,9 @@ from tracetools_read import utils
 
 def ctf_to_pickle(trace_directory: str, target: Pickler) -> int:
     """
-    Load CTF trace and convert to a pickle file.
+    Load CTF trace, convert events, and dump to a pickle file.
 
-    :param trace_directory: the main/top trace directory
+    :param trace_directory: the trace directory
     :param target: the target pickle file to write to
     :return: the number of events written
     """
@@ -51,3 +51,18 @@ def ctf_to_pickle(trace_directory: str, target: Pickler) -> int:
         count_written += 1
 
     return count_written
+
+
+def convert(trace_directory: str, pickle_target_path: str) -> int:
+    """
+    Convert CTF trace to pickle file.
+
+    :param trace_directory: the trace directory
+    :param pickle_target_path: the path to the pickle file that will be created
+    :return: the number of events written to the pickle file
+    """
+    with open(pickle_target_path, 'wb') as f:
+        p = Pickler(f, protocol=4)
+        count = ctf_to_pickle(trace_directory, p)
+
+    return count

@@ -35,6 +35,7 @@ def main():
     trace_directory = args.trace_directory
     pickle_target_path = args.pickle_path
 
+    print(f'Importing trace directory: {trace_directory}')
     start_time = time.time()
     count = ctf.convert(trace_directory, pickle_target_path)
     time_diff = time.time() - start_time

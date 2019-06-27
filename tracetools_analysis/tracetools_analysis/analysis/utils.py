@@ -52,7 +52,9 @@ class DataModelUtil():
         # Get their symbol
         return {obj: callback_symbols.loc[obj, 'symbol'] for obj in callback_objects}
 
-    def get_callback_durations(self, callback_obj: int) -> DataFrame:
+    def get_callback_durations(
+        self, callback_obj: int
+    ) -> DataFrame:
         """
         Get durations of callback instances for a given callback object.
 
@@ -64,7 +66,9 @@ class DataModelUtil():
             :
         ]
 
-    def get_callback_owner_info(self, callback_obj: int) -> Union[str, None]:
+    def get_callback_owner_info(
+        self, callback_obj: int
+    ) -> Union[str, None]:
         """
         Get information about the owner of a callback.
 
@@ -104,7 +108,9 @@ class DataModelUtil():
             info = f'{type_name} -- {self.format_info_dict(info)}'
         return info
 
-    def get_timer_handle_info(self, timer_handle: int) -> Union[Mapping[str, Any], None]:
+    def get_timer_handle_info(
+        self, timer_handle: int
+    ) -> Union[Mapping[str, Any], None]:
         """
         Get information about the owner of a timer.
 
@@ -120,7 +126,9 @@ class DataModelUtil():
         period_ms = period_ns / 1000000.0
         return {'tid': tid, 'period': f'{period_ms:.0f} ms'}
 
-    def get_publisher_handle_info(self, publisher_handle: int) -> Union[Mapping[str, Any], None]:
+    def get_publisher_handle_info(
+        self, publisher_handle: int
+    ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a publisher handle.
 
@@ -129,14 +137,16 @@ class DataModelUtil():
         """
         if publisher_handle not in self._data.publishers.index:
             return None
-        
+
         node_handle = self._data.publishers.loc[publisher_handle, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
         topic_name = self._data.publishers.loc[publisher_handle, 'topic_name']
         publisher_info = {'topic': topic_name}
         return {**node_handle_info, **publisher_info}
 
-    def get_subscription_handle_info(self, subscription_handle: int) -> Union[Mapping[str, Any], None]:
+    def get_subscription_handle_info(
+        self, subscription_handle: int
+    ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a subscription handle.
 
@@ -156,7 +166,9 @@ class DataModelUtil():
         subscription_info = {'topic': topic_name}
         return {**node_handle_info, **subscription_info}
 
-    def get_service_handle_info(self, service_handle: int) -> Union[Mapping[str, Any], None]:
+    def get_service_handle_info(
+        self, service_handle: int
+    ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a service handle.
 
@@ -165,14 +177,16 @@ class DataModelUtil():
         """
         if service_handle not in self._data.services:
             return None
-        
+
         node_handle = self._data.services.loc[service_handle, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
         service_name = self._data.services.loc[service_handle, 'service_name']
         service_info = {'service': service_name}
         return {**node_handle_info, **service_info}
 
-    def get_client_handle_info(self, client_handle: int) -> Union[Mapping[str, Any], None]:
+    def get_client_handle_info(
+        self, client_handle: int
+    ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a client handle.
 
@@ -181,14 +195,16 @@ class DataModelUtil():
         """
         if client_handle not in self._data.clients:
             return None
-        
+
         node_handle = self._data.clients.loc[client_handle, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
         service_name = self._data.clients.loc[client_handle, 'service_name']
         service_info = {'service': service_name}
         return {**node_handle_info, **service_info}
 
-    def get_node_handle_info(self, node_handle: int) -> Union[Mapping[str, Any], None]:
+    def get_node_handle_info(
+        self, node_handle: int
+    ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a node handle.
 

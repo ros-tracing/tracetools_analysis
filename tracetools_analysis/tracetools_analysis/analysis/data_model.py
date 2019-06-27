@@ -166,9 +166,3 @@ class DataModel():
         print()
         print(f'Callback instances:\n{self.callback_instances.to_string()}')
         print('==================================================')
-
-        timers_info = self.timers.merge(self.nodes, on='tid', right_index=True)
-        print(timers_info.to_string())
-        print()
-        subscriptions_info = self.subscriptions.merge(self.nodes, left_on='node_handle', right_index=True)
-        print(subscriptions_info.to_string())

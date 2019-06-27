@@ -155,7 +155,8 @@ class Ros2Processor(EventHandler):
         handle = get_field(event, 'timer_handle')
         timestamp = metadata.timestamp
         period = get_field(event, 'period')
-        self._data.add_timer(handle, timestamp, period)
+        tid = metadata.tid
+        self._data.add_timer(handle, timestamp, period, tid)
 
     def _handle_rclcpp_timer_callback_added(
         self, event: Dict, metadata: EventMetadata

@@ -68,7 +68,8 @@ class DataModel():
         self.clients.set_index(['client_handle'], inplace=True, drop=True)
         self.timers = pd.DataFrame(columns=['timer_handle',
                                             'timestamp',
-                                            'period'])
+                                            'period',
+                                            'tid'])
         self.timers.set_index(['timer_handle'], inplace=True, drop=True)
 
         self.callback_objects = pd.DataFrame(columns=['handle',
@@ -117,9 +118,9 @@ class DataModel():
         self.clients.loc[handle] = [timestamp, node_handle, rmw_handle, service_name]
 
     def add_timer(
-        self, handle, timestamp, period
+        self, handle, timestamp, period, tid
     ) -> None:
-        self.timers.loc[handle] = [timestamp, period]
+        self.timers.loc[handle] = [timestamp, period, tid]
 
     def add_callback_object(
         self, handle, timestamp, callback_object
@@ -165,3 +166,9 @@ class DataModel():
         print()
         print(f'Callback instances:\n{self.callback_instances.to_string()}')
         print('==================================================')
+
+        timers_info = self.timers.merge(self.nodes, on='tid', right_index=True)
+        print(timers_info.to_string())
+        print()
+        subscriptions_info = self.subscriptions.merge(self.nodes, left_on='node_handle', right_index=True)
+        print(subscriptions_info.to_string())

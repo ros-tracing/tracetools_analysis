@@ -16,7 +16,6 @@
 """Entrypoint/script to convert CTF trace data to a pickle file."""
 
 import argparse
-from pickle import Pickler
 import time
 
 from tracetools_analysis.conversion import ctf

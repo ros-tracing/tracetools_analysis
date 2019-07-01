@@ -14,6 +14,7 @@
 
 """Module for data model utility class."""
 
+from datetime import datetime as dt
 from typing import Any
 from typing import Mapping
 from typing import Union
@@ -59,12 +60,20 @@ class DataModelUtil():
         Get durations of callback instances for a given callback object.
 
         :param callback_obj: the callback object value
-        :return: a dataframe containing the durations of all callback instances for that object
+        :return: a dataframe containing the start timestamp (datetime)
+        and duration (ms) of all callback instances for that object
         """
-        return self._data.callback_instances.loc[
+        data = self._data.callback_instances.loc[
             self._data.callback_instances.loc[:, 'callback_object'] == callback_obj,
-            :
+            ['timestamp', 'duration']
         ]
+        # Transform both columns to ms
+        data[['timestamp', 'duration']] = data[
+            ['timestamp', 'duration']
+        ].apply(lambda d: d / 1000000.0)
+        # Transform start timestamp column to datetime objects
+        data['timestamp'] = data['timestamp'].apply(lambda t: dt.fromtimestamp(t / 1000.0))
+        return data
 
     def get_callback_owner_info(
         self, callback_obj: int

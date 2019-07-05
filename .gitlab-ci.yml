@@ -1,0 +1,23 @@
+image: registry.gitlab.com/ros_tracing/ros2_tracing/ci-base:latest
+
+variables:
+  DOCKER_DRIVER: overlay2
+  PACKAGES_LIST: tracetools_analysis
+
+before_script:
+  - git clone https://gitlab.com/ros_tracing/ros2_tracing.git
+
+build:
+  script:
+    - colcon build --symlink-install --packages-up-to $PACKAGES_LIST
+    - colcon test --packages-select $PACKAGES_LIST
+    - colcon test-result
+  artifacts:
+    paths:
+      - install
+      - build/*/test_results/*/*.xunit.xml
+      - build/*/pytest.xml
+    reports:
+      junit:
+        - build/*/test_results/*/*.xunit.xml
+        - build/*/pytest.xml

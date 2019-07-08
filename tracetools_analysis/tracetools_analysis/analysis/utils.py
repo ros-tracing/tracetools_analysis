@@ -39,6 +39,32 @@ class DataModelUtil():
         """
         self._data = data_model
 
+    def _prettify(self, original: str) -> str:
+        """
+        Process symbol to make it more readable.
+
+        Processing will depend on the kind of symbol:
+        * bind object: remove placeholder and allocator info
+        * function pointer: no processing
+        * lambda: (TODO)
+        * timer: (TODO)
+
+        :param original: the original symbol
+        :return: the prettified symbol
+        """
+        pretty = original
+        pretty = pretty.replace('_<std::allocator<void> > ', '')
+        if pretty.startswith('std::_Bind<'):
+            # bind
+            # remove bind<>
+            pretty = pretty.replace('std::_Bind<', '')
+            pretty = pretty[:-1]
+            # remove placeholder stuff
+            placeholder_from = pretty.find('*')
+            placeholder_to = pretty.find(')', placeholder_from)
+            pretty = pretty[:placeholder_from] + '?' + pretty[(placeholder_to + 1):]
+        return pretty
+
     def get_callback_symbols(self) -> Mapping[int, str]:
         """
         Get mappings between a callback object and its resolved symbol.
@@ -51,7 +77,9 @@ class DataModelUtil():
         # Get a list of callback objects
         callback_objects = set(callback_instances['callback_object'])
         # Get their symbol
-        return {obj: callback_symbols.loc[obj, 'symbol'] for obj in callback_objects}
+        return {
+            obj: self._prettify(callback_symbols.loc[obj, 'symbol']) for obj in callback_objects
+        }
 
     def get_callback_durations(
         self, callback_obj: int

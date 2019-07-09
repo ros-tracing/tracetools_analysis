@@ -1,6 +1,6 @@
 # tracetools_analysis
 
-Analysis tools for [ROS 2 tracing](https://gitlab.com/ros_tracing/ros2_tracing).
+Analysis tools for [ROS 2 tracing](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing).
 
 # Setup
 

@@ -1,11 +1,11 @@
-image: registry.gitlab.com/ros_tracing/ros2_tracing/ci-base:latest
+image: registry.gitlab.com/micro-ros/ros_tracing/ci_base
 
 variables:
   DOCKER_DRIVER: overlay2
   PACKAGES_LIST: tracetools_analysis
 
 before_script:
-  - git clone https://gitlab.com/ros_tracing/ros2_tracing.git
+  - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
 
 build:
   script:

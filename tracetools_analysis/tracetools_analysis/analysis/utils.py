@@ -43,26 +43,55 @@ class DataModelUtil():
         """
         Process symbol to make it more readable.
 
-        Processing will depend on the kind of symbol:
-        * bind object: remove placeholder and allocator info
-        * function pointer: no processing
-        * lambda: (TODO)
-        * timer: (TODO)
+        * remove std::allocator
+        * remove std::default_delete
+        * bind object: remove placeholder
 
         :param original: the original symbol
         :return: the prettified symbol
         """
         pretty = original
-        pretty = pretty.replace('_<std::allocator<void> > ', '')
-        if pretty.startswith('std::_Bind<'):
-            # bind
+        # remove spaces
+        pretty = pretty.replace(' ', '')
+        # allocator
+        STD_ALLOCATOR = '_<std::allocator<void>>'
+        pretty = pretty.replace(STD_ALLOCATOR, '')
+        # default_delete
+        STD_DEFAULTDELETE = 'std::default_delete'
+        if STD_DEFAULTDELETE in pretty:
+            dd_start = pretty.find(STD_DEFAULTDELETE)
+            template_param_open = dd_start + len(STD_DEFAULTDELETE)
+            # find index of matching/closing GT sign
+            template_param_close = template_param_open
+            level = 0
+            done = False
+            while not done:
+                template_param_close += 1
+                if pretty[template_param_close] == '<':
+                    level += 1
+                elif pretty[template_param_close] == '>':
+                    if level == 0:
+                        done = True
+                    else:
+                        level -= 1
+            pretty = pretty[:dd_start] + pretty[(template_param_close + 1):]
+        # bind
+        STD_BIND = 'std::_Bind<'
+        if pretty.startswith(STD_BIND):
             # remove bind<>
-            pretty = pretty.replace('std::_Bind<', '')
+            pretty = pretty.replace(STD_BIND, '')
             pretty = pretty[:-1]
             # remove placeholder stuff
             placeholder_from = pretty.find('*')
             placeholder_to = pretty.find(')', placeholder_from)
             pretty = pretty[:placeholder_from] + '?' + pretty[(placeholder_to + 1):]
+        # remove dangling comma
+        pretty = pretty.replace(',>', '>')
+        # restore meaningful spaces
+        if pretty.startswith('void'):
+            pretty = 'void' + ' ' + pretty[len('void'):]
+        if pretty.endswith('const'):
+            pretty = pretty[:(len(pretty) - len('const'))] + ' ' + 'const'
         return pretty
 
     def get_callback_symbols(self) -> Mapping[int, str]:

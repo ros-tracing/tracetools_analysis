@@ -1,4 +1,4 @@
-image: registry.gitlab.com/micro-ros/ros_tracing/ros2_tracing/ci-base:latest
+image: registry.gitlab.com/micro-ros/ros_tracing/ci_base
 
 variables:
   DOCKER_DRIVER: overlay2

@@ -27,9 +27,13 @@ setup(
         'fixed-term.christophe.bourquebedard@de.bosch.com, '
         'ingo.luetkebohle@de.bosch.com'
     ),
-    # url='',
-    keywords=['ROS'],
-    description='Tools for analysing trace data',
+    url='https://gitlab.com/micro-ROS/ros_tracing/tracetools_analysis',
+    keywords=[],
+    description='Tools for analysing trace data.',
+    long_description=(
+        'This package provides tools for analysing trace data, from '
+        'building a model of the trace data to providing plotting utilities.'
+    ),
     entry_points={
         'console_scripts': [
             f'convert = {package_name}.convert:main',

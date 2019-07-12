@@ -3,11 +3,11 @@
 <package format="2">
   <name>tracetools_analysis</name>
   <version>0.1.0</version>
-  <description>Tools for analysing trace data</description>
+  <description>Tools for analysing trace data.</description>
   <maintainer email="fixed-term.christophe.bourquebedard@de.bosch.com">Christophe Bedard</maintainer>
   <maintainer email="ingo.luetkebohle@de.bosch.com">Ingo Lütkebohle</maintainer>
   <license>Apache 2.0</license>
-  <author email="ingo.luetkebohle@de.bosch.com">Ingo Luetkebohle</author>
+  <author email="ingo.luetkebohle@de.bosch.com">Ingo Lütkebohle</author>
   <author email="fixed-term.christophe.bourquebedard@de.bosch.com">Christophe Bedard</author>
 
   <exec_depend>tracetools_read</exec_depend>

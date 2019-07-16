@@ -5,7 +5,7 @@ package_name = 'tracetools_analysis'
 
 setup(
     name=package_name,
-    version='0.1.0',
+    version='0.1.1',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
@@ -27,9 +27,13 @@ setup(
         'fixed-term.christophe.bourquebedard@de.bosch.com, '
         'ingo.luetkebohle@de.bosch.com'
     ),
-    # url='',
-    keywords=['ROS'],
-    description='Tools for analysing trace data',
+    url='https://gitlab.com/micro-ROS/ros_tracing/tracetools_analysis',
+    keywords=[],
+    description='Tools for analysing trace data.',
+    long_description=(
+        'This package provides tools for analysing trace data, from '
+        'building a model of the trace data to providing plotting utilities.'
+    ),
     entry_points={
         'console_scripts': [
             f'convert = {package_name}.convert:main',

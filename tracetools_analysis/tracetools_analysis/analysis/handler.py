@@ -14,7 +14,6 @@
 
 """Module for event handler."""
 
-import sys
 from typing import Callable
 from typing import Dict
 from typing import List
@@ -68,5 +67,3 @@ class EventHandler():
             cpu_id = get_field(event, 'cpu_id')
             metadata = EventMetadata(event_name, pid, tid, timestamp, procname, cpu_id)
             handler_function(event, metadata)
-        else:
-            print(f'unhandled event name: {event_name}', file=sys.stderr)

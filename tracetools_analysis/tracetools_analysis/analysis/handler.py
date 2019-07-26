@@ -65,7 +65,8 @@ class EventHandler():
                     raise_if_not_found=False))
             timestamp = get_field(event, '_timestamp')
             procname = get_field(event, 'procname')
-            metadata = EventMetadata(event_name, pid, tid, timestamp, procname)
+            cpu_id = get_field(event, 'cpu_id')
+            metadata = EventMetadata(event_name, pid, tid, timestamp, procname, cpu_id)
             handler_function(event, metadata)
         else:
             print(f'unhandled event name: {event_name}', file=sys.stderr)

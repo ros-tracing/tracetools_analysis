@@ -18,12 +18,13 @@
 class EventMetadata():
     """Container for event metadata."""
 
-    def __init__(self, event_name, pid, tid, timestamp, procname) -> None:
+    def __init__(self, event_name, pid, tid, timestamp, procname, cpu_id) -> None:
         self._event_name = event_name
         self._pid = pid
         self._tid = tid
         self._timestamp = timestamp
         self._procname = procname
+        self._cpu_id = cpu_id
 
     @property
     def event_name(self):
@@ -44,3 +45,7 @@ class EventMetadata():
     @property
     def procname(self):
         return self._procname
+
+    @property
+    def cpu_id(self):
+        return self._cpu_id

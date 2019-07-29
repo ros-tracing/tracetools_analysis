@@ -153,6 +153,22 @@ class RosDataModelUtil():
         data['timestamp'] = data['timestamp'].apply(lambda t: dt.fromtimestamp(t / 1000.0))
         return data
 
+    def get_node_tid_from_name(
+        self, node_name: str
+    ) -> Union[int, None]:
+        """
+        Get the tid corresponding to a node.
+
+        :param node_name: the name of the node
+        :return: the tid, or `None` if not found
+        """
+        # Assuming there is only one row with the given name
+        node_row = self._data.nodes.loc[
+            self._data.nodes['name'] == node_name
+        ]
+        assert len(node_row.index) <= 1, 'more than 1 node found'
+        return node_row.iloc[0]['tid'] if not node_row.empty else None
+
     def get_callback_owner_info(
         self, callback_obj: int
     ) -> Union[str, None]:

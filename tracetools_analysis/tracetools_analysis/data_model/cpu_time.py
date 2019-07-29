@@ -16,12 +16,14 @@
 
 import pandas as pd
 
+from . import DataModel
 
-class CpuTimeDataModel():
+
+class CpuTimeDataModel(DataModel):
     """
     Container to model pre-processed CPU time data for analysis.
 
-    Contains data for an analysis to use. It uses pandas DataFrames directly.
+    Contains every duration instance.
     """
 
     def __init__(self) -> None:

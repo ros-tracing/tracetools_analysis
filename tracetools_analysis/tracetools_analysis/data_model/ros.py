@@ -16,14 +16,14 @@
 
 import pandas as pd
 
+from . import DataModel
 
-class RosDataModel():
+
+class RosDataModel(DataModel):
     """
     Container to model pre-processed ROS data for analysis.
 
-    Contains data for an analysis to use. This is a middleground between ROS userspace trace
-    events data and the output data of an analysis. This aims to represent the data in a
-    ROS-aware way. It uses pandas DataFrames directly.
+    This aims to represent the data in a ROS-aware way.
     """
 
     def __init__(self) -> None:

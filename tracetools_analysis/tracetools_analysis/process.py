@@ -19,8 +19,8 @@ import argparse
 import time
 
 from tracetools_analysis.loading import load_pickle
-from tracetools_analysis.analysis.cpu_time_processor import CpuTimeProcessor
-from tracetools_analysis.analysis.ros2_processor import Ros2Processor
+from tracetools_analysis.processor.cpu_time import CpuTimeProcessor
+from tracetools_analysis.processor.ros2 import Ros2Processor
 
 
 def parse_args():

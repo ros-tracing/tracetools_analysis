@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for event handler."""
+"""Module for event handling."""
 
 from typing import Callable
 from typing import Dict
@@ -21,7 +21,41 @@ from typing import List
 from tracetools_read.utils import get_event_name
 from tracetools_read.utils import get_field
 
-from .lttng_models import EventMetadata
+
+class EventMetadata():
+    """Container for event metadata."""
+
+    def __init__(self, event_name, pid, tid, timestamp, procname, cpu_id) -> None:
+        self._event_name = event_name
+        self._pid = pid
+        self._tid = tid
+        self._timestamp = timestamp
+        self._procname = procname
+        self._cpu_id = cpu_id
+
+    @property
+    def event_name(self):
+        return self._event_name
+
+    @property
+    def pid(self):
+        return self._pid
+
+    @property
+    def tid(self):
+        return self._tid
+
+    @property
+    def timestamp(self):
+        return self._timestamp
+
+    @property
+    def procname(self):
+        return self._procname
+
+    @property
+    def cpu_id(self):
+        return self._cpu_id
 
 
 class EventHandler():

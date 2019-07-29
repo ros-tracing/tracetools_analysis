@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for data model utility class."""
+"""Module for data model utility classes."""
 
 from datetime import datetime as dt
 from typing import Any
@@ -26,7 +26,7 @@ from .data_model.ros import RosDataModel
 
 class RosDataModelUtil():
     """
-    Data model utility class.
+    ROS data model utility class.
 
     Provides functions to get info on a ROS data model.
     """

@@ -31,12 +31,13 @@ def parse_args():
 
 def main():
     args = parse_args()
-
     pickle_filename = args.pickle_file
 
     start_time = time.time()
+
     events = load.load_pickle(pickle_filename)
     processor = ros2_processor.ros2_process(events)
+
     time_diff = time.time() - start_time
     print(f'processed {len(events)} events in {time_diff * 1000:.2f} ms')
 

@@ -145,7 +145,7 @@ class RosDataModel():
 
     def print_model(self) -> None:
         """Debug method to print every contained df."""
-        print('====================DATA MODEL====================')
+        print('====================ROS DATA MODEL====================')
         print(f'Contexts:\n{self.contexts.to_string()}')
         print()
         print(f'Nodes:\n{self.nodes.to_string()}')

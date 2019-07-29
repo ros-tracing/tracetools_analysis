@@ -21,7 +21,28 @@ from typing import Union
 
 from pandas import DataFrame
 
+from .data_model.cpu_time import CpuTimeDataModel
 from .data_model.ros import RosDataModel
+
+
+class CpuTimeDataModelUtil():
+    """
+    CPU time data model utility class.
+
+    Provides functions to get info on a CPU time data model.
+    """
+
+    def __init__(self, data_model: CpuTimeDataModel) -> None:
+        """
+        Constructor.
+
+        :param data_model: the data model object to use
+        """
+        self._data = data_model
+
+    def get_time_per_thread(self) -> DataFrame:
+        """Get a DataFrame of total duration for each thread."""
+        return self._data.times.loc[:, ['tid', 'duration']].groupby(by='tid').sum()
 
 
 class RosDataModelUtil():

@@ -18,7 +18,7 @@
 import argparse
 import time
 
-from tracetools_analysis.analysis import load
+from tracetools_analysis.loading import load_pickle
 from tracetools_analysis.analysis.cpu_time_processor import CpuTimeProcessor
 from tracetools_analysis.analysis.ros2_processor import Ros2Processor
 
@@ -36,7 +36,7 @@ def main():
 
     start_time = time.time()
 
-    events = load.load_pickle(pickle_filename)
+    events = load_pickle(pickle_filename)
     processor = Ros2Processor.process(events)
     cpu_processor = CpuTimeProcessor.process(events)
 

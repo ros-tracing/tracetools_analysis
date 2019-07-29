@@ -21,17 +21,17 @@ from typing import Union
 
 from pandas import DataFrame
 
-from .data_model import DataModel
+from .data_model.ros import RosDataModel
 
 
-class DataModelUtil():
+class RosDataModelUtil():
     """
     Data model utility class.
 
-    Provides functions to get info on a data model.
+    Provides functions to get info on a ROS data model.
     """
 
-    def __init__(self, data_model: DataModel) -> None:
+    def __init__(self, data_model: RosDataModel) -> None:
         """
         Constructor.
 

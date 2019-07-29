@@ -19,7 +19,7 @@ from typing import List
 
 from tracetools_read.utils import get_field
 
-from .data_model import DataModel
+from .data_model.ros import RosDataModel
 from .handler import EventHandler
 from .lttng_models import EventMetadata
 
@@ -63,12 +63,12 @@ class Ros2Processor(EventHandler):
         }
         super().__init__(handler_map)
 
-        self._data = DataModel()
+        self._data = RosDataModel()
 
         # Temporary buffers
         self._callback_instances = {}
 
-    def get_data_model(self) -> DataModel:
+    def get_data_model(self) -> RosDataModel:
         return self._data
 
     def _handle_rcl_init(

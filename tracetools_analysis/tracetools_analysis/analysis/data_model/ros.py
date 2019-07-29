@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for data model."""
+"""Module for ROS data model."""
 
 import pandas as pd
 
 
-class DataModel():
+class RosDataModel():
     """
-    Container to model pre-processed data for analysis.
+    Container to model pre-processed ROS data for analysis.
 
-    Contains data for an analysis to use. This is a middleground between trace events data and the
-    output data of an analysis. This aims to represent the data in a ROS-aware way.
-    It uses pandas DataFrames directly.
+    Contains data for an analysis to use. This is a middleground between ROS userspace trace
+    events data and the output data of an analysis. This aims to represent the data in a
+    ROS-aware way. It uses pandas DataFrames directly.
     """
 
     def __init__(self) -> None:

@@ -67,6 +67,7 @@ class EventHandler():
 
         :param handler_map: the mapping from event name to handling method
         """
+        assert handler_map is not None and len(handler_map) > 0, f'empty map: {handler_map}'
         self._handler_map = handler_map
 
     def handle_events(self, events: List[Dict[str, str]]) -> None:

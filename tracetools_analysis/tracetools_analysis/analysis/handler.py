@@ -67,3 +67,16 @@ class EventHandler():
             cpu_id = get_field(event, 'cpu_id')
             metadata = EventMetadata(event_name, pid, tid, timestamp, procname, cpu_id)
             handler_function(event, metadata)
+
+    @classmethod
+    def process(cls, events: List[Dict[str, str]]) -> 'EventHandler':
+        """
+        Create processor and process unpickled events to create model.
+
+        :param events: the list of events
+        :return: the processor object after processing
+        """
+        assert cls != EventHandler, 'only call process() from inheriting classes'
+        processor = cls()  # pylint: disable=no-value-for-parameter
+        processor.handle_events(events)
+        return processor

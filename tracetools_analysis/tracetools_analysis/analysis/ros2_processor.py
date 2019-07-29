@@ -15,7 +15,6 @@
 """Module for trace events processor and ROS model creation."""
 
 from typing import Dict
-from typing import List
 
 from tracetools_read.utils import get_field
 
@@ -198,15 +197,3 @@ class Ros2Processor(EventHandler):
                 bool(is_intra_process))
         else:
             print(f'No matching callback start for callback object "{callback_object}"')
-
-
-def ros2_process(events: List[Dict[str, str]]) -> Ros2Processor:
-    """
-    Process unpickled events and create ROS 2 model.
-
-    :param events: the list of events
-    :return: the processor object
-    """
-    processor = Ros2Processor()
-    processor.handle_events(events)
-    return processor

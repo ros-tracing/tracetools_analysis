@@ -18,9 +18,9 @@
 import argparse
 import time
 
-from tracetools_analysis.analysis import cpu_time_processor
 from tracetools_analysis.analysis import load
-from tracetools_analysis.analysis import ros2_processor
+from tracetools_analysis.analysis.cpu_time_processor import CpuTimeProcessor
+from tracetools_analysis.analysis.ros2_processor import Ros2Processor
 
 
 def parse_args():
@@ -37,9 +37,8 @@ def main():
     start_time = time.time()
 
     events = load.load_pickle(pickle_filename)
-    processor = ros2_processor.ros2_process(events)
-    cpu_processor = cpu_time_processor.CpuTimeProcessor()
-    cpu_processor.handle_events(events)
+    processor = Ros2Processor.process(events)
+    cpu_processor = CpuTimeProcessor.process(events)
 
     time_diff = time.time() - start_time
     print(f'processed {len(events)} events in {time_diff * 1000:.2f} ms')

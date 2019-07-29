@@ -18,9 +18,9 @@ from typing import Dict
 
 from tracetools_read.utils import get_field
 
-from ..data_model.ros import RosDataModel
 from .handler import EventHandler
 from .handler import EventMetadata
+from ..data_model.ros import RosDataModel
 
 
 class Ros2Processor(EventHandler):

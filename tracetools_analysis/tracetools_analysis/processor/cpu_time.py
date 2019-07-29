@@ -18,9 +18,9 @@ from typing import Dict
 
 from tracetools_read.utils import get_field
 
-from ..data_model.cpu_time import CpuTimeDataModel
 from .handler import EventHandler
 from .handler import EventMetadata
+from ..data_model.cpu_time import CpuTimeDataModel
 
 
 class CpuTimeProcessor(EventHandler):

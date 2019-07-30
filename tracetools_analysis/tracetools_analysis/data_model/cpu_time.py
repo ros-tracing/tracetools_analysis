@@ -36,7 +36,11 @@ class CpuTimeDataModel(DataModel):
         ])
 
     def add_duration(
-        self, tid: int, start_timestamp: int, duration: int, cpu_id: int
+        self,
+        tid: int,
+        start_timestamp: int,
+        duration: int,
+        cpu_id: int,
     ) -> None:
         data = {
             'tid': tid,

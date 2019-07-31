@@ -27,12 +27,12 @@ class EventMetadata():
 
     def __init__(
         self,
-        event_name,
-        timestamp,
-        cpu_id,
-        procname = None,
-        pid = None,
-        tid = None,
+        event_name: str,
+        timestamp: int,
+        cpu_id: int,
+        procname: str = None,
+        pid: int = None,
+        tid: int = None,
     ) -> None:
         """
         Constructor.

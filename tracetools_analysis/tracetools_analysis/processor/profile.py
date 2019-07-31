@@ -63,7 +63,7 @@ class ProfileProcessor(EventHandler):
         self.functions = functions
 
         # Temporary buffers
-        # tid -> 
+        # tid ->
         #   (list of functions currently executing (ordered by relative depth),
         #    start timestamp of the function)
         self._current_funcs: Dict[int, List[Tuple[str, int]]] = defaultdict(list)

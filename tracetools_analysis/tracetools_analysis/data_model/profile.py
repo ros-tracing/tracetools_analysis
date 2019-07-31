@@ -21,7 +21,7 @@ from . import DataModel
 
 class ProfileDataModel(DataModel):
     """Container to model pre-processed profiling data for analysis."""
-    
+
     def __init__(self) -> None:
         """Constructor."""
         self.times = pd.DataFrame(columns=[

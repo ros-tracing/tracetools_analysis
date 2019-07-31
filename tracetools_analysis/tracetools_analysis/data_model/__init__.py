@@ -22,4 +22,6 @@ class DataModel():
     Contains data for an analysis to use. This is a middleground between trace events data and the
     output data of an analysis. It uses pandas `DataFrame` directly.
     """
-    pass
+
+    def __init__(self) -> None:
+        pass

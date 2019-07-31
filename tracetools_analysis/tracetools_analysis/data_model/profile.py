@@ -24,6 +24,7 @@ class ProfileDataModel(DataModel):
 
     def __init__(self) -> None:
         """Constructor."""
+        super().__init__()
         self.times = pd.DataFrame(columns=[
             'tid',
             'depth',

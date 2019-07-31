@@ -27,6 +27,8 @@ class RosDataModel(DataModel):
     """
 
     def __init__(self) -> None:
+        """Constructor."""
+        super().__init__()
         # Objects (one-time events, usually when something is created)
         self.contexts = pd.DataFrame(columns=['context_handle',
                                               'timestamp',

@@ -18,12 +18,14 @@ from collections import defaultdict
 from typing import Dict
 from typing import List
 from typing import Tuple
+from typing import Type
 from typing import Union
 
 from tracetools_read.utils import get_field
 
 from . import EventHandler
 from . import EventMetadata
+from .cpu_time import CpuTimeHandler
 
 from ..data_model.profile import ProfileDataModel
 
@@ -78,6 +80,10 @@ class ProfileHandler(EventHandler):
             int('0x7F6CD676BC54', 16): 'wait_for_work',
             int('0x7F6CD678D0F8', 16): 'collect_entities',
         }
+
+    @staticmethod
+    def dependencies() -> List[Type[EventHandler]]:
+        return [CpuTimeHandler]
 
     def get_data_model(self) -> ProfileDataModel:
         return self._data

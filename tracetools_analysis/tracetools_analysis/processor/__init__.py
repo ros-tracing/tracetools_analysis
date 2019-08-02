@@ -106,8 +106,8 @@ class EventHandler():
         """Get the handler functions map."""
         return self._handler_map
 
-    @property
-    def dependencies(self) -> List[Type['EventHandler']]:
+    @staticmethod
+    def dependencies() -> List[Type['EventHandler']]:
         """
         Get the `EventHandler`s that should also exist along with this current one.
 

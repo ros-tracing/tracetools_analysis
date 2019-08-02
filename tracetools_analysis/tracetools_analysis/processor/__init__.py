@@ -18,6 +18,7 @@ from collections import defaultdict
 from typing import Callable
 from typing import Dict
 from typing import List
+from typing import Set
 from typing import Type
 
 from tracetools_read.utils import DictEvent
@@ -97,6 +98,7 @@ class EventHandler():
 
         :param handler_map: the mapping from event name to handling method
         """
+        print(f'{self.__class__.__name__}.**kwargs={kwargs}')
         assert handler_map is not None and len(handler_map) > 0, f'empty map: {handler_map}'
         self._handler_map = handler_map
         self.processor = None
@@ -135,6 +137,51 @@ class EventHandler():
         return handler_object
 
 
+class DepedencySolver():
+    """
+    Solve `EventHandler` dependencies.
+
+    Post-order depth-first search (ish).
+    """
+
+    @staticmethod
+    def solve(initial_handlers: List[EventHandler]) -> List[EventHandler]:
+        """
+        Solve.
+
+        :param initial_handlers: the initial handlers for which to check dependencies, in order
+        :return: the solved list, in order
+        """
+        visited: Set[Type[EventHandler]] = set()
+        result: List[EventHandler] = []
+        for handler in initial_handlers:
+            DepedencySolver._solve_instance(handler, visited, result)
+        return result
+
+    def _solve_instance(
+        handler_instance: EventHandler,
+        visited: Set[Type[EventHandler]],
+        result: List[EventHandler],
+    ) -> None:
+        if type(handler_instance) not in visited:
+            for dependency_type in type(handler_instance).dependencies():
+                DepedencySolver._solve_type(dependency_type, visited, result)
+            visited.add(type(handler_instance))
+            result.append(handler_instance)
+
+    @staticmethod
+    def _solve_type(
+        handler_type: Type[EventHandler],
+        visited: Set[Type[EventHandler]],
+        result: List[EventHandler],
+    ) -> None:
+        if handler_type not in visited:
+            for dependency_type in handler_type.dependencies():
+                DepedencySolver._solve_type(dependency_type, visited, result)
+            visited.add(handler_type)
+            result.append(handler_type())
+
+
 class Processor():
     """Base processor class."""
 
@@ -150,27 +197,28 @@ class Processor():
         """
         self._handlers = list(handlers)
         print('handlers before:', [type(handler).__name__ for handler in self._handlers])
-        self._add_handler_dependencies(self._handlers, **kwargs)
+        self._handlers = self._expand_dependencies(self._handlers, **kwargs)
         print('handlers after:', [type(handler).__name__ for handler in self._handlers])
         self._register_with_handlers()
+        input()
 
     def _register_with_handlers(self) -> None:
         """Register this processor with its `EventHandler`s."""
         for handler in self._handlers:
             handler.register_processor(self)
 
-    def _add_handler_dependencies(self, handlers: List[EventHandler], **kwargs) -> None:
+    def _expand_dependencies(
+        self,
+        handlers: List[EventHandler],
+        **kwargs,
+    ) -> List[EventHandler]:
         """
-        Check handlers and add handler dependencies if not included.
-
-        Ordered.
+        Check handlers and add dependencies if not included.
 
         :param handlers: the list of primary `EventHandler`s
         """
-        # TODO
-        # For each handler object, check if its dependencies are included
-        # If not, add them _before_
-        pass
+        # TODO pass on **kwargs
+        return DepedencySolver.solve(handlers)
 
     def _get_handler_maps(self) -> HandlerMultimap:
         """

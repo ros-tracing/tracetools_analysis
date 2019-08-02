@@ -99,11 +99,13 @@ class ProfileHandler(EventHandler):
         function_depth = len(tid_functions) - 1
         (start_timestamp, start_function_name) = tid_functions.pop()
         # Add to data model
+        parent_name = tid_functions[-1][1] if function_depth > 0 else None
         duration = metadata.timestamp - start_timestamp
         self._data.add_duration(
             tid,
             function_depth,
             start_function_name,
+            parent_name,
             start_timestamp,
             duration
         )

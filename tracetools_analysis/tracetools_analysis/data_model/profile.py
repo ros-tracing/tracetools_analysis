@@ -29,6 +29,7 @@ class ProfileDataModel(DataModel):
             'tid',
             'depth',
             'function_name',
+            'parent_name',
             'start_timestamp',
             'duration',
         ])
@@ -38,6 +39,7 @@ class ProfileDataModel(DataModel):
         tid: int,
         depth: int,
         function_name: str,
+        parent_name: str,
         start_timestamp: int,
         duration: int,
     ) -> None:
@@ -45,6 +47,7 @@ class ProfileDataModel(DataModel):
             'tid': tid,
             'depth': depth,
             'function_name': function_name,
+            'parent_name': parent_name,
             'start_timestamp': start_timestamp,
             'duration': duration,
         }

@@ -86,7 +86,12 @@ class EventHandler():
     Provides handling functions for some events, depending on the name.
     """
 
-    def __init__(self, handler_map: HandlerMap) -> None:
+    def __init__(
+        self,
+        *,
+        handler_map: HandlerMap,
+        **kwargs,
+    ) -> None:
         """
         Constructor.
 
@@ -111,7 +116,7 @@ class EventHandler():
         return []
 
     @classmethod
-    def process(cls, events: List[DictEvent]) -> 'EventHandler':
+    def process(cls, events: List[DictEvent], **kwargs) -> 'EventHandler':
         """
         Create a `Processor` and process an instance of the class.
 
@@ -119,8 +124,8 @@ class EventHandler():
         :return: the processor object after processing
         """
         assert cls != EventHandler, 'only call process() from inheriting classes'
-        handler_object = cls()  # pylint: disable=no-value-for-parameter
-        processor = Processor(handler_object)
+        handler_object = cls(**kwargs)  # pylint: disable=no-value-for-parameter
+        processor = Processor(handler_object, **kwargs)
         processor.process(events)
         return handler_object
 
@@ -128,7 +133,11 @@ class EventHandler():
 class Processor():
     """Base processor class."""
 
-    def __init__(self, *handlers: EventHandler) -> None:
+    def __init__(
+        self,
+        *handlers: EventHandler,
+        **kwargs,
+    ) -> None:
         """
         Constructor.
 
@@ -136,13 +145,15 @@ class Processor():
         """
         self._handlers = list(handlers)
         print('handlers before:', [type(handler).__name__ for handler in self._handlers])
-        self._add_dependant_handlers(self._handlers)
+        self._add_handler_dependencies(self._handlers, **kwargs)
         print('handlers after:', [type(handler).__name__ for handler in self._handlers])
         self._register(self._handlers)
 
-    def _add_dependant_handlers(self, handlers: List[EventHandler]) -> None:
+    def _add_handler_dependencies(self, handlers: List[EventHandler], **kwargs) -> None:
         """
-        Check handlers and add dependant handlers if not included. Ordered.
+        Check handlers and add handler dependencies if not included.
+
+        Ordered.
 
         :param handlers: the list of primary `EventHandler`s
         """

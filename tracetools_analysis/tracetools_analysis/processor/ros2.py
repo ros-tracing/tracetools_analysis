@@ -30,7 +30,10 @@ class Ros2Handler(EventHandler):
     Handles a trace's events and builds a model with the data.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        **kwargs,
+    ) -> None:
         # Link a ROS trace event to its corresponding handling method
         handler_map = {
             'ros2:rcl_init':
@@ -60,7 +63,7 @@ class Ros2Handler(EventHandler):
             'ros2:callback_end':
                 self._handle_callback_end,
         }
-        super().__init__(handler_map)
+        super().__init__(handler_map=handler_map, **kwargs)
 
         self._data = RosDataModel()
 

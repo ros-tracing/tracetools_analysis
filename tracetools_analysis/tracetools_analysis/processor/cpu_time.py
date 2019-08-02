@@ -30,13 +30,16 @@ class CpuTimeHandler(EventHandler):
     It extracts timestamps from sched_switch events to later compute CPU time per thread.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        **kwargs,
+    ) -> None:
         # Link event to handling method
         handler_map = {
             'sched_switch':
                 self._handle_sched_switch,
         }
-        super().__init__(handler_map)
+        super().__init__(handler_map=handler_map, **kwargs)
 
         self._data = CpuTimeDataModel()
 

@@ -49,7 +49,9 @@ class ProfileHandler(EventHandler):
 
     def __init__(
         self,
-        functions: Dict[str, List[str]] = FUNCTIONS
+        *,
+        functions: Dict[str, List[str]] = FUNCTIONS,
+        **kwargs,
     ) -> None:
         handler_map = {
             'lttng_ust_cyg_profile_fast:func_entry':
@@ -57,7 +59,7 @@ class ProfileHandler(EventHandler):
             'lttng_ust_cyg_profile_fast:func_exit':
                 self._handle_function_exit,
         }
-        super().__init__(handler_map)
+        super().__init__(handler_map=handler_map, **kwargs)
 
         self._data = ProfileDataModel()
         self.functions = functions

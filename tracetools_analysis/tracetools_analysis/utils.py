@@ -14,15 +14,76 @@
 
 """Module for data model utility classes."""
 
+from collections import defaultdict
 from datetime import datetime as dt
 from typing import Any
+from typing import Dict
+from typing import List
 from typing import Mapping
+from typing import Set
 from typing import Union
 
 from pandas import DataFrame
 
 from .data_model.cpu_time import CpuTimeDataModel
+from .data_model.profile import ProfileDataModel
 from .data_model.ros import RosDataModel
+
+
+class ProfileDataModelUtil():
+    """
+    Profiling data model utility class.
+
+    Provides functions to get more info on the data.
+    """
+
+    def __init__(self, data_model: ProfileDataModel) -> None:
+        """
+        Constructor.
+
+        :param data_model: the data model object to use
+        """
+        self.data = data_model
+
+    def with_tid(self, tid: int) -> DataFrame:
+        return self.data.times.loc[self.data.times['tid'] == tid]
+
+    def get_tids(self) -> Set[int]:
+        """Get the TIDs in the data model."""
+        return set(self.data.times['tid'])
+
+    def get_call_tree(self, tid: int) -> Dict[str, List[str]]:
+        depth_names = self.with_tid(tid)[
+            ['depth', 'function_name', 'parent_name']
+        ].drop_duplicates()
+        # print(depth_names.to_string())
+        tree = defaultdict(set)
+        for _, row in depth_names.iterrows():
+            depth = row['depth']
+            name = row['function_name']
+            parent = row['parent_name']
+            if depth == 0:
+                tree[name]
+            else:
+                tree[parent].add(name)
+        return dict(tree)
+
+    def get_stats(self, tid: int):
+        """Get profiling statistics."""
+        tid_df = self.with_tid(tid)
+        depth_names = tid_df[['depth', 'function_name', 'parent_name']].drop_duplicates()
+        print('depth_names')
+        print(depth_names.to_string())
+        for _, row in depth_names.iterrows():
+            depth = row['depth']
+            name = row['function_name']
+            parent = row['parent_name']
+            desc = tid_df.loc[
+                (tid_df['depth'] == depth) &
+                (tid_df['function_name'] == name)
+            ]['duration'].astype(int).describe()
+            print(depth, name, parent)
+            print(desc)
 
 
 class CpuTimeDataModelUtil():

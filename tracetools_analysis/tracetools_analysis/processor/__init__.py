@@ -179,6 +179,8 @@ class DepedencySolver():
             for dependency_type in handler_type.dependencies():
                 DepedencySolver._solve_type(dependency_type, visited, result)
             visited.add(handler_type)
+            # FIXME if it exists in the initial handler instances use that instead
+            # otherwise that instance is going to be replaced by the new instance below
             result.append(handler_type())
 
 

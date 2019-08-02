@@ -22,8 +22,8 @@ from typing import Union
 
 from tracetools_read.utils import get_field
 
-from .handler import EventHandler
-from .handler import EventMetadata
+from . import EventHandler
+from . import EventMetadata
 
 from ..data_model.profile import ProfileDataModel
 

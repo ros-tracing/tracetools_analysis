@@ -100,9 +100,10 @@ class EventHandler():
     def handler_map(self) -> HandlerMap:
         return self._handler_map
 
-    def get_dependants(self) -> List[Type['EventHandler']]:
-        # Default: no dependants
-        # Subclasses should override this method id they want to declare dependants
+    @property
+    def dependencies(self) -> List[Type['EventHandler']]:
+        # Default: no dependencies
+        # Subclasses should override this method id they want to declare dependencies
         return []
 
     @classmethod

@@ -152,11 +152,11 @@ class Processor():
         print('handlers before:', [type(handler).__name__ for handler in self._handlers])
         self._add_handler_dependencies(self._handlers, **kwargs)
         print('handlers after:', [type(handler).__name__ for handler in self._handlers])
-        self._register_with_handlers(self._handlers)
+        self._register_with_handlers()
 
-    def _register_with_handlers(self, handlers: List[EventHandler]) -> None:
+    def _register_with_handlers(self) -> None:
         """Register this processor with its `EventHandler`s."""
-        for handler in handlers:
+        for handler in self._handlers:
             handler.register_processor(self)
 
     def _add_handler_dependencies(self, handlers: List[EventHandler], **kwargs) -> None:

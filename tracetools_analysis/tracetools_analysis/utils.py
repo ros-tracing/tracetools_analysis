@@ -38,11 +38,11 @@ class CpuTimeDataModelUtil():
 
         :param data_model: the data model object to use
         """
-        self._data = data_model
+        self.data = data_model
 
     def get_time_per_thread(self) -> DataFrame:
         """Get a DataFrame of total duration for each thread."""
-        return self._data.times.loc[:, ['tid', 'duration']].groupby(by='tid').sum()
+        return self.data.times.loc[:, ['tid', 'duration']].groupby(by='tid').sum()
 
 
 class RosDataModelUtil():
@@ -58,7 +58,7 @@ class RosDataModelUtil():
 
         :param data_model: the data model object to use
         """
-        self._data = data_model
+        self.data = data_model
 
     def _prettify(self, original: str) -> str:
         """
@@ -121,8 +121,8 @@ class RosDataModelUtil():
 
         :return: the map
         """
-        callback_instances = self._data.callback_instances
-        callback_symbols = self._data.callback_symbols
+        callback_instances = self.data.callback_instances
+        callback_symbols = self.data.callback_symbols
 
         # Get a list of callback objects
         callback_objects = set(callback_instances['callback_object'])
@@ -141,8 +141,8 @@ class RosDataModelUtil():
         :return: a dataframe containing the start timestamp (datetime)
         and duration (ms) of all callback instances for that object
         """
-        data = self._data.callback_instances.loc[
-            self._data.callback_instances.loc[:, 'callback_object'] == callback_obj,
+        data = self.data.callback_instances.loc[
+            self.data.callback_instances.loc[:, 'callback_object'] == callback_obj,
             ['timestamp', 'duration']
         ]
         # Transform both columns to ms
@@ -163,8 +163,8 @@ class RosDataModelUtil():
         :return: the tid, or `None` if not found
         """
         # Assuming there is only one row with the given name
-        node_row = self._data.nodes.loc[
-            self._data.nodes['name'] == node_name
+        node_row = self.data.nodes.loc[
+            self.data.nodes['name'] == node_name
         ]
         assert len(node_row.index) <= 1, 'more than 1 node found'
         return node_row.iloc[0]['tid'] if not node_row.empty else None
@@ -184,26 +184,26 @@ class RosDataModelUtil():
         :return: information about the owner of the callback, or `None` if it fails
         """
         # Get handle corresponding to callback object
-        handle = self._data.callback_objects.loc[
-            self._data.callback_objects['callback_object'] == callback_obj
+        handle = self.data.callback_objects.loc[
+            self.data.callback_objects['callback_object'] == callback_obj
         ].index.values.astype(int)[0]
 
         type_name = None
         info = None
         # Check if it's a timer first (since it's slightly different than the others)
-        if handle in self._data.timers.index:
+        if handle in self.data.timers.index:
             type_name = 'Timer'
             info = self.get_timer_handle_info(handle)
-        elif handle in self._data.publishers.index:
+        elif handle in self.data.publishers.index:
             type_name = 'Publisher'
             info = self.get_publisher_handle_info(handle)
-        elif handle in self._data.subscriptions.index:
+        elif handle in self.data.subscriptions.index:
             type_name = 'Subscription'
             info = self.get_subscription_handle_info(handle)
-        elif handle in self._data.services.index:
+        elif handle in self.data.services.index:
             type_name = 'Service'
             info = self.get_subscription_handle_info(handle)
-        elif handle in self._data.clients.index:
+        elif handle in self.data.clients.index:
             type_name = 'Client'
             info = self.get_client_handle_info(handle)
 
@@ -221,11 +221,11 @@ class RosDataModelUtil():
         :return: a dictionary with name:value info, or `None` if it fails
         """
         # TODO find a way to link a timer to a specific node
-        if timer_handle not in self._data.timers.index:
+        if timer_handle not in self.data.timers.index:
             return None
 
-        tid = self._data.timers.loc[timer_handle, 'tid']
-        period_ns = self._data.timers.loc[timer_handle, 'period']
+        tid = self.data.timers.loc[timer_handle, 'tid']
+        period_ns = self.data.timers.loc[timer_handle, 'period']
         period_ms = period_ns / 1000000.0
         return {'tid': tid, 'period': f'{period_ms:.0f} ms'}
 
@@ -238,12 +238,12 @@ class RosDataModelUtil():
         :param publisher_handle: the publisher handle value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        if publisher_handle not in self._data.publishers.index:
+        if publisher_handle not in self.data.publishers.index:
             return None
 
-        node_handle = self._data.publishers.loc[publisher_handle, 'node_handle']
+        node_handle = self.data.publishers.loc[publisher_handle, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
-        topic_name = self._data.publishers.loc[publisher_handle, 'topic_name']
+        topic_name = self.data.publishers.loc[publisher_handle, 'topic_name']
         publisher_info = {'topic': topic_name}
         return {**node_handle_info, **publisher_info}
 
@@ -256,11 +256,11 @@ class RosDataModelUtil():
         :param subscription_handle: the subscription handle value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        subscriptions_info = self._data.subscriptions.merge(
-            self._data.nodes,
+        subscriptions_info = self.data.subscriptions.merge(
+            self.data.nodes,
             left_on='node_handle',
             right_index=True)
-        if subscription_handle not in self._data.subscriptions.index:
+        if subscription_handle not in self.data.subscriptions.index:
             return None
 
         node_handle = subscriptions_info.loc[subscription_handle, 'node_handle']
@@ -278,12 +278,12 @@ class RosDataModelUtil():
         :param service_handle: the service handle value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        if service_handle not in self._data.services:
+        if service_handle not in self.data.services:
             return None
 
-        node_handle = self._data.services.loc[service_handle, 'node_handle']
+        node_handle = self.data.services.loc[service_handle, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
-        service_name = self._data.services.loc[service_handle, 'service_name']
+        service_name = self.data.services.loc[service_handle, 'service_name']
         service_info = {'service': service_name}
         return {**node_handle_info, **service_info}
 
@@ -296,12 +296,12 @@ class RosDataModelUtil():
         :param client_handle: the client handle value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        if client_handle not in self._data.clients:
+        if client_handle not in self.data.clients:
             return None
 
-        node_handle = self._data.clients.loc[client_handle, 'node_handle']
+        node_handle = self.data.clients.loc[client_handle, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
-        service_name = self._data.clients.loc[client_handle, 'service_name']
+        service_name = self.data.clients.loc[client_handle, 'service_name']
         service_info = {'service': service_name}
         return {**node_handle_info, **service_info}
 
@@ -314,11 +314,11 @@ class RosDataModelUtil():
         :param node_handle: the node handle value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        if node_handle not in self._data.nodes.index:
+        if node_handle not in self.data.nodes.index:
             return None
 
-        node_name = self._data.nodes.loc[node_handle, 'name']
-        tid = self._data.nodes.loc[node_handle, 'tid']
+        node_name = self.data.nodes.loc[node_handle, 'name']
+        tid = self.data.nodes.loc[node_handle, 'tid']
         return {'node': node_name, 'tid': tid}
 
     def format_info_dict(self, info_dict: Mapping[str, Any]) -> str:

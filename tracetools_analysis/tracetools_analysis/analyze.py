@@ -21,7 +21,6 @@ import time
 from tracetools_analysis.loading import load_pickle
 from tracetools_analysis.processor.cpu_time import CpuTimeHandler
 from tracetools_analysis.processor.profile import ProfileHandler
-from tracetools_analysis.processor.ros2 import Ros2Handler
 from tracetools_analysis.utils import ProfileDataModelUtil
 
 

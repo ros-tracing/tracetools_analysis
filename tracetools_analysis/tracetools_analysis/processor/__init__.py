@@ -129,7 +129,7 @@ class EventHandler():
         :return: the processor object after processing
         """
         assert cls != EventHandler, 'only call process() from inheriting classes'
-        handler_object = cls(**kwargs)  # pylint: disable=no-value-for-parameter
+        handler_object = cls(**kwargs)  # pylint: disable=all
         processor = Processor(handler_object, **kwargs)
         processor.process(events)
         return handler_object

@@ -99,6 +99,7 @@ class EventHandler():
         """
         assert handler_map is not None and len(handler_map) > 0, f'empty map: {handler_map}'
         self._handler_map = handler_map
+        self.processor = None
 
     @property
     def handler_map(self) -> HandlerMap:
@@ -114,6 +115,10 @@ class EventHandler():
         Default: no dependencies.
         """
         return []
+
+    def register_processor(self, processor: 'Processor') -> None:
+        """Register processor with this `EventHandler` so that it can query other handlers."""
+        self.processor = processor
 
     @classmethod
     def process(cls, events: List[DictEvent], **kwargs) -> 'EventHandler':
@@ -147,7 +152,12 @@ class Processor():
         print('handlers before:', [type(handler).__name__ for handler in self._handlers])
         self._add_handler_dependencies(self._handlers, **kwargs)
         print('handlers after:', [type(handler).__name__ for handler in self._handlers])
-        self._register(self._handlers)
+        self._register_with_handlers(self._handlers)
+
+    def _register_with_handlers(self, handlers: List[EventHandler]) -> None:
+        """Register this processor with its `EventHandler`s."""
+        for handler in handlers:
+            handler.register_processor(self)
 
     def _add_handler_dependencies(self, handlers: List[EventHandler], **kwargs) -> None:
         """

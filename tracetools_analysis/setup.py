@@ -36,6 +36,7 @@ setup(
     ),
     entry_points={
         'console_scripts': [
+            f'analyze = {package_name}.analyze:main',
             f'convert = {package_name}.convert:main',
             f'process = {package_name}.process:main',
         ],

@@ -13,13 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Entrypoint/script to process events from a pickle file to build a ROS model."""
+"""Entrypoint/script for analysis."""
 
 import argparse
 import time
 
 from tracetools_analysis.loading import load_pickle
+from tracetools_analysis.processor.cpu_time import CpuTimeHandler
+from tracetools_analysis.processor.profile import ProfileHandler
 from tracetools_analysis.processor.ros2 import Ros2Handler
+from tracetools_analysis.utils import ProfileDataModelUtil
 
 
 def parse_args():
@@ -36,9 +39,16 @@ def main():
     start_time = time.time()
 
     events = load_pickle(pickle_filename)
-    ros2_handler = Ros2Handler.process(events)
+
+    # cpu_handler = CpuTimeHandler.process(events)
+    profile_handler = ProfileHandler.process(events)
 
     time_diff = time.time() - start_time
     print(f'processed {len(events)} events in {time_diff * 1000:.2f} ms')
 
-    ros2_handler.get_data_model().print_model()
+    # cpu_handler.get_data_model().print_model()
+    profile_handler.get_data_model().print_model()
+    util = ProfileDataModelUtil(profile_handler.get_data_model())
+    print(util.get_tids())
+    util.get_stats(12616)
+    print(util.get_call_tree(12616))

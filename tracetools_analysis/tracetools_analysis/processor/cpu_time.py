@@ -23,9 +23,9 @@ from . import EventMetadata
 from ..data_model.cpu_time import CpuTimeDataModel
 
 
-class CpuTimeProcessor(EventHandler):
+class CpuTimeHandler(EventHandler):
     """
-    Processor that extracts data for CPU time.
+    Handler that extracts data for CPU time.
 
     It extracts timestamps from sched_switch events to later compute CPU time per thread.
     """

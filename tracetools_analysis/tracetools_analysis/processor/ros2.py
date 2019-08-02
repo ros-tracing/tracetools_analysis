@@ -23,9 +23,9 @@ from . import EventMetadata
 from ..data_model.ros import RosDataModel
 
 
-class Ros2Processor(EventHandler):
+class Ros2Handler(EventHandler):
     """
-    ROS 2-aware event processing/handling class implementation.
+    ROS 2-aware event handling class implementation.
 
     Handles a trace's events and builds a model with the data.
     """

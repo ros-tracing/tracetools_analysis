@@ -28,9 +28,9 @@ from . import EventMetadata
 from ..data_model.profile import ProfileDataModel
 
 
-class ProfileProcessor(EventHandler):
+class ProfileHandler(EventHandler):
     """
-    Processor that extracts profiling information.
+    Handler that extracts profiling information.
 
     It uses the following events:
         * lttng_ust_cyg_profile_fast:func_entry

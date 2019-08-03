@@ -153,19 +153,28 @@ class DepedencySolver():
     Post-order depth-first search (ish). Does not check for circular dependencies or other errors.
     """
 
-    @staticmethod
-    def solve(initial_dependants: List[Dependant]) -> List[Dependant]:
+    def __init__(
+        self,
+        initial_dependants: List[Dependant],
+    ) -> None:
+        """
+        Constructor.
+
+        :param initial_dependants: the initial dependant instances, in order
+        """
+        self._initial_deps = initial_dependants
+
+    def solve(self) -> List[Dependant]:
         """
         Solve.
 
-        :param initial_dependants: the initial dependant instances, in order
         :return: the solved list, including at least the initial dependants, in order
         """
         visited: Set[Type[Dependant]] = set()
         solution: List[Dependant] = []
-        initial_map = {type(dep_instance): dep_instance for dep_instance in initial_dependants}
-        for dep_instance in initial_dependants:
-            DepedencySolver._solve_instance(
+        initial_map = {type(dep_instance): dep_instance for dep_instance in self._initial_deps}
+        for dep_instance in self._initial_deps:
+            self.__solve_instance(
                 dep_instance,
                 visited,
                 initial_map,
@@ -173,8 +182,8 @@ class DepedencySolver():
             )
         return solution
 
-    @staticmethod
-    def _solve_instance(
+    def __solve_instance(
+        self,
         dep_instance: Dependant,
         visited: Set[Type[Dependant]],
         initial_map: Dict[Type[Dependant], Dependant],
@@ -182,7 +191,7 @@ class DepedencySolver():
     ) -> None:
         if type(dep_instance) not in visited:
             for dependency_type in type(dep_instance).dependencies():
-                DepedencySolver._solve_type(
+                DepedencySolver.__solve_type(
                     dependency_type,
                     visited,
                     initial_map,
@@ -192,7 +201,7 @@ class DepedencySolver():
             visited.add(type(dep_instance))
 
     @staticmethod
-    def _solve_type(
+    def __solve_type(
         dep_type: Type[Dependant],
         visited: Set[Type[Dependant]],
         initial_map: Dict[Type[Dependant], Dependant],
@@ -200,7 +209,7 @@ class DepedencySolver():
     ) -> None:
         if dep_type not in visited:
             for dependency_type in dep_type.dependencies():
-                DepedencySolver._solve_type(
+                DepedencySolver.__solve_type(
                     dependency_type,
                     visited,
                     initial_map,
@@ -252,7 +261,7 @@ class Processor():
         :param handlers: the list of primary `EventHandler`s
         """
         # TODO pass on **kwargs
-        return DepedencySolver.solve(handlers)
+        return DepedencySolver(handlers).solve()
 
     def _get_handler_maps(self) -> HandlerMultimap:
         """

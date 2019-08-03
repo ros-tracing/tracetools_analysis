@@ -150,38 +150,61 @@ class DepedencySolver():
         Solve.
 
         :param initial_handlers: the initial handlers for which to check dependencies, in order
-        :return: the solved list, in order
+        :return: the solved list, including at least the initial handlers, in order
         """
         visited: Set[Type[EventHandler]] = set()
         result: List[EventHandler] = []
+        initial_map = {type(handler): handler for handler in initial_handlers}
         for handler in initial_handlers:
-            DepedencySolver._solve_instance(handler, visited, result)
+            DepedencySolver._solve_instance(
+                handler,
+                visited,
+                initial_map,
+                result,
+            )
         return result
 
+    @staticmethod
     def _solve_instance(
         handler_instance: EventHandler,
         visited: Set[Type[EventHandler]],
+        initial_map: Dict[Type[EventHandler], EventHandler],
         result: List[EventHandler],
     ) -> None:
         if type(handler_instance) not in visited:
             for dependency_type in type(handler_instance).dependencies():
-                DepedencySolver._solve_type(dependency_type, visited, result)
-            visited.add(type(handler_instance))
+                DepedencySolver._solve_type(
+                    dependency_type,
+                    visited,
+                    initial_map,
+                    result,
+                )
             result.append(handler_instance)
+            visited.add(type(handler_instance))
 
     @staticmethod
     def _solve_type(
         handler_type: Type[EventHandler],
         visited: Set[Type[EventHandler]],
+        initial_map: Dict[Type[EventHandler], EventHandler],
         result: List[EventHandler],
     ) -> None:
         if handler_type not in visited:
             for dependency_type in handler_type.dependencies():
-                DepedencySolver._solve_type(dependency_type, visited, result)
+                DepedencySolver._solve_type(
+                    dependency_type,
+                    visited,
+                    initial_map,
+                    result,
+                )
+            # If an instance of this type was given initially, use it instead
+            new_instance = None
+            if handler_type in initial_map:
+                new_instance = initial_map.get(handler_type)
+            else:
+                new_instance = handler_type()
+            result.append(new_instance)
             visited.add(handler_type)
-            # FIXME if it exists in the initial handler instances use that instead
-            # otherwise that instance is going to be replaced by the new instance below
-            result.append(handler_type())
 
 
 class Processor():
@@ -250,7 +273,7 @@ class Processor():
     def _process_event(self, event: DictEvent) -> None:
         """Process a single event."""
         event_name = get_event_name(event)
-        print(f"event name: {event_name}")
+        print(f'event name: {event_name}')
         handler_functions = self._handler_multimap.get(event_name, None)
         if handler_functions is not None:
             print(f'\thandler functions: {handler_functions}')

@@ -146,7 +146,7 @@ class EventHandler(Dependant):
         return handler_object
 
 
-class DepedencySolver():
+class DependencySolver():
     """
     Solve `Dependant` dependencies.
 
@@ -191,7 +191,7 @@ class DepedencySolver():
     ) -> None:
         if type(dep_instance) not in visited:
             for dependency_type in type(dep_instance).dependencies():
-                DepedencySolver.__solve_type(
+                DependencySolver.__solve_type(
                     dependency_type,
                     visited,
                     initial_map,
@@ -209,7 +209,7 @@ class DepedencySolver():
     ) -> None:
         if dep_type not in visited:
             for dependency_type in dep_type.dependencies():
-                DepedencySolver.__solve_type(
+                DependencySolver.__solve_type(
                     dependency_type,
                     visited,
                     initial_map,
@@ -261,7 +261,7 @@ class Processor():
         :param handlers: the list of primary `EventHandler`s
         """
         # TODO pass on **kwargs
-        return DepedencySolver(handlers).solve()
+        return DependencySolver(handlers).solve()
 
     def _get_handler_maps(self) -> HandlerMultimap:
         """

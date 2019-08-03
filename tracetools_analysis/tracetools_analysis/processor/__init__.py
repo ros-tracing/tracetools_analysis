@@ -141,7 +141,7 @@ class DepedencySolver():
     """
     Solve `EventHandler` dependencies.
 
-    Post-order depth-first search (ish).
+    Post-order depth-first search (ish). Does not check for circular dependencies or other errors.
     """
 
     @staticmethod

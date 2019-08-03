@@ -80,7 +80,26 @@ HandlerMap = Dict[str, Callable[[DictEvent, EventMetadata], None]]
 HandlerMultimap = Dict[str, List[Callable[[DictEvent, EventMetadata], None]]]
 
 
-class EventHandler():
+class Dependant():
+    """
+    Object which depends on other types.
+
+    A dependant depends on other types which might have dependencies themselves.
+    Dependencies are type-related only.
+    """
+
+    @staticmethod
+    def dependencies() -> List[Type['Dependant']]:
+        """
+        Get the dependencies that should also exist along with this current one.
+
+        Subclasses should override this method if they want to declare dependencies
+        Default: no dependencies.
+        """
+        return []
+
+
+class EventHandler(Dependant):
     """
     Base event handling class.
 
@@ -108,16 +127,6 @@ class EventHandler():
         """Get the handler functions map."""
         return self._handler_map
 
-    @staticmethod
-    def dependencies() -> List[Type['EventHandler']]:
-        """
-        Get the `EventHandler`s that should also exist along with this current one.
-
-        Subclasses should override this method id they want to declare dependencies
-        Default: no dependencies.
-        """
-        return []
-
     def register_processor(self, processor: 'Processor') -> None:
         """Register processor with this `EventHandler` so that it can query other handlers."""
         self.processor = processor
@@ -139,72 +148,72 @@ class EventHandler():
 
 class DepedencySolver():
     """
-    Solve `EventHandler` dependencies.
+    Solve `Dependant` dependencies.
 
     Post-order depth-first search (ish). Does not check for circular dependencies or other errors.
     """
 
     @staticmethod
-    def solve(initial_handlers: List[EventHandler]) -> List[EventHandler]:
+    def solve(initial_dependants: List[Dependant]) -> List[Dependant]:
         """
         Solve.
 
-        :param initial_handlers: the initial handlers for which to check dependencies, in order
-        :return: the solved list, including at least the initial handlers, in order
+        :param initial_dependants: the initial dependant instances, in order
+        :return: the solved list, including at least the initial dependants, in order
         """
-        visited: Set[Type[EventHandler]] = set()
-        result: List[EventHandler] = []
-        initial_map = {type(handler): handler for handler in initial_handlers}
-        for handler in initial_handlers:
+        visited: Set[Type[Dependant]] = set()
+        solution: List[Dependant] = []
+        initial_map = {type(dep_instance): dep_instance for dep_instance in initial_dependants}
+        for dep_instance in initial_dependants:
             DepedencySolver._solve_instance(
-                handler,
+                dep_instance,
                 visited,
                 initial_map,
-                result,
+                solution,
             )
-        return result
+        return solution
 
     @staticmethod
     def _solve_instance(
-        handler_instance: EventHandler,
-        visited: Set[Type[EventHandler]],
-        initial_map: Dict[Type[EventHandler], EventHandler],
-        result: List[EventHandler],
+        dep_instance: Dependant,
+        visited: Set[Type[Dependant]],
+        initial_map: Dict[Type[Dependant], Dependant],
+        solution: List[Dependant],
     ) -> None:
-        if type(handler_instance) not in visited:
-            for dependency_type in type(handler_instance).dependencies():
+        if type(dep_instance) not in visited:
+            for dependency_type in type(dep_instance).dependencies():
                 DepedencySolver._solve_type(
                     dependency_type,
                     visited,
                     initial_map,
-                    result,
+                    solution,
                 )
-            result.append(handler_instance)
-            visited.add(type(handler_instance))
+            solution.append(dep_instance)
+            visited.add(type(dep_instance))
 
     @staticmethod
     def _solve_type(
-        handler_type: Type[EventHandler],
-        visited: Set[Type[EventHandler]],
-        initial_map: Dict[Type[EventHandler], EventHandler],
-        result: List[EventHandler],
+        dep_type: Type[Dependant],
+        visited: Set[Type[Dependant]],
+        initial_map: Dict[Type[Dependant], Dependant],
+        solution: List[Dependant],
     ) -> None:
-        if handler_type not in visited:
-            for dependency_type in handler_type.dependencies():
+        if dep_type not in visited:
+            for dependency_type in dep_type.dependencies():
                 DepedencySolver._solve_type(
                     dependency_type,
                     visited,
                     initial_map,
-                    result,
+                    solution,
                 )
             # If an instance of this type was given initially, use it instead
             new_instance = None
-            if handler_type in initial_map:
-                new_instance = initial_map.get(handler_type)
+            if dep_type in initial_map:
+                new_instance = initial_map.get(dep_type)
             else:
-                new_instance = handler_type()
-            result.append(new_instance)
-            visited.add(handler_type)
+                new_instance = dep_type()
+            solution.append(new_instance)
+            visited.add(dep_type)
 
 
 class Processor():

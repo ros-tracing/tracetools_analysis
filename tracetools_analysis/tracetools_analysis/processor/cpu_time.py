@@ -16,7 +16,7 @@
 
 from typing import Dict
 
-from tracetools_read.utils import get_field
+from tracetools_read import get_field
 
 from . import EventHandler
 from . import EventMetadata

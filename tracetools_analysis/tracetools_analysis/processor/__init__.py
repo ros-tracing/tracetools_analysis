@@ -21,9 +21,9 @@ from typing import List
 from typing import Set
 from typing import Type
 
-from tracetools_read.utils import DictEvent
-from tracetools_read.utils import get_event_name
-from tracetools_read.utils import get_field
+from tracetools_read import DictEvent
+from tracetools_read import get_event_name
+from tracetools_read import get_field
 
 
 class EventMetadata():

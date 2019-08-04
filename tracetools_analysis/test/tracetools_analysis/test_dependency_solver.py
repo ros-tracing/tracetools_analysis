@@ -37,6 +37,7 @@ class DepOne2(Dependant):
     def dependencies():
         return [DepEmtpy]
 
+
 class DepTwo(Dependant):
 
     @staticmethod
@@ -59,7 +60,7 @@ class TestDependencySolver(unittest.TestCase):
         self.assertEqual(len(solution), 2, 'solution length invalid')
         self.assertIsInstance(solution[0], DepEmtpy)
         self.assertIs(solution[1], depone_instance)
-    
+
     def test_single_dep_existing(self) -> None:
         depempty_instance = DepEmtpy()
         depone_instance = DepOne()

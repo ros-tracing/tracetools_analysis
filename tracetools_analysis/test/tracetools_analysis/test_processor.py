@@ -51,12 +51,36 @@ class StubHandler2(EventHandler):
         self.handler_called = True
 
 
+class WrongHandler(EventHandler):
+
+    def __init__(self) -> None:
+        handler_map = {
+            'myeventname': self._handler_wrong,
+        }
+        super().__init__(handler_map=handler_map)
+
+    def _handler_wrong(
+        self,
+    ) -> None:
+        pass
+
 class TestProcessor(unittest.TestCase):
 
     def __init__(self, *args) -> None:
         super().__init__(
             *args,
         )
+
+    def test_handler_wrong_signature(self) -> None:
+        handler = WrongHandler()
+        mock_event = {
+            '_name': 'myeventname',
+            '_timestamp': 0,
+            'cpu_id': 0,
+        }
+        processor = Processor(handler)
+        with self.assertRaises(TypeError):
+            processor.process([mock_event])
 
     def test_handler_method_with_merge(self) -> None:
         handler1 = StubHandler1()

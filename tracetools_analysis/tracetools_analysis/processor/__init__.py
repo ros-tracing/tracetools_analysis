@@ -246,7 +246,6 @@ class Processor():
         self._handlers = self._expand_dependencies(*handlers, **kwargs)
         print('handlers after:', [type(handler).__name__ for handler in self._handlers])
         self._register_with_handlers()
-        input()
 
     def _register_with_handlers(self) -> None:
         """Register this processor with its `EventHandler`s."""
@@ -324,4 +323,3 @@ class Processor():
                     raise_if_not_found=False)
                 metadata = EventMetadata(event_name, timestamp, cpu_id, procname, pid, tid)
                 handler_function(event, metadata)
-                input()

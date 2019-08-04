@@ -156,7 +156,7 @@ class DependencySolver():
 
     def __init__(
         self,
-        initial_dependants: List[Dependant],
+        *initial_dependants: Dependant,
         **kwargs,
     ) -> None:
         """
@@ -165,7 +165,7 @@ class DependencySolver():
         :param initial_dependants: the initial dependant instances, in order
         :param kwargs: the parameters to pass on to new instances
         """
-        self._initial_deps = initial_dependants
+        self._initial_deps = list(initial_dependants)
         self._kwargs = kwargs
 
     def solve(self) -> List[Dependant]:
@@ -241,10 +241,10 @@ class Processor():
         Constructor.
 
         :param handlers: the `EventHandler`s to use for processing
+        :param kwargs: the parameters to pass on to new handlers
         """
-        self._handlers = list(handlers)
-        print('handlers before:', [type(handler).__name__ for handler in self._handlers])
-        self._handlers = self._expand_dependencies(self._handlers, **kwargs)
+        print('handlers before:', [type(handler).__name__ for handler in handlers])
+        self._handlers = self._expand_dependencies(*handlers, **kwargs)
         print('handlers after:', [type(handler).__name__ for handler in self._handlers])
         self._register_with_handlers()
         input()
@@ -256,15 +256,16 @@ class Processor():
 
     def _expand_dependencies(
         self,
-        handlers: List[EventHandler],
+        *handlers: EventHandler,
         **kwargs,
     ) -> List[EventHandler]:
         """
         Check handlers and add dependencies if not included.
 
         :param handlers: the list of primary `EventHandler`s
+        :param kwargs: the parameters to pass on to new instances
         """
-        return DependencySolver(handlers, **kwargs).solve()
+        return DependencySolver(*handlers, **kwargs).solve()
 
     def _get_handler_maps(self) -> HandlerMultimap:
         """

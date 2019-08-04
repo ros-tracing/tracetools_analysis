@@ -55,7 +55,7 @@ class TestDependencySolver(unittest.TestCase):
         depone_instance = DepOne()
 
         # DepEmtpy should be added before
-        solution = DependencySolver([depone_instance]).solve()
+        solution = DependencySolver(depone_instance).solve()
         self.assertEqual(len(solution), 2, 'solution length invalid')
         self.assertIsInstance(solution[0], DepEmtpy)
         self.assertIs(solution[1], depone_instance)
@@ -65,13 +65,13 @@ class TestDependencySolver(unittest.TestCase):
         depone_instance = DepOne()
 
         # Already in order
-        solution = DependencySolver([depempty_instance, depone_instance]).solve()
+        solution = DependencySolver(depempty_instance, depone_instance).solve()
         self.assertEqual(len(solution), 2, 'solution length invalid')
         self.assertIs(solution[0], depempty_instance, 'wrong solution order')
         self.assertIs(solution[1], depone_instance, 'wrong solution order')
 
         # Out of order
-        solution = DependencySolver([depone_instance, depempty_instance]).solve()
+        solution = DependencySolver(depone_instance, depempty_instance).solve()
         self.assertEqual(len(solution), 2, 'solution length invalid')
         self.assertIs(solution[0], depempty_instance, 'solution does not use existing instance')
         self.assertIs(solution[1], depone_instance, 'solution does not use existing instance')
@@ -80,7 +80,7 @@ class TestDependencySolver(unittest.TestCase):
         deptwo_instance = DepTwo()
 
         # DepOne and DepOne2 both depend on DepEmpty
-        solution = DependencySolver([deptwo_instance]).solve()
+        solution = DependencySolver(deptwo_instance).solve()
         self.assertEqual(len(solution), 4, 'solution length invalid')
         self.assertIsInstance(solution[0], DepEmtpy)
         self.assertIsInstance(solution[1], DepOne)
@@ -89,7 +89,7 @@ class TestDependencySolver(unittest.TestCase):
 
         # Existing instance of DepEmpty, in order
         depempty_instance = DepEmtpy()
-        solution = DependencySolver([depempty_instance, deptwo_instance]).solve()
+        solution = DependencySolver(depempty_instance, deptwo_instance).solve()
         self.assertEqual(len(solution), 4, 'solution length invalid')
         self.assertIsInstance(solution[0], DepEmtpy)
         self.assertIsInstance(solution[1], DepOne)
@@ -97,7 +97,7 @@ class TestDependencySolver(unittest.TestCase):
         self.assertIs(solution[3], deptwo_instance)
 
         # Existing instance of DepEmpty, not in order
-        solution = DependencySolver([deptwo_instance, depempty_instance]).solve()
+        solution = DependencySolver(deptwo_instance, depempty_instance).solve()
         self.assertEqual(len(solution), 4, 'solution length invalid')
         self.assertIsInstance(solution[0], DepEmtpy)
         self.assertIsInstance(solution[1], DepOne)
@@ -108,7 +108,7 @@ class TestDependencySolver(unittest.TestCase):
         depone_instance = DepOne()
 
         # Pass parameter and check that the new instance has it
-        solution = DependencySolver([depone_instance], myparam='myvalue').solve()
+        solution = DependencySolver(depone_instance, myparam='myvalue').solve()
         self.assertEqual(len(solution), 2, 'solution length invalid')
         self.assertEqual(solution[0].myparam, 'myvalue', 'parameter not passed on')
 

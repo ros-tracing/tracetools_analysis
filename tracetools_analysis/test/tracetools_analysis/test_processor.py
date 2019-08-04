@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from inspect import signature
 from typing import Dict
 import unittest
 
@@ -63,6 +62,7 @@ class WrongHandler(EventHandler):
         self,
     ) -> None:
         pass
+
 
 class TestProcessor(unittest.TestCase):
 

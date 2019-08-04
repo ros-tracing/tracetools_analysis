@@ -19,7 +19,9 @@ from tracetools_analysis.processor import DependencySolver
 
 
 class DepEmtpy(Dependant):
-    pass
+
+    def __init__(self, **kwargs) -> None:
+        self.myparam = kwargs.get('myparam', None)
 
 
 class DepOne(Dependant):
@@ -101,6 +103,14 @@ class TestDependencySolver(unittest.TestCase):
         self.assertIsInstance(solution[1], DepOne)
         self.assertIsInstance(solution[2], DepOne2)
         self.assertIs(solution[3], deptwo_instance)
+
+    def test_kwargs(self) -> None:
+        depone_instance = DepOne()
+
+        # Pass parameter and check that the new instance has it
+        solution = DependencySolver([depone_instance], myparam='myvalue').solve()
+        self.assertEqual(len(solution), 2, 'solution length invalid')
+        self.assertEqual(solution[0].myparam, 'myvalue', 'parameter not passed on')
 
 
 if __name__ == '__main__':

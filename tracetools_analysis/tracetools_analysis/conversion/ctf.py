@@ -16,8 +16,8 @@
 
 from pickle import Pickler
 
-from tracetools_read import _get_trace_ctf_events
 from tracetools_read import event_to_dict
+from tracetools_read import get_trace_ctf_events
 
 
 def ctf_to_pickle(trace_directory: str, target: Pickler) -> int:
@@ -28,7 +28,7 @@ def ctf_to_pickle(trace_directory: str, target: Pickler) -> int:
     :param target: the target pickle file to write to
     :return: the number of events written
     """
-    ctf_events = _get_trace_ctf_events(trace_directory)
+    ctf_events = get_trace_ctf_events(trace_directory)
 
     count = 0
     count_written = 0

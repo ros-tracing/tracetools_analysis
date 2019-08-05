@@ -115,6 +115,8 @@ class EventHandler(Dependant):
         """
         Constructor.
 
+        TODO make subclasses pass on their *DataModel to this class
+
         :param handler_map: the mapping from event name to handling method
         """
         print(f'{self.__class__.__name__}.**kwargs={kwargs}')

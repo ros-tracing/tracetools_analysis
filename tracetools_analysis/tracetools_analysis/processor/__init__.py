@@ -119,7 +119,6 @@ class EventHandler(Dependant):
 
         :param handler_map: the mapping from event name to handling method
         """
-        print(f'{self.__class__.__name__}.**kwargs={kwargs}')
         assert handler_map is not None and len(handler_map) > 0, f'empty map: {handler_map}'
         self._handler_map = handler_map
         self.processor = None
@@ -244,18 +243,12 @@ class Processor():
         :param handlers: the `EventHandler`s to use for processing
         :param kwargs: the parameters to pass on to new handlers
         """
-        print('handlers before:', [type(handler).__name__ for handler in handlers])
-        self._handlers = self._expand_dependencies(*handlers, **kwargs)
-        print('handlers after:', [type(handler).__name__ for handler in self._handlers])
-        self._register_with_handlers()
+        expanded_handlers = self._expand_dependencies(*handlers, **kwargs)
+        self._handler_multimap = self._get_handler_maps(expanded_handlers)
+        self._register_with_handlers(expanded_handlers)
 
-    def _register_with_handlers(self) -> None:
-        """Register this processor with its `EventHandler`s."""
-        for handler in self._handlers:
-            handler.register_processor(self)
-
+    @staticmethod
     def _expand_dependencies(
-        self,
         *handlers: EventHandler,
         **kwargs,
     ) -> List[EventHandler]:
@@ -267,19 +260,33 @@ class Processor():
         """
         return DependencySolver(*handlers, **kwargs).solve()
 
-    def _get_handler_maps(self) -> HandlerMultimap:
+    @staticmethod
+    def _get_handler_maps(
+        handlers: List[EventHandler],
+    ) -> HandlerMultimap:
         """
         Collect and merge `HandlerMap`s from all events handlers into a `HandlerMultimap`.
 
+        :param handlers: the list of handlers
         :return: the merged multimap
         """
         handler_multimap = defaultdict(list)
-        for handler in self._handlers:
-            handler_map = handler.handler_map
-            print(f'{handler}:: {handler_map}')
-            for event_name, handler in handler_map.items():
+        for handler in handlers:
+            for event_name, handler in handler.handler_map.items():
                 handler_multimap[event_name].append(handler)
         return handler_multimap
+
+    def _register_with_handlers(
+        self,
+        handlers: List[EventHandler],
+    ) -> None:
+        """
+        Register this processor with its `EventHandler`s.
+
+        :param handlers: the list of handlers
+        """
+        for handler in handlers:
+            handler.register_processor(self)
 
     def process(self, events: List[DictEvent]) -> None:
         """
@@ -287,20 +294,15 @@ class Processor():
 
         :param events: the events to process
         """
-        self._handler_multimap = self._get_handler_maps()
-        print(f'multimap: {self._handler_multimap}')
         for event in events:
             self._process_event(event)
 
     def _process_event(self, event: DictEvent) -> None:
         """Process a single event."""
         event_name = get_event_name(event)
-        print(f'event name: {event_name}')
         handler_functions = self._handler_multimap.get(event_name, None)
         if handler_functions is not None:
-            print(f'\thandler functions: {handler_functions}')
             for handler_function in handler_functions:
-                print(f'\t\thandler function: {handler_function}')
                 timestamp = get_field(event, '_timestamp')
                 cpu_id = get_field(event, 'cpu_id')
                 # TODO perhaps validate fields depending on the type of event,

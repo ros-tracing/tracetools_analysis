@@ -20,7 +20,6 @@ import time
 
 from tracetools_analysis.loading import load_pickle
 from tracetools_analysis.processor import Processor
-from tracetools_analysis.processor.cpu_time import CpuTimeHandler
 from tracetools_analysis.processor.profile import ProfileHandler
 from tracetools_analysis.utils import ProfileDataModelUtil
 
@@ -40,7 +39,6 @@ def main():
 
     events = load_pickle(pickle_filename)
 
-    # cpu_handler = CpuTimeHandler.process(events)
     profile_handler = ProfileHandler()
     processor = Processor(profile_handler, somestring='aa')
     processor.process(events)
@@ -48,5 +46,6 @@ def main():
     time_diff = time.time() - start_time
     print(f'processed {len(events)} events in {time_diff * 1000:.2f} ms')
 
-    # cpu_handler.get_data_model().print_model()
     profile_handler.get_data_model().print_model()
+    util = ProfileDataModelUtil(profile_handler.get_data_model())
+    print(util.get_tids())

@@ -18,7 +18,6 @@ from collections import defaultdict
 from typing import Dict
 from typing import List
 from typing import Tuple
-from typing import Type
 from typing import Union
 
 from tracetools_read import get_field
@@ -36,6 +35,7 @@ class ProfileHandler(EventHandler):
     It uses the following events:
         * lttng_ust_cyg_profile_fast:func_entry
         * lttng_ust_cyg_profile_fast:func_exit
+        * sched_switch
     """
 
     FUNCTIONS = {
@@ -59,6 +59,8 @@ class ProfileHandler(EventHandler):
                 self._handle_function_entry,
             'lttng_ust_cyg_profile_fast:func_exit':
                 self._handle_function_exit,
+            'sched_switch':
+                self._handle_sched_switch,
         }
         super().__init__(handler_map=handler_map, **kwargs)
 
@@ -67,30 +69,55 @@ class ProfileHandler(EventHandler):
 
         # Temporary buffers
         # tid ->
-        #   (list of functions currently executing (ordered by relative depth),
-        #    start timestamp of the function)
-        self._current_funcs: Dict[int, List[Tuple[str, int]]] = defaultdict(list)
-
-        # TODO get debug_info from babeltrace for
-        # lttng_ust_cyg_profile_fast:func_entry events
-        # (or resolve { address -> function } name another way)
-        self.address_to_func = {
-            int('0x7F6CD676CDB4', 16): 'get_next_ready_executable',
-            int('0x7F6CD676BC54', 16): 'wait_for_work',
-            int('0x7F6CD678D0F8', 16): 'collect_entities',
-        }
+        #   list:[
+        #           functions currently executing (ordered by relative depth), with info:
+        #           [
+        #               function name,
+        #               start timestamp,
+        #               last execution start timestamp of the function,
+        #               total duration,
+        #           ]
+        #        ]
+        self._current_funcs: Dict[int, List[List[Union[str, int]]]] = defaultdict(list)
 
     def get_data_model(self) -> ProfileDataModel:
         return self._data
+
+    def _handle_sched_switch(
+        self, event: Dict, metadata: EventMetadata
+    ) -> None:
+        timestamp = metadata.timestamp
+        # If function(s) currently running stop executing
+        prev_tid = get_field(event, 'prev_tid')
+        if prev_tid in self._current_funcs:
+            # Increment durations using last start timestamp
+            for info in self._current_funcs.get(prev_tid):
+                last_start = info[2]
+                total_duration = info[3]
+                total_duration += timestamp - last_start
+                info[2] = None
+                info[3] = total_duration
+        # If stopped function(s) start(s) executing again
+        next_tid = get_field(event, 'next_tid')
+        if next_tid in self._current_funcs:
+            # Set last start timestamp to now
+            for info in self._current_funcs.get(next_tid):
+                assert info[2] is None
+                info[2] = timestamp
 
     def _handle_function_entry(
         self, event: Dict, metadata: EventMetadata
     ) -> None:
         function_name = self._get_function_name(event)
         assert function_name is not None, f'cannot resolve function name for event: {event}'
-        # Push function data to stack
+        # Push function data to stack, setting both timestamps to now
         self._current_funcs[metadata.tid].append(
-            (metadata.timestamp, function_name)
+            [
+                function_name,
+                metadata.timestamp,
+                metadata.timestamp,
+                0,
+            ]
         )
 
     def _handle_function_exit(
@@ -100,17 +127,23 @@ class ProfileHandler(EventHandler):
         tid = metadata.tid
         tid_functions = self._current_funcs[tid]
         function_depth = len(tid_functions) - 1
-        (start_timestamp, start_function_name) = tid_functions.pop()
+        info = tid_functions.pop()
+        function_name = info[0]
+        start_timestamp = info[1]
+        last_start_timestamp = info[2]
+        total_duration = info[3]
         # Add to data model
-        parent_name = tid_functions[-1][1] if function_depth > 0 else None
+        parent_name = tid_functions[-1][0] if function_depth > 0 else None
         duration = metadata.timestamp - start_timestamp
+        actual_duration = (metadata.timestamp - last_start_timestamp) + total_duration
         self._data.add_duration(
             tid,
             function_depth,
-            start_function_name,
+            function_name,
             parent_name,
             start_timestamp,
-            duration
+            duration,
+            actual_duration,
         )
 
     def _get_function_name(
@@ -123,5 +156,12 @@ class ProfileHandler(EventHandler):
     def _resolve_function_address(
         self, address: int
     ) -> Union[str, None]:
-        # TODO get from trace/binaries
-        return self.address_to_func.get(address, None)
+        # TODO get debug_info from babeltrace for
+        # lttng_ust_cyg_profile_fast:func_entry events
+        # (or resolve { address -> function } name another way)
+        address_to_func = {
+            int('0x7F3418EC4DB4', 16): 'get_next_ready_executable',
+            int('0x7F3418EC3C54', 16): 'wait_for_work',
+            int('0x7F3418EE50F8', 16): 'collect_entities',
+        }
+        return address_to_func.get(address, None)

@@ -20,7 +20,12 @@ from . import DataModel
 
 
 class ProfileDataModel(DataModel):
-    """Container to model pre-processed profiling data for analysis."""
+    """
+    Container to model pre-processed profiling data for analysis.
+
+    Duration is the time difference between the function entry and the function exit.
+    Actual duration is the actual time spent executing the function (or a child function).
+    """
 
     def __init__(self) -> None:
         """Constructor."""
@@ -32,6 +37,7 @@ class ProfileDataModel(DataModel):
             'parent_name',
             'start_timestamp',
             'duration',
+            'actual_duration',
         ])
 
     def add_duration(
@@ -42,6 +48,7 @@ class ProfileDataModel(DataModel):
         parent_name: str,
         start_timestamp: int,
         duration: int,
+        actual_duration: int,
     ) -> None:
         data = {
             'tid': tid,
@@ -50,6 +57,7 @@ class ProfileDataModel(DataModel):
             'parent_name': parent_name,
             'start_timestamp': start_timestamp,
             'duration': duration,
+            'actual_duration': actual_duration,
         }
         self.times = self.times.append(data, ignore_index=True)
 

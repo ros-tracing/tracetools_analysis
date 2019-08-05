@@ -109,7 +109,6 @@ class ProfileHandler(EventHandler):
         self, event: Dict, metadata: EventMetadata
     ) -> None:
         function_name = self._get_function_name(event)
-        assert function_name is not None, f'cannot resolve function name for event: {event}'
         # Push function data to stack, setting both timestamps to now
         self._current_funcs[metadata.tid].append(
             [
@@ -150,8 +149,10 @@ class ProfileHandler(EventHandler):
         self, event: Dict
     ) -> str:
         address = get_field(event, 'addr')
-        return self._resolve_function_address(address)
-        # return address
+        resolution = self._resolve_function_address(address)
+        if resolution is None:
+            resolution = str(address)
+        return resolution
 
     def _resolve_function_address(
         self, address: int

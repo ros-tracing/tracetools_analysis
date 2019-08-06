@@ -93,7 +93,7 @@ class Dependant():
         """
         Get the dependencies that should also exist along with this current one.
 
-        Subclasses should override this method if they want to declare dependencies
+        Subclasses should override this method if they want to declare dependencies.
         Default: no dependencies.
         """
         return []
@@ -104,6 +104,7 @@ class EventHandler(Dependant):
     Base event handling class.
 
     Provides handling functions for some events, depending on the name.
+    To be subclassed.
     """
 
     def __init__(
@@ -119,7 +120,8 @@ class EventHandler(Dependant):
 
         :param handler_map: the mapping from event name to handling method
         """
-        assert handler_map is not None and len(handler_map) > 0, f'empty map: {handler_map}'
+        assert handler_map is not None and len(handler_map) > 0, \
+            f'empty map: {self.__class__.__name__}'
         self._handler_map = handler_map
         self.processor = None
 

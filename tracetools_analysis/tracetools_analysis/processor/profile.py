@@ -37,20 +37,8 @@ class ProfileHandler(EventHandler):
         * sched_switch
     """
 
-    FUNCTIONS = {
-        'get_next_ready_executable': [],
-        'wait_for_work': [
-            'collect_entities',
-            'add_handles_to_wait_set',
-            'rmw_wait',
-            'remove_null_handles',
-        ],
-    }
-
     def __init__(
         self,
-        *,
-        functions: Dict[str, List[str]] = FUNCTIONS,
         **kwargs,
     ) -> None:
         handler_map = {
@@ -64,7 +52,6 @@ class ProfileHandler(EventHandler):
         super().__init__(handler_map=handler_map, **kwargs)
 
         self._data = ProfileDataModel()
-        self.functions = functions
 
         # Temporary buffers
         # tid ->
@@ -86,7 +73,7 @@ class ProfileHandler(EventHandler):
         self, event: Dict, metadata: EventMetadata
     ) -> None:
         timestamp = metadata.timestamp
-        # If function(s) currently running stop executing
+        # If function(s) currently running stop(s) executing
         prev_tid = get_field(event, 'prev_tid')
         if prev_tid in self._current_funcs:
             # Increment durations using last start timestamp
@@ -109,14 +96,12 @@ class ProfileHandler(EventHandler):
     ) -> None:
         function_name = self._get_function_name(event)
         # Push function data to stack, setting both timestamps to now
-        self._current_funcs[metadata.tid].append(
-            [
-                function_name,
-                metadata.timestamp,
-                metadata.timestamp,
-                0,
-            ]
-        )
+        self._current_funcs[metadata.tid].append([
+            function_name,
+            metadata.timestamp,
+            metadata.timestamp,
+            0,
+        ])
 
     def _handle_function_exit(
         self, event: Dict, metadata: EventMetadata

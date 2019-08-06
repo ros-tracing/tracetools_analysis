@@ -28,19 +28,13 @@ def generate_launch_description():
                 'lttng_ust_cyg_profile_fast:func_entry',
                 'lttng_ust_cyg_profile_fast:func_exit',
             ] + DEFAULT_EVENTS_ROS,
-            events_kernel=['sched_switch'],
-            append_timestamp=True,
+            events_kernel=[
+                'sched_switch',
+            ],
         ),
         Node(
-            package='tracetools_test',
-            node_executable='test_ping',
-            arguments=['do_more'],
-            output='screen',
-        ),
-        Node(
-            package='tracetools_test',
-            node_executable='test_pong',
-            arguments=['do_more'],
+            package='ros_performance',
+            node_executable='nopub',
             output='screen',
         ),
     ])

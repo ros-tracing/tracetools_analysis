@@ -68,22 +68,26 @@ class ProfileDataModelUtil():
                 tree[parent].add(name)
         return dict(tree)
 
-    def get_stats(self, tid: int):
-        """Get profiling statistics."""
+    def get_function_duration_data(self, tid: int) -> List[Dict[str, Union[int, str, DataFrame]]]:
+        """Get duration data for each function."""
         tid_df = self.with_tid(tid)
         depth_names = tid_df[['depth', 'function_name', 'parent_name']].drop_duplicates()
-        print('depth_names')
-        print(depth_names.to_string())
+        functions_data = []
         for _, row in depth_names.iterrows():
             depth = row['depth']
             name = row['function_name']
             parent = row['parent_name']
-            desc = tid_df.loc[
+            data = tid_df.loc[
                 (tid_df['depth'] == depth) &
                 (tid_df['function_name'] == name)
-            ]['duration'].astype(int).describe()
-            print(depth, name, parent)
-            print(desc)
+            ][['start_timestamp', 'duration', 'actual_duration']]
+            functions_data.append({
+                'depth': depth,
+                'function_name': name,
+                'parent_name': parent,
+                'data': data,
+            })
+        return functions_data
 
 
 class CpuTimeDataModelUtil():
@@ -229,6 +233,19 @@ class RosDataModelUtil():
         ]
         assert len(node_row.index) <= 1, 'more than 1 node found'
         return node_row.iloc[0]['tid'] if not node_row.empty else None
+
+    def get_node_names_from_tid(
+        self, tid: str
+    ) -> Union[List[str], None]:
+        """
+        Get the list of node names corresponding to a tid.
+
+        :param tid: the tid
+        :return: the list of node names, or `None` if not found
+        """
+        return self.data.nodes[
+            self.data.nodes['tid'] == tid
+        ]['name'].tolist()
 
     def get_callback_owner_info(
         self, callback_obj: int

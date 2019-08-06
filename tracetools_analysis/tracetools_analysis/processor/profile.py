@@ -17,7 +17,6 @@
 from collections import defaultdict
 from typing import Dict
 from typing import List
-from typing import Tuple
 from typing import Union
 
 from tracetools_read import get_field

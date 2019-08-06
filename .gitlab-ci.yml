@@ -6,10 +6,13 @@ variables:
 
 before_script:
   - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
+  - rosdep install --from-paths . -i . -i /root/ws --rosdistro dashing -y
+  - . /root/ws/install/local_setup.sh
 
 build:
   script:
     - colcon build --symlink-install --packages-up-to $PACKAGES_LIST
+    - . install/local_setup.sh
     - colcon test --packages-select $PACKAGES_LIST
     - colcon test-result
   artifacts:

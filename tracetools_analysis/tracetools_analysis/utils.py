@@ -25,17 +25,63 @@ from typing import Union
 
 from pandas import DataFrame
 
+from .data_model import DataModel
 from .data_model.cpu_time import CpuTimeDataModel
 from .data_model.profile import ProfileDataModel
 from .data_model.ros import RosDataModel
 
 
-class ProfileDataModelUtil():
+class DataModelUtil():
     """
-    Profiling data model utility class.
+    Base data model util class, which provides functions to get more info about a data model.
 
-    Provides functions to get more info on the data.
+    This class provides basic util functions.
     """
+
+    def __init__(self, data_model: DataModel) -> None:
+        """
+        Constructor.
+
+        :param data_model: the data model
+        """
+        self.__data = data_model
+
+    @property
+    def data(self) -> DataModel:
+        return self.__data
+
+    @staticmethod
+    def convert_time_columns(
+        original: DataFrame,
+        columns_ns_to_ms: List[str] = [],
+        columns_ns_to_datetime: List[str] = [],
+        inplace: bool = True,
+    ) -> DataFrame:
+        """
+        Convert time columns from nanoseconds to either milliseconds or `datetime` objects.
+
+        :param original: the original `DataFrame`
+        :param columns_ns_to_ms: the columns for which to convert ns to ms
+        :param columns_ns_to_datetime: the columns for which to convert ns to `datetime`
+        :param inplace: whether to convert in place or to return a copy
+        :return: the resulting `DataFrame`
+        """
+        df = original if inplace else original.copy()
+        # Convert from ns to ms
+        if len(columns_ns_to_ms) > 0:
+            df[columns_ns_to_ms] = df[columns_ns_to_ms].applymap(
+                lambda t: t / 1000000.0
+            )
+        # Convert from ns to ms + ms to datetime, as UTC
+        if len(columns_ns_to_datetime) > 0:
+            df[columns_ns_to_datetime] = df[columns_ns_to_datetime].applymap(
+                lambda t: dt.utcfromtimestamp(t / 1000000000.0)
+            )
+        return df
+
+
+class ProfileDataModelUtil(DataModelUtil):
+    """Profiling data model utility class."""
 
     def __init__(self, data_model: ProfileDataModel) -> None:
         """
@@ -43,7 +89,7 @@ class ProfileDataModelUtil():
 
         :param data_model: the data model object to use
         """
-        self.data = data_model
+        super().__init__(data_model)
 
     def with_tid(self, tid: int) -> DataFrame:
         return self.data.times.loc[self.data.times['tid'] == tid]
@@ -90,12 +136,8 @@ class ProfileDataModelUtil():
         return functions_data
 
 
-class CpuTimeDataModelUtil():
-    """
-    CPU time data model utility class.
-
-    Provides functions to get info on a CPU time data model.
-    """
+class CpuTimeDataModelUtil(DataModelUtil):
+    """CPU time data model utility class."""
 
     def __init__(self, data_model: CpuTimeDataModel) -> None:
         """
@@ -103,19 +145,15 @@ class CpuTimeDataModelUtil():
 
         :param data_model: the data model object to use
         """
-        self.data = data_model
+        super().__init__(data_model)
 
     def get_time_per_thread(self) -> DataFrame:
         """Get a DataFrame of total duration for each thread."""
         return self.data.times.loc[:, ['tid', 'duration']].groupby(by='tid').sum()
 
 
-class RosDataModelUtil():
-    """
-    ROS data model utility class.
-
-    Provides functions to get info on a ROS data model.
-    """
+class RosDataModelUtil(DataModelUtil):
+    """ROS data model utility class."""
 
     def __init__(self, data_model: RosDataModel) -> None:
         """
@@ -123,7 +161,7 @@ class RosDataModelUtil():
 
         :param data_model: the data model object to use
         """
-        self.data = data_model
+        super().__init__(data_model)
 
     def _prettify(self, original: str) -> str:
         """
@@ -210,13 +248,8 @@ class RosDataModelUtil():
             self.data.callback_instances.loc[:, 'callback_object'] == callback_obj,
             ['timestamp', 'duration']
         ]
-        # Transform both columns to ms
-        data[['timestamp', 'duration']] = data[
-            ['timestamp', 'duration']
-        ].apply(lambda d: d / 1000000.0)
-        # Transform start timestamp column to datetime objects
-        data['timestamp'] = data['timestamp'].apply(lambda t: dt.fromtimestamp(t / 1000.0))
-        return data
+        # Time conversion
+        return self.convert_time_columns(data, ['timestamp', 'duration'], ['timestamp'])
 
     def get_node_tid_from_name(
         self, node_name: str

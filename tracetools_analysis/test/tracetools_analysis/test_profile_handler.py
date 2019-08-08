@@ -308,11 +308,7 @@ class TestProfileHandler(unittest.TestCase):
     def test_profiling(self) -> None:
         handler = self.__class__.handler
         expected_df = self.__class__.expected
-        result_df = handler.get_data_model().times
-        print('RESULT')
-        print(result_df.to_string())
-        print('EXPECTED')
-        print(expected_df.to_string())
+        result_df = handler.data.times
         assert_frame_equal(result_df, expected_df)
 
 

@@ -63,15 +63,19 @@ class Ros2Handler(EventHandler):
             'ros2:callback_end':
                 self._handle_callback_end,
         }
-        super().__init__(handler_map=handler_map, **kwargs)
+        super().__init__(
+            handler_map=handler_map,
+            **kwargs,
+        )
 
-        self._data = RosDataModel()
+        self._data_model = RosDataModel()
 
         # Temporary buffers
         self._callback_instances = {}
 
-    def get_data_model(self) -> RosDataModel:
-        return self._data
+    @property
+    def data(self) -> RosDataModel:
+        return self._data_model
 
     def _handle_rcl_init(
         self, event: Dict, metadata: EventMetadata
@@ -80,7 +84,7 @@ class Ros2Handler(EventHandler):
         timestamp = metadata.timestamp
         pid = metadata.pid
         version = get_field(event, 'version')
-        self._data.add_context(context_handle, timestamp, pid, version)
+        self.data.add_context(context_handle, timestamp, pid, version)
 
     def _handle_rcl_node_init(
         self, event: Dict, metadata: EventMetadata
@@ -91,7 +95,7 @@ class Ros2Handler(EventHandler):
         rmw_handle = get_field(event, 'rmw_handle')
         name = get_field(event, 'node_name')
         namespace = get_field(event, 'namespace')
-        self._data.add_node(handle, timestamp, tid, rmw_handle, name, namespace)
+        self.data.add_node(handle, timestamp, tid, rmw_handle, name, namespace)
 
     def _handle_rcl_publisher_init(
         self, event: Dict, metadata: EventMetadata
@@ -102,7 +106,7 @@ class Ros2Handler(EventHandler):
         rmw_handle = get_field(event, 'rmw_publisher_handle')
         topic_name = get_field(event, 'topic_name')
         depth = get_field(event, 'queue_depth')
-        self._data.add_publisher(handle, timestamp, node_handle, rmw_handle, topic_name, depth)
+        self.data.add_publisher(handle, timestamp, node_handle, rmw_handle, topic_name, depth)
 
     def _handle_subscription_init(
         self, event: Dict, metadata: EventMetadata
@@ -113,7 +117,7 @@ class Ros2Handler(EventHandler):
         rmw_handle = get_field(event, 'rmw_subscription_handle')
         topic_name = get_field(event, 'topic_name')
         depth = get_field(event, 'queue_depth')
-        self._data.add_subscription(handle, timestamp, node_handle, rmw_handle, topic_name, depth)
+        self.data.add_subscription(handle, timestamp, node_handle, rmw_handle, topic_name, depth)
 
     def _handle_rclcpp_subscription_callback_added(
         self, event: Dict, metadata: EventMetadata
@@ -121,7 +125,7 @@ class Ros2Handler(EventHandler):
         handle = get_field(event, 'subscription_handle')
         timestamp = metadata.timestamp
         callback_object = get_field(event, 'callback')
-        self._data.add_callback_object(handle, timestamp, callback_object)
+        self.data.add_callback_object(handle, timestamp, callback_object)
 
     def _handle_rcl_service_init(
         self, event: Dict, metadata: EventMetadata
@@ -131,7 +135,7 @@ class Ros2Handler(EventHandler):
         node_handle = get_field(event, 'node_handle')
         rmw_handle = get_field(event, 'rmw_service_handle')
         service_name = get_field(event, 'service_name')
-        self._data.add_service(handle, timestamp, node_handle, rmw_handle, service_name)
+        self.data.add_service(handle, timestamp, node_handle, rmw_handle, service_name)
 
     def _handle_rclcpp_service_callback_added(
         self, event: Dict, metadata: EventMetadata
@@ -139,7 +143,7 @@ class Ros2Handler(EventHandler):
         handle = get_field(event, 'service_handle')
         timestamp = metadata.timestamp
         callback_object = get_field(event, 'callback')
-        self._data.add_callback_object(handle, timestamp, callback_object)
+        self.data.add_callback_object(handle, timestamp, callback_object)
 
     def _handle_rcl_client_init(
         self, event: Dict, metadata: EventMetadata
@@ -149,7 +153,7 @@ class Ros2Handler(EventHandler):
         node_handle = get_field(event, 'node_handle')
         rmw_handle = get_field(event, 'rmw_client_handle')
         service_name = get_field(event, 'service_name')
-        self._data.add_client(handle, timestamp, node_handle, rmw_handle, service_name)
+        self.data.add_client(handle, timestamp, node_handle, rmw_handle, service_name)
 
     def _handle_rcl_timer_init(
         self, event: Dict, metadata: EventMetadata
@@ -158,7 +162,7 @@ class Ros2Handler(EventHandler):
         timestamp = metadata.timestamp
         period = get_field(event, 'period')
         tid = metadata.tid
-        self._data.add_timer(handle, timestamp, period, tid)
+        self.data.add_timer(handle, timestamp, period, tid)
 
     def _handle_rclcpp_timer_callback_added(
         self, event: Dict, metadata: EventMetadata
@@ -166,7 +170,7 @@ class Ros2Handler(EventHandler):
         handle = get_field(event, 'timer_handle')
         timestamp = metadata.timestamp
         callback_object = get_field(event, 'callback')
-        self._data.add_callback_object(handle, timestamp, callback_object)
+        self.data.add_callback_object(handle, timestamp, callback_object)
 
     def _handle_rclcpp_callback_register(
         self, event: Dict, metadata: EventMetadata
@@ -174,7 +178,7 @@ class Ros2Handler(EventHandler):
         callback_object = get_field(event, 'callback')
         timestamp = metadata.timestamp
         symbol = get_field(event, 'symbol')
-        self._data.add_callback_symbol(callback_object, timestamp, symbol)
+        self.data.add_callback_symbol(callback_object, timestamp, symbol)
 
     def _handle_callback_start(
         self, event: Dict, metadata: EventMetadata
@@ -193,7 +197,7 @@ class Ros2Handler(EventHandler):
             del self._callback_instances[callback_object]
             duration = metadata.timestamp - metadata_start.timestamp
             is_intra_process = get_field(event_start, 'is_intra_process', raise_if_not_found=False)
-            self._data.add_callback_instance(
+            self.data.add_callback_instance(
                 callback_object,
                 metadata_start.timestamp,
                 duration,

@@ -59,9 +59,12 @@ class ProfileHandler(EventHandler):
             'sched_switch':
                 self._handle_sched_switch,
         }
-        super().__init__(handler_map=handler_map, **kwargs)
+        super().__init__(
+            handler_map=handler_map,
+            **kwargs,
+        )
 
-        self._data = ProfileDataModel()
+        self._data_model = ProfileDataModel()
         self._address_to_func = address_to_func
 
         # Temporary buffers
@@ -77,8 +80,9 @@ class ProfileHandler(EventHandler):
         #        ]
         self._current_funcs: Dict[int, List[List[Union[str, int]]]] = defaultdict(list)
 
-    def get_data_model(self) -> ProfileDataModel:
-        return self._data
+    @property
+    def data(self) -> ProfileDataModel:
+        return self._data_model
 
     def _handle_sched_switch(
         self, event: Dict, metadata: EventMetadata
@@ -130,7 +134,7 @@ class ProfileHandler(EventHandler):
         parent_name = tid_functions[-1][0] if function_depth > 0 else None
         duration = metadata.timestamp - start_timestamp
         actual_duration = (metadata.timestamp - last_start_timestamp) + total_duration
-        self._data.add_duration(
+        self.data.add_duration(
             tid,
             function_depth,
             function_name,

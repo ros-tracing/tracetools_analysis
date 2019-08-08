@@ -41,4 +41,4 @@ def main():
     time_diff = time.time() - start_time
     print(f'processed {len(events)} events in {time_diff * 1000:.2f} ms')
 
-    ros2_handler.get_data_model().print_model()
+    ros2_handler.data.print_model()

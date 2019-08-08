@@ -35,12 +35,22 @@ class ProfileHandler(EventHandler):
         * lttng_ust_cyg_profile_fast:func_entry
         * lttng_ust_cyg_profile_fast:func_exit
         * sched_switch
+
+    TODO get debug_info from babeltrace for
+    lttng_ust_cyg_profile_fast:func_entry events
+    (or resolve { address -> function } name another way)
     """
 
     def __init__(
         self,
+        address_to_func: Dict[int, str] = {},
         **kwargs,
     ) -> None:
+        """
+        Constructor.
+
+        :param address_to_func: the mapping from function address to name
+        """
         handler_map = {
             'lttng_ust_cyg_profile_fast:func_entry':
                 self._handle_function_entry,
@@ -52,6 +62,7 @@ class ProfileHandler(EventHandler):
         super().__init__(handler_map=handler_map, **kwargs)
 
         self._data = ProfileDataModel()
+        self._address_to_func = address_to_func
 
         # Temporary buffers
         # tid ->
@@ -141,12 +152,4 @@ class ProfileHandler(EventHandler):
     def _resolve_function_address(
         self, address: int
     ) -> Union[str, None]:
-        # TODO get debug_info from babeltrace for
-        # lttng_ust_cyg_profile_fast:func_entry events
-        # (or resolve { address -> function } name another way)
-        address_to_func = {
-            int('0x7F3418EC4DB4', 16): 'get_next_ready_executable',
-            int('0x7F3418EC3C54', 16): 'wait_for_work',
-            int('0x7F3418EE50F8', 16): 'collect_entities',
-        }
-        return address_to_func.get(address, None)
+        return self._address_to_func.get(address, None)

@@ -43,13 +43,13 @@ class ProfileHandler(EventHandler):
 
     def __init__(
         self,
-        address_to_func: Dict[int, str] = {},
+        address_to_func: Dict[Union[int, str], str] = {},
         **kwargs,
     ) -> None:
         """
         Constructor.
 
-        :param address_to_func: the mapping from function address to name
+        :param address_to_func: the mapping from function address (`int` or hex `str`) to name
         """
         handler_map = {
             'lttng_ust_cyg_profile_fast:func_entry':
@@ -65,7 +65,9 @@ class ProfileHandler(EventHandler):
         )
 
         self._data_model = ProfileDataModel()
-        self._address_to_func = address_to_func
+        self._address_to_func = {
+            self._addr_to_int(addr): name for addr, name in address_to_func.items()
+        }
 
         # Temporary buffers
         # tid ->
@@ -79,6 +81,11 @@ class ProfileHandler(EventHandler):
         #           ]
         #        ]
         self._current_funcs: Dict[int, List[List[Union[str, int]]]] = defaultdict(list)
+
+    @staticmethod
+    def _addr_to_int(addr: Union[int, str]) -> int:
+        """Transform an address into an `int` if it's a hex `str`."""
+        return int(addr, 16) if isinstance(addr, str) else addr
 
     @property
     def data(self) -> ProfileDataModel:

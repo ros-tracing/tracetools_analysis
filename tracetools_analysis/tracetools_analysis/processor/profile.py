@@ -66,7 +66,7 @@ class ProfileHandler(EventHandler):
 
         self._data_model = ProfileDataModel()
         self._address_to_func = {
-            self._addr_to_int(addr): name for addr, name in address_to_func.items()
+            self.addr_to_int(addr): name for addr, name in address_to_func.items()
         }
 
         # Temporary buffers
@@ -83,7 +83,7 @@ class ProfileHandler(EventHandler):
         self._current_funcs: Dict[int, List[List[Union[str, int]]]] = defaultdict(list)
 
     @staticmethod
-    def _addr_to_int(addr: Union[int, str]) -> int:
+    def addr_to_int(addr: Union[int, str]) -> int:
         """Transform an address into an `int` if it's a hex `str`."""
         return int(addr, 16) if isinstance(addr, str) else addr
 
@@ -157,7 +157,7 @@ class ProfileHandler(EventHandler):
         address = get_field(event, 'addr')
         resolution = self._resolve_function_address(address)
         if resolution is None:
-            resolution = self._int_to_hex_str(address)
+            resolution = self.int_to_hex_str(address)
         return resolution
 
     def _resolve_function_address(

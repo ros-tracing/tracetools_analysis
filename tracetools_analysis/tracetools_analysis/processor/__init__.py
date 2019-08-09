@@ -140,7 +140,7 @@ class EventHandler(Dependant):
         self.processor = processor
 
     @staticmethod
-    def _int_to_hex_str(addr: int) -> str:
+    def int_to_hex_str(addr: int) -> str:
         """Format an `int` into an hex `str`."""
         return f'0x{addr:X}'
 

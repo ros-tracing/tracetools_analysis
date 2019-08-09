@@ -270,6 +270,13 @@ expected = [
 ]
 
 
+address_to_func = {
+    '0xfA': '0xfA',
+    '0xfAA': '0xfAA',
+    '0xfB': '0xfB',
+}
+
+
 class TestProfileHandler(unittest.TestCase):
 
     def __init__(self, *args) -> None:
@@ -292,16 +299,19 @@ class TestProfileHandler(unittest.TestCase):
         return expected_df.append(expected_data, ignore_index=True)
 
     @staticmethod
-    def add_fake_fields(events: List[DictEvent]) -> None:
-        # Actual value does not matter here; it just needs to be there
+    def transform_fake_fields(events: List[DictEvent]) -> None:
         for event in events:
+            # Actual value does not matter here; it just needs to be there
             event['cpu_id'] = 69
+            if event['_name'] == 'lttng_ust_cyg_profile_fast:func_entry':
+                # The 'addr' field is supposed to be an int
+                event['addr'] = ProfileHandler.addr_to_int(event['addr'])
 
     @classmethod
     def setUpClass(cls):
-        cls.add_fake_fields(input_events)
+        cls.transform_fake_fields(input_events)
         cls.expected = cls.build_expected_df(expected)
-        cls.handler = ProfileHandler()
+        cls.handler = ProfileHandler(address_to_func=address_to_func)
         cls.processor = Processor(cls.handler)
         cls.processor.process(input_events)
 

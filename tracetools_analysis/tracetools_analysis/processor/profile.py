@@ -157,7 +157,7 @@ class ProfileHandler(EventHandler):
         address = get_field(event, 'addr')
         resolution = self._resolve_function_address(address)
         if resolution is None:
-            resolution = str(address)
+            resolution = self._int_to_hex_str(address)
         return resolution
 
     def _resolve_function_address(

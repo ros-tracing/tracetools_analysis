@@ -139,6 +139,11 @@ class EventHandler(Dependant):
         """Register processor with this `EventHandler` so that it can query other handlers."""
         self.processor = processor
 
+    @staticmethod
+    def _int_to_hex_str(addr: int) -> str:
+        """Format an `int` into an hex `str`."""
+        return f'0x{addr:X}'
+
     @classmethod
     def process(cls, events: List[DictEvent], **kwargs) -> 'EventHandler':
         """

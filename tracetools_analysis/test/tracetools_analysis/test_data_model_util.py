@@ -70,6 +70,45 @@ class TestDataModelUtil(unittest.TestCase):
         )
         assert_frame_equal(result_df, expected_df, check_dtype=False)
 
+    def test_compute_column_difference(self) -> None:
+        input_df = DataFrame(
+            data=[
+                {
+                    'a': 10,
+                    'b': 13,
+                    'c': 1,
+                },
+                {
+                    'a': 1,
+                    'b': 3,
+                    'c': 69,
+                },
+            ],
+        )
+        expected_df = DataFrame(
+            data=[
+                {
+                    'a': 10,
+                    'b': 13,
+                    'c': 1,
+                    'diff': 3,
+                },
+                {
+                    'a': 1,
+                    'b': 3,
+                    'c': 69,
+                    'diff': 2,
+                },
+            ],
+        )
+        DataModelUtil.compute_column_difference(
+            input_df,
+            'b',
+            'a',
+            'diff',
+        )
+        assert_frame_equal(input_df, expected_df)
+
 
 if __name__ == '__main__':
     unittest.main()

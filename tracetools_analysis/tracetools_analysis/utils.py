@@ -79,6 +79,23 @@ class DataModelUtil():
             )
         return df
 
+    @staticmethod
+    def compute_column_difference(
+        df: DataFrame,
+        left_column: str,
+        right_column: str,
+        diff_column: str,
+    ) -> None:
+        """
+        Create new column with difference between two columns.
+
+        :param df: the dataframe (inplace)
+        :param left_column: the name of the left column
+        :param right_column: the name of the right column
+        :param diff_column: the name of the new column with differences
+        """
+        df[diff_column] = df.apply(lambda row: row[left_column] - row[right_column], axis=1)
+
 
 class ProfileDataModelUtil(DataModelUtil):
     """Profiling data model utility class."""
@@ -127,6 +144,12 @@ class ProfileDataModelUtil(DataModelUtil):
                 (tid_df['depth'] == depth) &
                 (tid_df['function_name'] == name)
             ][['start_timestamp', 'duration', 'actual_duration']]
+            self.compute_column_difference(
+                data,
+                'duration',
+                'actual_duration',
+                'duration_difference',
+            )
             functions_data.append({
                 'depth': depth,
                 'function_name': name,

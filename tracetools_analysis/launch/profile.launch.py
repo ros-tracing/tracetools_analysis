@@ -27,6 +27,10 @@ def generate_launch_description():
             events_ust=[
                 'lttng_ust_cyg_profile_fast:func_entry',
                 'lttng_ust_cyg_profile_fast:func_exit',
+                'lttng_ust_statedump:start',
+                'lttng_ust_statedump:end',
+                'lttng_ust_statedump:bin_info',
+                'lttng_ust_statedump:build_id',
             ] + DEFAULT_EVENTS_ROS,
             events_kernel=[
                 'sched_switch',
@@ -34,7 +38,7 @@ def generate_launch_description():
         ),
         Node(
             package='ros_performance',
-            node_executable='nopub',
+            node_executable='ros',
             output='screen',
         ),
     ])

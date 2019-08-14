@@ -18,8 +18,8 @@
 import argparse
 import time
 
-from tracetools_analysis.analysis import load
-from tracetools_analysis.analysis import ros2_processor
+from tracetools_analysis.loading import load_pickle
+from tracetools_analysis.processor.ros2 import Ros2Handler
 
 
 def parse_args():
@@ -31,13 +31,14 @@ def parse_args():
 
 def main():
     args = parse_args()
-
     pickle_filename = args.pickle_file
 
     start_time = time.time()
-    events = load.load_pickle(pickle_filename)
-    processor = ros2_processor.ros2_process(events)
+
+    events = load_pickle(pickle_filename)
+    ros2_handler = Ros2Handler.process(events)
+
     time_diff = time.time() - start_time
     print(f'processed {len(events)} events in {time_diff * 1000:.2f} ms')
 
-    processor.get_data_model().print_model()
+    ros2_handler.get_data_model().print_model()

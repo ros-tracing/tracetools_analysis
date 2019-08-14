@@ -15,23 +15,25 @@
 """Module for trace events processor and ROS model creation."""
 
 from typing import Dict
-from typing import List
 
-from tracetools_read.utils import get_field
+from tracetools_read import get_field
 
-from .data_model import DataModel
-from .handler import EventHandler
-from .lttng_models import EventMetadata
+from . import EventHandler
+from . import EventMetadata
+from ..data_model.ros import RosDataModel
 
 
-class Ros2Processor(EventHandler):
+class Ros2Handler(EventHandler):
     """
-    ROS 2-aware event processing/handling class implementation.
+    ROS 2-aware event handling class implementation.
 
     Handles a trace's events and builds a model with the data.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        **kwargs,
+    ) -> None:
         # Link a ROS trace event to its corresponding handling method
         handler_map = {
             'ros2:rcl_init':
@@ -61,14 +63,14 @@ class Ros2Processor(EventHandler):
             'ros2:callback_end':
                 self._handle_callback_end,
         }
-        super().__init__(handler_map)
+        super().__init__(handler_map=handler_map, **kwargs)
 
-        self._data = DataModel()
+        self._data = RosDataModel()
 
         # Temporary buffers
         self._callback_instances = {}
 
-    def get_data_model(self) -> DataModel:
+    def get_data_model(self) -> RosDataModel:
         return self._data
 
     def _handle_rcl_init(
@@ -198,15 +200,3 @@ class Ros2Processor(EventHandler):
                 bool(is_intra_process))
         else:
             print(f'No matching callback start for callback object "{callback_object}"')
-
-
-def ros2_process(events: List[Dict[str, str]]) -> Ros2Processor:
-    """
-    Process unpickled events and create ROS 2 model.
-
-    :param events: the list of events
-    :return: the processor object
-    """
-    processor = Ros2Processor()
-    processor.handle_events(events)
-    return processor

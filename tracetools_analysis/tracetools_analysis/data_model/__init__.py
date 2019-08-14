@@ -11,3 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+"""Base data model module."""
+
+
+class DataModel():
+    """
+    Container with pre-processed data for an analysis to use.
+
+    Contains data for an analysis to use. This is a middleground between trace events data and the
+    output data of an analysis. It uses pandas `DataFrame` directly.
+    """
+
+    def __init__(self) -> None:
+        pass

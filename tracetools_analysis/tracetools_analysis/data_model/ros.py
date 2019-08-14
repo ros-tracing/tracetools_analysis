@@ -12,21 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for data model."""
+"""Module for ROS data model."""
 
 import pandas as pd
 
+from . import DataModel
 
-class DataModel():
+
+class RosDataModel(DataModel):
     """
-    Container to model pre-processed data for analysis.
+    Container to model pre-processed ROS data for analysis.
 
-    Contains data for an analysis to use. This is a middleground between trace events data and the
-    output data of an analysis. This aims to represent the data in a ROS-aware way.
-    It uses pandas DataFrames directly.
+    This aims to represent the data in a ROS-aware way.
     """
 
     def __init__(self) -> None:
+        """Constructor."""
+        super().__init__()
         # Objects (one-time events, usually when something is created)
         self.contexts = pd.DataFrame(columns=['context_handle',
                                               'timestamp',
@@ -145,7 +147,7 @@ class DataModel():
 
     def print_model(self) -> None:
         """Debug method to print every contained df."""
-        print('====================DATA MODEL====================')
+        print('====================ROS DATA MODEL====================')
         print(f'Contexts:\n{self.contexts.to_string()}')
         print()
         print(f'Nodes:\n{self.nodes.to_string()}')

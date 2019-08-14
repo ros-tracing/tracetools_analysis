@@ -12,32 +12,118 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for data model utility class."""
+"""Module for data model utility classes."""
 
+from collections import defaultdict
 from datetime import datetime as dt
 from typing import Any
+from typing import Dict
+from typing import List
 from typing import Mapping
+from typing import Set
 from typing import Union
 
 from pandas import DataFrame
 
-from .data_model import DataModel
+from .data_model.cpu_time import CpuTimeDataModel
+from .data_model.profile import ProfileDataModel
+from .data_model.ros import RosDataModel
 
 
-class DataModelUtil():
+class ProfileDataModelUtil():
     """
-    Data model utility class.
+    Profiling data model utility class.
 
-    Provides functions to get info on a data model.
+    Provides functions to get more info on the data.
     """
 
-    def __init__(self, data_model: DataModel) -> None:
+    def __init__(self, data_model: ProfileDataModel) -> None:
         """
         Constructor.
 
         :param data_model: the data model object to use
         """
-        self._data = data_model
+        self.data = data_model
+
+    def with_tid(self, tid: int) -> DataFrame:
+        return self.data.times.loc[self.data.times['tid'] == tid]
+
+    def get_tids(self) -> Set[int]:
+        """Get the TIDs in the data model."""
+        return set(self.data.times['tid'])
+
+    def get_call_tree(self, tid: int) -> Dict[str, List[str]]:
+        depth_names = self.with_tid(tid)[
+            ['depth', 'function_name', 'parent_name']
+        ].drop_duplicates()
+        # print(depth_names.to_string())
+        tree = defaultdict(set)
+        for _, row in depth_names.iterrows():
+            depth = row['depth']
+            name = row['function_name']
+            parent = row['parent_name']
+            if depth == 0:
+                tree[name]
+            else:
+                tree[parent].add(name)
+        return dict(tree)
+
+    def get_function_duration_data(self, tid: int) -> List[Dict[str, Union[int, str, DataFrame]]]:
+        """Get duration data for each function."""
+        tid_df = self.with_tid(tid)
+        depth_names = tid_df[['depth', 'function_name', 'parent_name']].drop_duplicates()
+        functions_data = []
+        for _, row in depth_names.iterrows():
+            depth = row['depth']
+            name = row['function_name']
+            parent = row['parent_name']
+            data = tid_df.loc[
+                (tid_df['depth'] == depth) &
+                (tid_df['function_name'] == name)
+            ][['start_timestamp', 'duration', 'actual_duration']]
+            functions_data.append({
+                'depth': depth,
+                'function_name': name,
+                'parent_name': parent,
+                'data': data,
+            })
+        return functions_data
+
+
+class CpuTimeDataModelUtil():
+    """
+    CPU time data model utility class.
+
+    Provides functions to get info on a CPU time data model.
+    """
+
+    def __init__(self, data_model: CpuTimeDataModel) -> None:
+        """
+        Constructor.
+
+        :param data_model: the data model object to use
+        """
+        self.data = data_model
+
+    def get_time_per_thread(self) -> DataFrame:
+        """Get a DataFrame of total duration for each thread."""
+        return self.data.times.loc[:, ['tid', 'duration']].groupby(by='tid').sum()
+
+
+class RosDataModelUtil():
+    """
+    ROS data model utility class.
+
+    Provides functions to get info on a ROS data model.
+    """
+
+    def __init__(self, data_model: RosDataModel) -> None:
+        """
+        Constructor.
+
+        :param data_model: the data model object to use
+        """
+        self.data = data_model
 
     def _prettify(self, original: str) -> str:
         """
@@ -100,8 +186,8 @@ class DataModelUtil():
 
         :return: the map
         """
-        callback_instances = self._data.callback_instances
-        callback_symbols = self._data.callback_symbols
+        callback_instances = self.data.callback_instances
+        callback_symbols = self.data.callback_symbols
 
         # Get a list of callback objects
         callback_objects = set(callback_instances['callback_object'])
@@ -120,8 +206,8 @@ class DataModelUtil():
         :return: a dataframe containing the start timestamp (datetime)
         and duration (ms) of all callback instances for that object
         """
-        data = self._data.callback_instances.loc[
-            self._data.callback_instances.loc[:, 'callback_object'] == callback_obj,
+        data = self.data.callback_instances.loc[
+            self.data.callback_instances.loc[:, 'callback_object'] == callback_obj,
             ['timestamp', 'duration']
         ]
         # Transform both columns to ms
@@ -131,6 +217,35 @@ class DataModelUtil():
         # Transform start timestamp column to datetime objects
         data['timestamp'] = data['timestamp'].apply(lambda t: dt.fromtimestamp(t / 1000.0))
         return data
+
+    def get_node_tid_from_name(
+        self, node_name: str
+    ) -> Union[int, None]:
+        """
+        Get the tid corresponding to a node.
+
+        :param node_name: the name of the node
+        :return: the tid, or `None` if not found
+        """
+        # Assuming there is only one row with the given name
+        node_row = self.data.nodes.loc[
+            self.data.nodes['name'] == node_name
+        ]
+        assert len(node_row.index) <= 1, 'more than 1 node found'
+        return node_row.iloc[0]['tid'] if not node_row.empty else None
+
+    def get_node_names_from_tid(
+        self, tid: str
+    ) -> Union[List[str], None]:
+        """
+        Get the list of node names corresponding to a tid.
+
+        :param tid: the tid
+        :return: the list of node names, or `None` if not found
+        """
+        return self.data.nodes[
+            self.data.nodes['tid'] == tid
+        ]['name'].tolist()
 
     def get_callback_owner_info(
         self, callback_obj: int
@@ -147,26 +262,26 @@ class DataModelUtil():
         :return: information about the owner of the callback, or `None` if it fails
         """
         # Get handle corresponding to callback object
-        handle = self._data.callback_objects.loc[
-            self._data.callback_objects['callback_object'] == callback_obj
+        handle = self.data.callback_objects.loc[
+            self.data.callback_objects['callback_object'] == callback_obj
         ].index.values.astype(int)[0]
 
         type_name = None
         info = None
         # Check if it's a timer first (since it's slightly different than the others)
-        if handle in self._data.timers.index:
+        if handle in self.data.timers.index:
             type_name = 'Timer'
             info = self.get_timer_handle_info(handle)
-        elif handle in self._data.publishers.index:
+        elif handle in self.data.publishers.index:
             type_name = 'Publisher'
             info = self.get_publisher_handle_info(handle)
-        elif handle in self._data.subscriptions.index:
+        elif handle in self.data.subscriptions.index:
             type_name = 'Subscription'
             info = self.get_subscription_handle_info(handle)
-        elif handle in self._data.services.index:
+        elif handle in self.data.services.index:
             type_name = 'Service'
             info = self.get_subscription_handle_info(handle)
-        elif handle in self._data.clients.index:
+        elif handle in self.data.clients.index:
             type_name = 'Client'
             info = self.get_client_handle_info(handle)
 
@@ -184,11 +299,11 @@ class DataModelUtil():
         :return: a dictionary with name:value info, or `None` if it fails
         """
         # TODO find a way to link a timer to a specific node
-        if timer_handle not in self._data.timers.index:
+        if timer_handle not in self.data.timers.index:
             return None
 
-        tid = self._data.timers.loc[timer_handle, 'tid']
-        period_ns = self._data.timers.loc[timer_handle, 'period']
+        tid = self.data.timers.loc[timer_handle, 'tid']
+        period_ns = self.data.timers.loc[timer_handle, 'period']
         period_ms = period_ns / 1000000.0
         return {'tid': tid, 'period': f'{period_ms:.0f} ms'}
 
@@ -201,12 +316,12 @@ class DataModelUtil():
         :param publisher_handle: the publisher handle value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        if publisher_handle not in self._data.publishers.index:
+        if publisher_handle not in self.data.publishers.index:
             return None
 
-        node_handle = self._data.publishers.loc[publisher_handle, 'node_handle']
+        node_handle = self.data.publishers.loc[publisher_handle, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
-        topic_name = self._data.publishers.loc[publisher_handle, 'topic_name']
+        topic_name = self.data.publishers.loc[publisher_handle, 'topic_name']
         publisher_info = {'topic': topic_name}
         return {**node_handle_info, **publisher_info}
 
@@ -219,11 +334,11 @@ class DataModelUtil():
         :param subscription_handle: the subscription handle value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        subscriptions_info = self._data.subscriptions.merge(
-            self._data.nodes,
+        subscriptions_info = self.data.subscriptions.merge(
+            self.data.nodes,
             left_on='node_handle',
             right_index=True)
-        if subscription_handle not in self._data.subscriptions.index:
+        if subscription_handle not in self.data.subscriptions.index:
             return None
 
         node_handle = subscriptions_info.loc[subscription_handle, 'node_handle']
@@ -241,12 +356,12 @@ class DataModelUtil():
         :param service_handle: the service handle value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        if service_handle not in self._data.services:
+        if service_handle not in self.data.services:
             return None
 
-        node_handle = self._data.services.loc[service_handle, 'node_handle']
+        node_handle = self.data.services.loc[service_handle, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
-        service_name = self._data.services.loc[service_handle, 'service_name']
+        service_name = self.data.services.loc[service_handle, 'service_name']
         service_info = {'service': service_name}
         return {**node_handle_info, **service_info}
 
@@ -259,12 +374,12 @@ class DataModelUtil():
         :param client_handle: the client handle value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        if client_handle not in self._data.clients:
+        if client_handle not in self.data.clients:
             return None
 
-        node_handle = self._data.clients.loc[client_handle, 'node_handle']
+        node_handle = self.data.clients.loc[client_handle, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
-        service_name = self._data.clients.loc[client_handle, 'service_name']
+        service_name = self.data.clients.loc[client_handle, 'service_name']
         service_info = {'service': service_name}
         return {**node_handle_info, **service_info}
 
@@ -277,11 +392,11 @@ class DataModelUtil():
         :param node_handle: the node handle value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        if node_handle not in self._data.nodes.index:
+        if node_handle not in self.data.nodes.index:
             return None
 
-        node_name = self._data.nodes.loc[node_handle, 'name']
-        tid = self._data.nodes.loc[node_handle, 'tid']
+        node_name = self.data.nodes.loc[node_handle, 'name']
+        tid = self.data.nodes.loc[node_handle, 'tid']
         return {'node': node_name, 'tid': tid}
 
     def format_info_dict(self, info_dict: Mapping[str, Any]) -> str:

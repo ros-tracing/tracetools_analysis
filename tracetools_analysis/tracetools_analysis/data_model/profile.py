@@ -59,7 +59,7 @@ class ProfileDataModel(DataModel):
             'duration': duration,
             'actual_duration': actual_duration,
         }
-        self.times = self.times.append(data, ignore_index=True)
+        self.times.loc[len(self.times.index)] = data
 
     def print_model(self) -> None:
         """Debug method to print every contained df."""

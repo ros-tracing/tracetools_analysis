@@ -104,7 +104,7 @@ class EventHandler(Dependant):
     Base event handling class.
 
     Provides handling functions for some events, depending on the name.
-    To be subclassed.
+    Passes that on to a data model. To be subclassed.
     """
 
     def __init__(
@@ -130,9 +130,19 @@ class EventHandler(Dependant):
         """Get the handler functions map."""
         return self._handler_map
 
+    @property
+    def data(self) -> None:
+        """Get the data model."""
+        return None
+
     def register_processor(self, processor: 'Processor') -> None:
         """Register processor with this `EventHandler` so that it can query other handlers."""
         self.processor = processor
+
+    @staticmethod
+    def int_to_hex_str(addr: int) -> str:
+        """Format an `int` into an hex `str`."""
+        return f'0x{addr:X}'
 
     @classmethod
     def process(cls, events: List[DictEvent], **kwargs) -> 'EventHandler':

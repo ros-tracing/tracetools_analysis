@@ -49,7 +49,7 @@ class CpuTimeDataModel(DataModel):
             'duration': duration,
             'cpu_id': cpu_id,
         }
-        self.times = self.times.append(data, ignore_index=True)
+        self.times.loc[len(self.times.index)] = data
 
     def print_model(self) -> None:
         """Debug method to print every contained df."""

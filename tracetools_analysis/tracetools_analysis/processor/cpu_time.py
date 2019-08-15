@@ -39,16 +39,20 @@ class CpuTimeHandler(EventHandler):
             'sched_switch':
                 self._handle_sched_switch,
         }
-        super().__init__(handler_map=handler_map, **kwargs)
+        super().__init__(
+            handler_map=handler_map,
+            **kwargs,
+        )
 
-        self._data = CpuTimeDataModel()
+        self._data_model = CpuTimeDataModel()
 
         # Temporary buffers
         # cpu_id -> start timestamp of the running thread
         self._cpu_start: Dict[int, int] = {}
 
-    def get_data_model(self) -> CpuTimeDataModel:
-        return self._data
+    @property
+    def data(self) -> CpuTimeDataModel:
+        return self._data_model
 
     def _handle_sched_switch(
         self, event: Dict, metadata: EventMetadata
@@ -62,6 +66,6 @@ class CpuTimeHandler(EventHandler):
         if prev_timestamp is not None:
             prev_tid = get_field(event, 'prev_tid')
             duration = timestamp - prev_timestamp
-            self._data.add_duration(prev_tid, prev_timestamp, duration, cpu_id)
+            self.data.add_duration(prev_tid, prev_timestamp, duration, cpu_id)
         # Set start timestamp of next thread
         self._cpu_start[cpu_id] = timestamp

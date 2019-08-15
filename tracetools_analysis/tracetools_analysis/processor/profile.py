@@ -35,12 +35,22 @@ class ProfileHandler(EventHandler):
         * lttng_ust_cyg_profile_fast:func_entry
         * lttng_ust_cyg_profile_fast:func_exit
         * sched_switch
+
+    TODO get debug_info from babeltrace for
+    lttng_ust_cyg_profile_fast:func_entry events
+    (or resolve { address -> function } name another way)
     """
 
     def __init__(
         self,
+        address_to_func: Dict[Union[int, str], str] = {},
         **kwargs,
     ) -> None:
+        """
+        Constructor.
+
+        :param address_to_func: the mapping from function address (`int` or hex `str`) to name
+        """
         handler_map = {
             'lttng_ust_cyg_profile_fast:func_entry':
                 self._handle_function_entry,
@@ -49,9 +59,15 @@ class ProfileHandler(EventHandler):
             'sched_switch':
                 self._handle_sched_switch,
         }
-        super().__init__(handler_map=handler_map, **kwargs)
+        super().__init__(
+            handler_map=handler_map,
+            **kwargs,
+        )
 
-        self._data = ProfileDataModel()
+        self._data_model = ProfileDataModel()
+        self._address_to_func = {
+            self.addr_to_int(addr): name for addr, name in address_to_func.items()
+        }
 
         # Temporary buffers
         # tid ->
@@ -66,8 +82,14 @@ class ProfileHandler(EventHandler):
         #        ]
         self._current_funcs: Dict[int, List[List[Union[str, int]]]] = defaultdict(list)
 
-    def get_data_model(self) -> ProfileDataModel:
-        return self._data
+    @staticmethod
+    def addr_to_int(addr: Union[int, str]) -> int:
+        """Transform an address into an `int` if it's a hex `str`."""
+        return int(addr, 16) if isinstance(addr, str) else addr
+
+    @property
+    def data(self) -> ProfileDataModel:
+        return self._data_model
 
     def _handle_sched_switch(
         self, event: Dict, metadata: EventMetadata
@@ -119,7 +141,7 @@ class ProfileHandler(EventHandler):
         parent_name = tid_functions[-1][0] if function_depth > 0 else None
         duration = metadata.timestamp - start_timestamp
         actual_duration = (metadata.timestamp - last_start_timestamp) + total_duration
-        self._data.add_duration(
+        self.data.add_duration(
             tid,
             function_depth,
             function_name,
@@ -135,18 +157,10 @@ class ProfileHandler(EventHandler):
         address = get_field(event, 'addr')
         resolution = self._resolve_function_address(address)
         if resolution is None:
-            resolution = str(address)
+            resolution = self.int_to_hex_str(address)
         return resolution
 
     def _resolve_function_address(
         self, address: int
     ) -> Union[str, None]:
-        # TODO get debug_info from babeltrace for
-        # lttng_ust_cyg_profile_fast:func_entry events
-        # (or resolve { address -> function } name another way)
-        address_to_func = {
-            int('0x7F3418EC4DB4', 16): 'get_next_ready_executable',
-            int('0x7F3418EC3C54', 16): 'wait_for_work',
-            int('0x7F3418EE50F8', 16): 'collect_entities',
-        }
-        return address_to_func.get(address, None)
+        return self._address_to_func.get(address, None)

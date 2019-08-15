@@ -16,8 +16,8 @@
 
 from pickle import Pickler
 
-from tracetools_read import event_to_dict
-from tracetools_read import get_trace_ctf_events
+from tracetools_read.trace import event_to_dict
+from tracetools_read.trace import get_trace_ctf_events
 
 
 def ctf_to_pickle(trace_directory: str, target: Pickler) -> int:

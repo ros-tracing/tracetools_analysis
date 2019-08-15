@@ -10,8 +10,8 @@
   <author email="ingo.luetkebohle@de.bosch.com">Ingo Lütkebohle</author>
   <author email="fixed-term.christophe.bourquebedard@de.bosch.com">Christophe Bedard</author>
 
-  <exec_depend>tracetools_read</exec_depend>
-  <exec_depend>python3-pandas</exec_depend>
+  <depend>tracetools_read</depend>
+  <depend>python3-pandas</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

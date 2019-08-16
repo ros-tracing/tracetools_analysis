@@ -18,6 +18,7 @@ from collections import defaultdict
 from typing import Callable
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Set
 from typing import Type
 
@@ -123,7 +124,7 @@ class EventHandler(Dependant):
         assert handler_map is not None and len(handler_map) > 0, \
             f'empty map: {self.__class__.__name__}'
         self._handler_map = handler_map
-        self.processor = None
+        self.processor: Optional[Processor] = None
 
     @property
     def handler_map(self) -> HandlerMap:

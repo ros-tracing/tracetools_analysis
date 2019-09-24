@@ -143,7 +143,7 @@ class RosDataModel(DataModel):
             'duration': duration,
             'intra_process': intra_process,
         }
-        self.callback_instances.loc[len(self.callback_instances.index)] = data
+        self.callback_instances = self.callback_instances.append(data, ignore_index=True)
 
     def print_model(self) -> None:
         """Debug method to print every contained df."""

@@ -26,12 +26,17 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Process a pickle file generated '
                                                  'from tracing and analyze the data.')
     parser.add_argument('pickle_file', help='the pickle file to import')
+    parser.add_argument(
+        '-d', '--debug',
+        action='store_true', default=False,
+        help='display debug information (e.g. resulting model)')
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
     pickle_filename = args.pickle_file
+    debug = args.debug
 
     start_time = time.time()
 
@@ -39,6 +44,6 @@ def main():
     ros2_handler = Ros2Handler.process(events)
 
     time_diff = time.time() - start_time
+    if debug:
+        ros2_handler.data.print_model()
     print(f'processed {len(events)} events in {time_diff * 1000:.2f} ms')
-
-    ros2_handler.data.print_model()

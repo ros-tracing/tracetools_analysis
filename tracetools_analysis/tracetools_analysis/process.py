@@ -28,17 +28,12 @@ def parse_args():
     parser.add_argument(
         'output_file_path',
         help='the converted file to import')
-    parser.add_argument(
-        '-d', '--debug', dest='debug',
-        action='store_true', default=False,
-        help='display debug information (e.g. resulting model)')
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
     output_file_path = args.output_file_path
-    debug = args.debug
 
     start_time = time.time()
 
@@ -46,6 +41,5 @@ def main():
     ros2_handler = Ros2Handler.process(events)
 
     time_diff = time.time() - start_time
-    if debug:
-        ros2_handler.data.print_model()
+    ros2_handler.data.print_model()
     print(f'processed {len(events)} events in {time_diff * 1000:.2f} ms')

@@ -348,11 +348,17 @@ class Processor():
 
 
 class ProcessingProgressDisplay():
+    """Display processing progress periodically on stdout."""
 
     def __init__(
         self,
         processing_elements: List[str],
     ) -> None:
+        """
+        Constructor.
+
+        :param processing_elements: the list of elements doing processing
+        """
         self.__info_string = '[' + ', '.join(processing_elements) + ']'
         self.__progress_count = 0
         self.__total_work = 0
@@ -362,6 +368,11 @@ class ProcessingProgressDisplay():
         self,
         total: int,
     ) -> None:
+        """
+        Set the total units of work.
+
+        :param total: the total number of units of work to do
+        """
         self.__total_work = total
         self.__work_display_period = int(self.__total_work / 100.0)
 
@@ -369,6 +380,11 @@ class ProcessingProgressDisplay():
         self,
         increment: int = 1,
     ) -> None:
+        """
+        Increment the amount of work done.
+
+        :param increment: the number of units of work to add to the total
+        """
         self.__progress_count += increment
         if self.__progress_count % self.__work_display_period == 0:
             percentage = 100.0 * (float(self.__progress_count) / float(self.__total_work))

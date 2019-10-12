@@ -13,19 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Entrypoint/script to process events from a pickle file to build a ROS model."""
+"""Entrypoint/script to process events from a converted file to build a ROS model."""
 
 import argparse
 import time
 
-from tracetools_analysis.loading import load_pickle
+from tracetools_analysis.loading import load_file
 from tracetools_analysis.processor.ros2 import Ros2Handler
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Process a pickle file generated '
-                                                 'from tracing and analyze the data.')
-    parser.add_argument('pickle_file', help='the pickle file to import')
+    parser = argparse.ArgumentParser(description='Process a file converted from a trace'
+                                                 'directory and analyze the data.')
+    parser.add_argument(
+        'output_file_path', help='the converted file to import')
     parser.add_argument(
         '-d', '--debug',
         action='store_true', default=False,
@@ -35,12 +36,12 @@ def parse_args():
 
 def main():
     args = parse_args()
-    pickle_filename = args.pickle_file
+    output_file_path = args.output_file_path
     debug = args.debug
 
     start_time = time.time()
 
-    events = load_pickle(pickle_filename)
+    events = load_file(output_file_path)
     ros2_handler = Ros2Handler.process(events)
 
     time_diff = time.time() - start_time

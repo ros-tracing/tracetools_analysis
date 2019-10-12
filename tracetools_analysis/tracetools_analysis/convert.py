@@ -26,9 +26,10 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='Convert CTF trace data to a file.')
     parser.add_argument(
-        'trace_directory', help='the path to the main CTF trace directory')
+        'trace_directory',
+        help='the path to the main CTF trace directory')
     parser.add_argument(
-        '-o', '--output-file-path',
+        '-o', '--output-file-path', dest='output_file_path',
         help='the path to the output file to generate (default: $trace_directory/converted)')
     args = parser.parse_args()
     if args.output_file_path is None:

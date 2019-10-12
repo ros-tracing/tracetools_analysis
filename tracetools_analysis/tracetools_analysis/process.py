@@ -26,9 +26,10 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Process a file converted from a trace'
                                                  'directory and analyze the data.')
     parser.add_argument(
-        'output_file_path', help='the converted file to import')
+        'output_file_path',
+        help='the converted file to import')
     parser.add_argument(
-        '-d', '--debug',
+        '-d', '--debug', dest='debug',
         action='store_true', default=False,
         help='display debug information (e.g. resulting model)')
     return parser.parse_args()

@@ -360,9 +360,10 @@ class ProcessingProgressDisplay():
         :param processing_elements: the list of elements doing processing
         """
         self.__info_string = '[' + ', '.join(processing_elements) + ']'
-        self.__progress_count = 0
-        self.__total_work = 0
-        self.__work_display_period = 1
+        self.__total_work = None
+        self.__progress_count = None
+        self.__rolling_count = None
+        self.__work_display_period = None
 
     def set_work_total(
         self,
@@ -374,7 +375,10 @@ class ProcessingProgressDisplay():
         :param total: the total number of units of work to do
         """
         self.__total_work = total
-        self.__work_display_period = int(self.__total_work / 100.0)
+        self.__progress_count = 0
+        self.__rolling_count = 0
+        self.__work_display_period = total // 100
+        self._update()
 
     def did_work(
         self,
@@ -385,7 +389,13 @@ class ProcessingProgressDisplay():
 
         :param increment: the number of units of work to add to the total
         """
+        # For now, let it fail if set_work_total() hasn't been called
         self.__progress_count += increment
-        if self.__progress_count % self.__work_display_period == 0:
-            percentage = 100.0 * (float(self.__progress_count) / float(self.__total_work))
-            sys.stdout.write(f' [{percentage:2.0f}%] {self.__info_string}\r')
+        self.__rolling_count += increment
+        if self.__rolling_count >= self.__work_display_period:
+            self.__rolling_count -= self.__work_display_period
+            self._update()
+
+    def _update(self) -> None:
+        percentage = 100.0 * (float(self.__progress_count) / float(self.__total_work))
+        sys.stdout.write(f' [{percentage:2.0f}%] {self.__info_string}\r')

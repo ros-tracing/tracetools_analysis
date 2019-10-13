@@ -4,12 +4,10 @@ variables:
   DOCKER_DRIVER: overlay2
   PACKAGES_LIST: tracetools_analysis
 
-before_script:
-  - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
-  - rosdep install --from-paths . -i . -i /root/ws --rosdistro dashing -y
-  - . /root/ws/install/local_setup.sh
-
 build:
+  before_script:
+    - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
+    - . /root/ws/install/local_setup.sh
   script:
     - colcon build --symlink-install --packages-up-to $PACKAGES_LIST
     - . install/local_setup.sh

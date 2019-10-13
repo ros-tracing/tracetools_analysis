@@ -1,10 +1,10 @@
-image: registry.gitlab.com/micro-ros/ros_tracing/ci_base
-
 variables:
   DOCKER_DRIVER: overlay2
   PACKAGES_LIST: tracetools_analysis
+  base_image_id: registry.gitlab.com/micro-ros/ros_tracing/ci_base
 
 build:
+  image: $base_image_id
   before_script:
     - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
     - . /root/ws/install/local_setup.sh

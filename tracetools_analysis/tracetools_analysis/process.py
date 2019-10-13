@@ -99,6 +99,7 @@ def inspect_input_path(
             return converted_file_path, True
         else:
             # Simplest use-case: given path is an existing converted file
+            print(f'found converted file: {converted_file_path}')
             return converted_file_path, False
 
 

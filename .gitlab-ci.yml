@@ -12,7 +12,7 @@ build:
     - colcon build --symlink-install --packages-up-to $PACKAGES_LIST
     - . install/local_setup.sh
     - colcon test --packages-select $PACKAGES_LIST
-    - colcon test-result
+    - colcon test-result --all
   artifacts:
     paths:
       - install

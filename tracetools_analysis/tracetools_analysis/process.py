@@ -43,6 +43,7 @@ def main():
 
     start_time = time.time()
 
+    input_path = os.path.expanduser(input_path)
     # Check if not a file
     if not os.path.isfile(input_path):
         # Might be a trace directory

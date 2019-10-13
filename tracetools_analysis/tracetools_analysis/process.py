@@ -16,28 +16,55 @@
 """Entrypoint/script to process events from a converted file to build a ROS model."""
 
 import argparse
+import os
+import sys
 import time
 
+from tracetools_analysis.convert import convert
+from tracetools_analysis.convert import DEFAULT_CONVERT_FILE_NAME
 from tracetools_analysis.loading import load_file
 from tracetools_analysis.processor.ros2 import Ros2Handler
+from tracetools_read.trace import is_trace_directory
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Process a file converted from a trace '
                                                  'directory and output model data.')
     parser.add_argument(
-        'output_file_path',
-        help='the converted file to import')
+        'input_path',
+        help='the path to a converted file to import, '
+        'or the path to a CTF directory to convert and process')
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
-    output_file_path = args.output_file_path
+    input_path = args.input_path
 
     start_time = time.time()
 
-    events = load_file(output_file_path)
+    # Check if not a file
+    if not os.path.isfile(input_path):
+        # Might be a trace directory
+        # Check if there is a converted file
+        prospective_converted_file = os.path.join(input_path, DEFAULT_CONVERT_FILE_NAME)
+        if os.path.isfile(prospective_converted_file):
+            # Use that as the converted input file
+            print(f'found converted file: {prospective_converted_file}')
+            input_path = prospective_converted_file
+        else:
+            # Check if it is a trace directory
+            # Result could be unexpected because it will look for trace directories recursively
+            if is_trace_directory(input_path):
+                # Convert trace directory first to create converted file
+                convert(input_path, prospective_converted_file)
+                input_path = prospective_converted_file
+            else:
+                # We cannot do anything
+                print('cannot find either a trace directory or a converted file', file=sys.stderr)
+                return 1
+
+    events = load_file(input_path)
     ros2_handler = Ros2Handler.process(events)
 
     time_diff = time.time() - start_time

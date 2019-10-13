@@ -2,16 +2,30 @@
 
 Analysis tools for [ROS 2 tracing](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing).
 
-# Setup
+## Setup
 
 To display results, install:
 
 * [Jupyter](https://jupyter.org/install)
 * [Bokeh](https://bokeh.pydata.org/en/latest/docs/user_guide/quickstart.html#userguide-quickstart-install)
 
-# Use
+## Trace analysis
 
-Start Jupyter Notebook:
+After generating a trace (see [`ros2_tracing`](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing#tracing)), we can analyze it to extract useful execution data.
+
+Since CTF traces (the output format of the [LTTng](https://lttng.org/) tracer) are very slow to read, we first convert them into a single file which can be read much faster.
+
+```
+$ ros2 trace-analysis convert /path/to/trace/directory
+```
+
+Then we can process it to create a data model which could be queried for analysis.
+
+```
+$ ros2 trace-analysis process /path/to/trace/directory
+```
+
+This last command will process and output the raw data models, but to actually display results, process and analyze using a Jupyter Notebook.
 
 ```
 $ jupyter notebook

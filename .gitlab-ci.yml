@@ -1,20 +1,9 @@
-image: registry.gitlab.com/micro-ros/ros_tracing/ci_base
-
 variables:
   DOCKER_DRIVER: overlay2
   PACKAGES_LIST: tracetools_analysis
+  base_image_id: registry.gitlab.com/micro-ros/ros_tracing/ci_base
 
-before_script:
-  - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
-  - rosdep install --from-paths . -i . -i /root/ws --rosdistro dashing -y
-  - . /root/ws/install/local_setup.sh
-
-build:
-  script:
-    - colcon build --symlink-install --packages-up-to $PACKAGES_LIST
-    - . install/local_setup.sh
-    - colcon test --packages-select $PACKAGES_LIST
-    - colcon test-result
+.global_artifacts: &global_artifacts
   artifacts:
     paths:
       - install
@@ -24,3 +13,15 @@ build:
       junit:
         - build/*/test_results/*/*.xunit.xml
         - build/*/pytest.xml
+
+build:
+  image: $base_image_id
+  before_script:
+    - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
+    - . /root/ws/install/local_setup.sh
+  script:
+    - colcon build --symlink-install --packages-up-to $PACKAGES_LIST
+    - . install/local_setup.sh
+    - colcon test --packages-select $PACKAGES_LIST
+    - colcon test-result --all
+  <<: *global_artifacts

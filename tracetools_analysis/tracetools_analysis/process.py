@@ -32,7 +32,7 @@ def parse_args():
                                                  'directory and output model data.')
     parser.add_argument(
         'input_path',
-        help='the path to a converted file to import, '
+        help='the path to a converted file to import and process, '
         'or the path to a CTF directory to convert and process')
     return parser.parse_args()
 
@@ -57,11 +57,13 @@ def main():
             # Result could be unexpected because it will look for trace directories recursively
             if is_trace_directory(input_path):
                 # Convert trace directory first to create converted file
-                convert(input_path, prospective_converted_file)
+                convert(input_path, DEFAULT_CONVERT_FILE_NAME)
                 input_path = prospective_converted_file
             else:
                 # We cannot do anything
-                print('cannot find either a trace directory or a converted file', file=sys.stderr)
+                print(
+                    f'cannot find either a trace directory or a converted file: {input_path}',
+                    file=sys.stderr)
                 return 1
 
     events = load_file(input_path)

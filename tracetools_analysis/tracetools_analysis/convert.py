@@ -32,20 +32,27 @@ def parse_args():
         'trace_directory',
         help='the path to the main CTF trace directory')
     parser.add_argument(
-        '-o', '--output-file-path', dest='output_file_path',
-        help='the path to the output file to generate '
-        f'(default: $trace_directory/{DEFAULT_CONVERT_FILE_NAME})')
-    args = parser.parse_args()
-    if args.output_file_path is None:
-        args.output_file_path = os.path.join(args.trace_directory, DEFAULT_CONVERT_FILE_NAME)
-    return args
+        '-o', '--output-file-name', dest='output_file_name',
+        default=DEFAULT_CONVERT_FILE_NAME,
+        help='the name of the output file to generate, '
+        'under $trace_directory (default: %(default)s)')
+    return parser.parse_args()
 
 
 def convert(
     trace_directory: str,
-    output_file_path: str,
+    output_file_name: str = DEFAULT_CONVERT_FILE_NAME,
 ) -> None:
-    print(f'importing trace directory: {trace_directory}')
+    """
+    Convert trace directory to a file.
+
+    The output file will be placed under the trace directory.
+
+    :param trace_directory: the path to the trace directory to import
+    :param outout_file_name: the name of the output file
+    """
+    print(f'converting trace directory: {trace_directory}')
+    output_file_path = os.path.join(os.path.expanduser(trace_directory), output_file_name)
     start_time = time.time()
     count = ctf.convert(trace_directory, output_file_path)
     time_diff = time.time() - start_time
@@ -57,6 +64,6 @@ def main():
     args = parse_args()
 
     trace_directory = args.trace_directory
-    output_file_path = args.output_file_path
+    output_file_name = args.output_file_name
 
-    convert(trace_directory, output_file_path)
+    convert(trace_directory, output_file_name)

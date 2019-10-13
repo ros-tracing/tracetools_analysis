@@ -14,6 +14,7 @@
 
 """Module for converted trace file loading."""
 
+import os
 import pickle
 from typing import Dict
 from typing import List
@@ -27,7 +28,7 @@ def load_file(file_path: str) -> List[Dict]:
     :return: the list of events read from the file
     """
     events = []
-    with open(file_path, 'rb') as f:
+    with open(os.path.expanduser(file_path), 'rb') as f:
         p = pickle.Unpickler(f)
         while True:
             try:

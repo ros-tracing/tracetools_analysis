@@ -18,6 +18,7 @@
 import argparse
 import os
 import time
+from typing import Optional
 
 from tracetools_analysis.conversion import ctf
 
@@ -25,24 +26,28 @@ from tracetools_analysis.conversion import ctf
 DEFAULT_CONVERT_FILE_NAME = 'converted'
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description='Convert CTF trace data to a file.')
+def add_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         'trace_directory',
-        help='the path to the main CTF trace directory')
+        help='the path to the main trace directory')
     parser.add_argument(
         '-o', '--output-file-name', dest='output_file_name',
         default=DEFAULT_CONVERT_FILE_NAME,
         help='the name of the output file to generate, '
         'under $trace_directory (default: %(default)s)')
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Convert trace data to a file.')
+    add_args(parser)
     return parser.parse_args()
 
 
 def convert(
     trace_directory: str,
     output_file_name: str = DEFAULT_CONVERT_FILE_NAME,
-) -> None:
+) -> Optional[int]:
     """
     Convert trace directory to a file.
 

@@ -1,6 +1,6 @@
 variables:
   DOCKER_DRIVER: overlay2
-  PACKAGES_LIST: tracetools_analysis
+  PACKAGES_LIST: tracetools_analysis ros2trace_analysis
   base_image_id: registry.gitlab.com/micro-ros/ros_tracing/ci_base
 
 .global_artifacts: &global_artifacts

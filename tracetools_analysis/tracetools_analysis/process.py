@@ -19,6 +19,7 @@ import argparse
 import os
 import sys
 import time
+from typing import Optional
 from typing import Tuple
 
 from tracetools_analysis.convert import convert
@@ -28,9 +29,7 @@ from tracetools_analysis.processor.ros2 import Ros2Handler
 from tracetools_read.trace import is_trace_directory
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description='Process a file converted from a trace '
-                                                 'directory and output model data.')
+def add_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         'input_path',
         help='the path to a converted file to import and process, '
@@ -39,6 +38,12 @@ def parse_args():
         '-f', '--force-conversion', dest='force_conversion',
         action='store_true', default=False,
         help='re-convert trace directory even if converted file is found')
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Process a file converted from a trace '
+                                                 'directory and output model data.')
+    add_args(parser)
     return parser.parse_args()
 
 
@@ -106,7 +111,7 @@ def inspect_input_path(
 def process(
     input_path: str,
     force_conversion: bool = False,
-) -> None:
+) -> Optional[int]:
     """
     Process converted trace file.
 

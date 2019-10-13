@@ -3,6 +3,17 @@ variables:
   PACKAGES_LIST: tracetools_analysis
   base_image_id: registry.gitlab.com/micro-ros/ros_tracing/ci_base
 
+.global_artifacts: &global_artifacts
+  artifacts:
+    paths:
+      - install
+      - build/*/test_results/*/*.xunit.xml
+      - build/*/pytest.xml
+    reports:
+      junit:
+        - build/*/test_results/*/*.xunit.xml
+        - build/*/pytest.xml
+
 build:
   image: $base_image_id
   before_script:
@@ -13,12 +24,4 @@ build:
     - . install/local_setup.sh
     - colcon test --packages-select $PACKAGES_LIST
     - colcon test-result --all
-  artifacts:
-    paths:
-      - install
-      - build/*/test_results/*/*.xunit.xml
-      - build/*/pytest.xml
-    reports:
-      junit:
-        - build/*/test_results/*/*.xunit.xml
-        - build/*/pytest.xml
+  <<: *global_artifacts

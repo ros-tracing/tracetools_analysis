@@ -12,22 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for pickle loading."""
+"""Module for converted trace file loading."""
 
+import os
 import pickle
 from typing import Dict
 from typing import List
 
 
-def load_pickle(pickle_file_path: str) -> List[Dict]:
+def load_file(file_path: str) -> List[Dict]:
     """
-    Load pickle file containing converted trace events.
+    Load file containing converted trace events.
 
-    :param pickle_file_path: the path to the pickle file to load
+    :param file_path: the path to the converted file to load
     :return: the list of events read from the file
     """
     events = []
-    with open(pickle_file_path, 'rb') as f:
+    with open(os.path.expanduser(file_path), 'rb') as f:
         p = pickle.Unpickler(f)
         while True:
             try:

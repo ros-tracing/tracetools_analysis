@@ -25,7 +25,7 @@ def ctf_to_pickle(trace_directory: str, target: Pickler) -> int:
     Load CTF trace, convert events, and dump to a pickle file.
 
     :param trace_directory: the trace directory
-    :param target: the target pickle file to write to
+    :param target: the target file to write to
     :return: the number of events written
     """
     ctf_events = get_trace_ctf_events(trace_directory)
@@ -43,15 +43,15 @@ def ctf_to_pickle(trace_directory: str, target: Pickler) -> int:
     return count_written
 
 
-def convert(trace_directory: str, pickle_target_path: str) -> int:
+def convert(trace_directory: str, output_file_path: str) -> int:
     """
     Convert CTF trace to pickle file.
 
     :param trace_directory: the trace directory
-    :param pickle_target_path: the path to the pickle file that will be created
-    :return: the number of events written to the pickle file
+    :param output_file_path: the path to the output file that will be created
+    :return: the number of events written to the output file
     """
-    with open(pickle_target_path, 'wb') as f:
+    with open(output_file_path, 'wb') as f:
         p = Pickler(f, protocol=4)
         count = ctf_to_pickle(trace_directory, p)
 

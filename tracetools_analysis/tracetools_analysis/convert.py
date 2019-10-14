@@ -13,38 +13,64 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Entrypoint/script to convert CTF trace data to a pickle file."""
+"""Entrypoint/script to convert CTF trace data to a file."""
 
 import argparse
 import os
 import time
+from typing import Optional
 
 from tracetools_analysis.conversion import ctf
+
+from . import time_diff_to_str
+
+
+DEFAULT_CONVERT_FILE_NAME = 'converted'
+
+
+def add_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        'trace_directory',
+        help='the path to the main trace directory')
+    parser.add_argument(
+        '-o', '--output-file-name', dest='output_file_name',
+        default=DEFAULT_CONVERT_FILE_NAME,
+        help='the name of the output file to generate, '
+        'under $trace_directory (default: %(default)s)')
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Convert CTF trace data to a pickle file.')
-    parser.add_argument(
-        'trace_directory', help='the path to the main CTF trace directory')
-    parser.add_argument(
-        '--pickle-path', '-p',
-        help='the path to the target pickle file to generate (default: $trace_directory/pickle)')
-    args = parser.parse_args()
-    if args.pickle_path is None:
-        args.pickle_path = os.path.join(args.trace_directory, 'pickle')
-    return args
+        description='Convert trace data to a file.')
+    add_args(parser)
+    return parser.parse_args()
+
+
+def convert(
+    trace_directory: str,
+    output_file_name: str = DEFAULT_CONVERT_FILE_NAME,
+) -> Optional[int]:
+    """
+    Convert trace directory to a file.
+
+    The output file will be placed under the trace directory.
+
+    :param trace_directory: the path to the trace directory to import
+    :param outout_file_name: the name of the output file
+    """
+    print(f'converting trace directory: {trace_directory}')
+    output_file_path = os.path.join(os.path.expanduser(trace_directory), output_file_name)
+    start_time = time.time()
+    count = ctf.convert(trace_directory, output_file_path)
+    time_diff = time.time() - start_time
+    print(f'converted {count} events in {time_diff_to_str(time_diff)}')
+    print(f'output written to: {output_file_path}')
 
 
 def main():
     args = parse_args()
 
     trace_directory = args.trace_directory
-    pickle_target_path = args.pickle_path
+    output_file_name = args.output_file_name
 
-    print(f'importing trace directory: {trace_directory}')
-    start_time = time.time()
-    count = ctf.convert(trace_directory, pickle_target_path)
-    time_diff = time.time() - start_time
-    print(f'converted {count} events in {time_diff * 1000:.2f} ms')
-    print(f'pickle written to: {pickle_target_path}')
+    convert(trace_directory, output_file_name)

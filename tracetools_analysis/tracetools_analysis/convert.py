@@ -22,6 +22,8 @@ from typing import Optional
 
 from tracetools_analysis.conversion import ctf
 
+from . import time_diff_to_str
+
 
 DEFAULT_CONVERT_FILE_NAME = 'converted'
 
@@ -61,7 +63,7 @@ def convert(
     start_time = time.time()
     count = ctf.convert(trace_directory, output_file_path)
     time_diff = time.time() - start_time
-    print(f'converted {count} events in {time_diff * 1000:.2f} ms')
+    print(f'converted {count} events in {time_diff_to_str(time_diff)}')
     print(f'output written to: {output_file_path}')
 
 

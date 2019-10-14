@@ -28,6 +28,8 @@ from tracetools_analysis.loading import load_file
 from tracetools_analysis.processor.ros2 import Ros2Handler
 from tracetools_read.trace import is_trace_directory
 
+from . import time_diff_to_str
+
 
 def add_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
@@ -136,7 +138,7 @@ def process(
 
     time_diff = time.time() - start_time
     ros2_handler.data.print_model()
-    print(f'processed {len(events)} events in {time_diff * 1000:.2f} ms')
+    print(f'processed {len(events)} events in {time_diff_to_str(time_diff)}')
 
 
 def main():

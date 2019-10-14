@@ -2,8 +2,8 @@
 Changelog for package tracetools_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.0 (2019-10-14)
+------------------
 * Improve UX
 * Add flag for process command to force re-conversion of trace directory
 * Make process command convert directory if necessary

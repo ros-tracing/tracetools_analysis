@@ -272,7 +272,7 @@ class RosDataModelUtil(DataModelUtil):
             ['timestamp', 'duration']
         ]
         # Time conversion
-        return self.convert_time_columns(data, ['timestamp', 'duration'], ['timestamp'])
+        return self.convert_time_columns(data, ['duration'], ['timestamp'])
 
     def get_node_tid_from_name(
         self, node_name: str

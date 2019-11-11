@@ -53,19 +53,24 @@ class DataModelUtil():
     @staticmethod
     def convert_time_columns(
         original: DataFrame,
-        columns_ns_to_ms: List[str] = [],
-        columns_ns_to_datetime: List[str] = [],
+        columns_ns_to_ms: Union[List[str], str] = [],
+        columns_ns_to_datetime: Union[List[str], str] = [],
         inplace: bool = True,
     ) -> DataFrame:
         """
         Convert time columns from nanoseconds to either milliseconds or `datetime` objects.
 
         :param original: the original `DataFrame`
-        :param columns_ns_to_ms: the columns for which to convert ns to ms
-        :param columns_ns_to_datetime: the columns for which to convert ns to `datetime`
+        :param columns_ns_to_ms: the column(s) for which to convert ns to ms
+        :param columns_ns_to_datetime: the column(s) for which to convert ns to `datetime`
         :param inplace: whether to convert in place or to return a copy
         :return: the resulting `DataFrame`
         """
+        if not isinstance(columns_ns_to_ms, list):
+            columns_ns_to_ms = list(columns_ns_to_ms)
+        if not isinstance(columns_ns_to_datetime, list):
+            columns_ns_to_datetime = list(columns_ns_to_datetime)
+
         df = original if inplace else original.copy()
         # Convert from ns to ms
         if len(columns_ns_to_ms) > 0:
@@ -272,7 +277,7 @@ class RosDataModelUtil(DataModelUtil):
             ['timestamp', 'duration']
         ]
         # Time conversion
-        return self.convert_time_columns(data, ['timestamp', 'duration'], ['timestamp'])
+        return self.convert_time_columns(data, ['duration'], ['timestamp'])
 
     def get_node_tid_from_name(
         self, node_name: str

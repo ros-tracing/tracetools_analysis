@@ -38,7 +38,10 @@ class DataModelUtil():
     This class provides basic util functions.
     """
 
-    def __init__(self, data_model: DataModel) -> None:
+    def __init__(
+        self,
+        data_model: DataModel,
+    ) -> None:
         """
         Constructor.
 
@@ -105,7 +108,10 @@ class DataModelUtil():
 class ProfileDataModelUtil(DataModelUtil):
     """Profiling data model utility class."""
 
-    def __init__(self, data_model: ProfileDataModel) -> None:
+    def __init__(
+        self,
+        data_model: ProfileDataModel,
+    ) -> None:
         """
         Constructor.
 
@@ -113,14 +119,20 @@ class ProfileDataModelUtil(DataModelUtil):
         """
         super().__init__(data_model)
 
-    def with_tid(self, tid: int) -> DataFrame:
+    def with_tid(
+        self,
+        tid: int,
+    ) -> DataFrame:
         return self.data.times.loc[self.data.times['tid'] == tid]
 
     def get_tids(self) -> Set[int]:
         """Get the TIDs in the data model."""
         return set(self.data.times['tid'])
 
-    def get_call_tree(self, tid: int) -> Dict[str, List[str]]:
+    def get_call_tree(
+        self,
+        tid: int,
+    ) -> Dict[str, List[str]]:
         depth_names = self.with_tid(tid)[
             ['depth', 'function_name', 'parent_name']
         ].drop_duplicates()
@@ -136,7 +148,10 @@ class ProfileDataModelUtil(DataModelUtil):
                 tree[parent].add(name)
         return dict(tree)
 
-    def get_function_duration_data(self, tid: int) -> List[Dict[str, Union[int, str, DataFrame]]]:
+    def get_function_duration_data(
+        self,
+        tid: int,
+    ) -> List[Dict[str, Union[int, str, DataFrame]]]:
         """Get duration data for each function."""
         tid_df = self.with_tid(tid)
         depth_names = tid_df[['depth', 'function_name', 'parent_name']].drop_duplicates()
@@ -167,7 +182,10 @@ class ProfileDataModelUtil(DataModelUtil):
 class CpuTimeDataModelUtil(DataModelUtil):
     """CPU time data model utility class."""
 
-    def __init__(self, data_model: CpuTimeDataModel) -> None:
+    def __init__(
+        self,
+        data_model: CpuTimeDataModel,
+    ) -> None:
         """
         Constructor.
 
@@ -183,7 +201,10 @@ class CpuTimeDataModelUtil(DataModelUtil):
 class RosDataModelUtil(DataModelUtil):
     """ROS data model utility class."""
 
-    def __init__(self, data_model: RosDataModel) -> None:
+    def __init__(
+        self,
+        data_model: RosDataModel,
+    ) -> None:
         """
         Constructor.
 
@@ -191,7 +212,10 @@ class RosDataModelUtil(DataModelUtil):
         """
         super().__init__(data_model)
 
-    def _prettify(self, original: str) -> str:
+    def _prettify(
+        self,
+        original: str,
+    ) -> str:
         """
         Process symbol to make it more readable.
 
@@ -263,7 +287,7 @@ class RosDataModelUtil(DataModelUtil):
         }
 
     def get_callback_durations(
-        self, callback_obj: int
+        self, callback_obj: int,
     ) -> DataFrame:
         """
         Get durations of callback instances for a given callback object.
@@ -280,7 +304,7 @@ class RosDataModelUtil(DataModelUtil):
         return self.convert_time_columns(data, ['duration'], ['timestamp'])
 
     def get_node_tid_from_name(
-        self, node_name: str
+        self, node_name: str,
     ) -> Union[int, None]:
         """
         Get the tid corresponding to a node.
@@ -296,7 +320,7 @@ class RosDataModelUtil(DataModelUtil):
         return node_row.iloc[0]['tid'] if not node_row.empty else None
 
     def get_node_names_from_tid(
-        self, tid: str
+        self, tid: str,
     ) -> Union[List[str], None]:
         """
         Get the list of node names corresponding to a tid.
@@ -309,7 +333,7 @@ class RosDataModelUtil(DataModelUtil):
         ]['name'].tolist()
 
     def get_callback_owner_info(
-        self, callback_obj: int
+        self, callback_obj: int,
     ) -> Union[str, None]:
         """
         Get information about the owner of a callback.
@@ -351,7 +375,7 @@ class RosDataModelUtil(DataModelUtil):
         return info
 
     def get_timer_handle_info(
-        self, timer_handle: int
+        self, timer_handle: int,
     ) -> Union[Mapping[str, Any], None]:
         """
         Get information about the owner of a timer.
@@ -369,7 +393,7 @@ class RosDataModelUtil(DataModelUtil):
         return {'tid': tid, 'period': f'{period_ms:.0f} ms'}
 
     def get_publisher_handle_info(
-        self, publisher_handle: int
+        self, publisher_handle: int,
     ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a publisher handle.
@@ -387,7 +411,7 @@ class RosDataModelUtil(DataModelUtil):
         return {**node_handle_info, **publisher_info}
 
     def get_subscription_handle_info(
-        self, subscription_handle: int
+        self, subscription_handle: int,
     ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a subscription handle.
@@ -409,7 +433,7 @@ class RosDataModelUtil(DataModelUtil):
         return {**node_handle_info, **subscription_info}
 
     def get_service_handle_info(
-        self, service_handle: int
+        self, service_handle: int,
     ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a service handle.
@@ -427,7 +451,7 @@ class RosDataModelUtil(DataModelUtil):
         return {**node_handle_info, **service_info}
 
     def get_client_handle_info(
-        self, client_handle: int
+        self, client_handle: int,
     ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a client handle.
@@ -445,7 +469,7 @@ class RosDataModelUtil(DataModelUtil):
         return {**node_handle_info, **service_info}
 
     def get_node_handle_info(
-        self, node_handle: int
+        self, node_handle: int,
     ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a node handle.
@@ -460,5 +484,8 @@ class RosDataModelUtil(DataModelUtil):
         tid = self.data.nodes.loc[node_handle, 'tid']
         return {'node': node_name, 'tid': tid}
 
-    def format_info_dict(self, info_dict: Mapping[str, Any]) -> str:
+    def format_info_dict(
+        self,
+        info_dict: Mapping[str, Any],
+    ) -> str:
         return ', '.join([f'{key}: {val}' for key, val in info_dict.items()])

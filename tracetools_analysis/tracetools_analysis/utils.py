@@ -341,7 +341,7 @@ class RosDataModelUtil(DataModelUtil):
             info = self.get_subscription_handle_info(handle)
         elif handle in self.data.services.index:
             type_name = 'Service'
-            info = self.get_subscription_handle_info(handle)
+            info = self.get_service_handle_info(handle)
         elif handle in self.data.clients.index:
             type_name = 'Client'
             info = self.get_client_handle_info(handle)

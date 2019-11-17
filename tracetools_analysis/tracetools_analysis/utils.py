@@ -287,7 +287,8 @@ class RosDataModelUtil(DataModelUtil):
         }
 
     def get_callback_durations(
-        self, callback_obj: int,
+        self,
+        callback_obj: int,
     ) -> DataFrame:
         """
         Get durations of callback instances for a given callback object.
@@ -304,7 +305,8 @@ class RosDataModelUtil(DataModelUtil):
         return self.convert_time_columns(data, ['duration'], ['timestamp'])
 
     def get_node_tid_from_name(
-        self, node_name: str,
+        self,
+        node_name: str,
     ) -> Union[int, None]:
         """
         Get the tid corresponding to a node.
@@ -320,7 +322,8 @@ class RosDataModelUtil(DataModelUtil):
         return node_row.iloc[0]['tid'] if not node_row.empty else None
 
     def get_node_names_from_tid(
-        self, tid: str,
+        self,
+        tid: str,
     ) -> Union[List[str], None]:
         """
         Get the list of node names corresponding to a tid.
@@ -333,7 +336,8 @@ class RosDataModelUtil(DataModelUtil):
         ]['name'].tolist()
 
     def get_callback_owner_info(
-        self, callback_obj: int,
+        self,
+        callback_obj: int,
     ) -> Union[str, None]:
         """
         Get information about the owner of a callback.
@@ -375,7 +379,8 @@ class RosDataModelUtil(DataModelUtil):
         return info
 
     def get_timer_handle_info(
-        self, timer_handle: int,
+        self,
+        timer_handle: int,
     ) -> Union[Mapping[str, Any], None]:
         """
         Get information about the owner of a timer.
@@ -393,7 +398,8 @@ class RosDataModelUtil(DataModelUtil):
         return {'tid': tid, 'period': f'{period_ms:.0f} ms'}
 
     def get_publisher_handle_info(
-        self, publisher_handle: int,
+        self,
+        publisher_handle: int,
     ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a publisher handle.
@@ -411,7 +417,8 @@ class RosDataModelUtil(DataModelUtil):
         return {**node_handle_info, **publisher_info}
 
     def get_subscription_reference_info(
-        self, subscription_reference: int,
+        self,
+        subscription_reference: int,
     ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a subscription handle.
@@ -462,7 +469,8 @@ class RosDataModelUtil(DataModelUtil):
         return {**node_handle_info, **subscription_info}
 
     def get_service_handle_info(
-        self, service_handle: int,
+        self,
+        service_handle: int,
     ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a service handle.
@@ -480,7 +488,8 @@ class RosDataModelUtil(DataModelUtil):
         return {**node_handle_info, **service_info}
 
     def get_client_handle_info(
-        self, client_handle: int,
+        self,
+        client_handle: int,
     ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a client handle.
@@ -498,7 +507,8 @@ class RosDataModelUtil(DataModelUtil):
         return {**node_handle_info, **service_info}
 
     def get_node_handle_info(
-        self, node_handle: int,
+        self,
+        node_handle: int,
     ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a node handle.

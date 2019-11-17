@@ -56,6 +56,10 @@ class RosDataModel(DataModel):
                                                    'topic_name',
                                                    'depth'])
         self.subscriptions.set_index(['subscription_handle'], inplace=True, drop=True)
+        self.subscription_objects = pd.DataFrame(columns=['subscription',
+                                                          'timestamp',
+                                                          'subscription_handle'])
+        self.subscription_objects.set_index(['subscription'], inplace=True, drop=True)
         self.services = pd.DataFrame(columns=['service_handle',
                                               'timestamp',
                                               'node_handle',
@@ -74,10 +78,10 @@ class RosDataModel(DataModel):
                                             'tid'])
         self.timers.set_index(['timer_handle'], inplace=True, drop=True)
 
-        self.callback_objects = pd.DataFrame(columns=['handle',
+        self.callback_objects = pd.DataFrame(columns=['reference',
                                                       'timestamp',
                                                       'callback_object'])
-        self.callback_objects.set_index(['handle'], inplace=True, drop=True)
+        self.callback_objects.set_index(['reference'], inplace=True, drop=True)
         self.callback_symbols = pd.DataFrame(columns=['callback_object',
                                                       'timestamp',
                                                       'symbol'])
@@ -104,10 +108,15 @@ class RosDataModel(DataModel):
     ) -> None:
         self.publishers.loc[handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
 
-    def add_subscription(
+    def add_rcl_subscription(
         self, handle, timestamp, node_handle, rmw_handle, topic_name, depth
     ) -> None:
         self.subscriptions.loc[handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
+
+    def add_rclcpp_subscription(
+        self, subscription_pointer, timestamp, subscription_handle
+    ) -> None:
+        self.subscription_objects.loc[subscription_pointer] = [timestamp, subscription_handle]
 
     def add_service(
         self, handle, timestamp, node_handle, rmw_handle, service_name
@@ -125,9 +134,9 @@ class RosDataModel(DataModel):
         self.timers.loc[handle] = [timestamp, period, tid]
 
     def add_callback_object(
-        self, handle, timestamp, callback_object
+        self, reference, timestamp, callback_object
     ) -> None:
-        self.callback_objects.loc[handle] = [timestamp, callback_object]
+        self.callback_objects.loc[reference] = [timestamp, callback_object]
 
     def add_callback_symbol(
         self, callback_object, timestamp, symbol
@@ -155,6 +164,8 @@ class RosDataModel(DataModel):
         print(f'Publishers:\n{self.publishers.to_string()}')
         print()
         print(f'Subscriptions:\n{self.subscriptions.to_string()}')
+        print()
+        print(f'Subscription objects:\n{self.subscription_objects.to_string()}')
         print()
         print(f'Services:\n{self.services.to_string()}')
         print()

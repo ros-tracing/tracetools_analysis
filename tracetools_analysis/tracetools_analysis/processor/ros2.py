@@ -20,7 +20,7 @@ from tracetools_read import get_field
 
 from . import EventHandler
 from . import EventMetadata
-from ..data_model.ros import RosDataModel
+from ..data_model.ros2 import Ros2DataModel
 
 
 class Ros2Handler(EventHandler):
@@ -70,13 +70,13 @@ class Ros2Handler(EventHandler):
             **kwargs,
         )
 
-        self._data_model = RosDataModel()
+        self._data_model = Ros2DataModel()
 
         # Temporary buffers
         self._callback_instances = {}
 
     @property
-    def data(self) -> RosDataModel:
+    def data(self) -> Ros2DataModel:
         return self._data_model
 
     def _handle_rcl_init(

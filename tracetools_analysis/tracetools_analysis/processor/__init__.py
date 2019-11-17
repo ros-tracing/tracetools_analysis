@@ -243,7 +243,7 @@ class DependencySolver():
 
 
 class Processor():
-    """Base processor class."""
+    """Processor class, which dispatches events to event handlers."""
 
     def __init__(
         self,
@@ -256,12 +256,14 @@ class Processor():
         :param handlers: the `EventHandler`s to use for processing
         :param kwargs: the parameters to pass on to new handlers
         """
+        self._initial_handlers = list(handlers)
         expanded_handlers = self._expand_dependencies(*handlers, **kwargs)
         self._handler_multimap = self._get_handler_maps(expanded_handlers)
         self._register_with_handlers(expanded_handlers)
         self._progress_display = ProcessingProgressDisplay(
             [type(handler).__name__ for handler in expanded_handlers],
         )
+        self._processing_done = False
 
     @staticmethod
     def _expand_dependencies(
@@ -304,16 +306,21 @@ class Processor():
         for handler in handlers:
             handler.register_processor(self)
 
-    def process(self, events: List[DictEvent]) -> None:
+    def process(
+        self,
+        events: List[DictEvent],
+    ) -> None:
         """
         Process all events.
 
         :param events: the events to process
         """
-        self._progress_display.set_work_total(len(events))
-        for event in events:
-            self._process_event(event)
-            self._progress_display.did_work()
+        if not self._processing_done:
+            self._progress_display.set_work_total(len(events))
+            for event in events:
+                self._process_event(event)
+                self._progress_display.did_work()
+            self._processing_done = True
 
     def _process_event(self, event: DictEvent) -> None:
         """Process a single event."""
@@ -345,6 +352,12 @@ class Processor():
                     raise_if_not_found=False)
                 metadata = EventMetadata(event_name, timestamp, cpu_id, procname, pid, tid)
                 handler_function(event, metadata)
+
+    def print_data(self) -> None:
+        """Print processed data."""
+        if self._processing_done:
+            for handler in self._initial_handlers:
+                handler.data.print_data()
 
 
 class ProcessingProgressDisplay():

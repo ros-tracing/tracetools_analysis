@@ -25,3 +25,7 @@ class DataModel():
 
     def __init__(self) -> None:
         pass
+
+    def print_data(self) -> None:
+        """Print the data model."""
+        return None

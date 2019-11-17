@@ -61,9 +61,9 @@ class ProfileDataModel(DataModel):
         }
         self.times = self.times.append(data, ignore_index=True)
 
-    def print_model(self) -> None:
-        """Debug method to print every contained df."""
+    def print_data(self) -> None:
         print('====================PROFILE DATA MODEL====================')
         tail = 20
-        print(f'Times (tail={tail}):\n{self.times.tail(tail).to_string()}')
+        print(f'Times (tail={tail}):')
+        print(self.times.tail(tail).to_string())
         print('==========================================================')

@@ -25,6 +25,7 @@ from typing import Tuple
 from tracetools_analysis.convert import convert
 from tracetools_analysis.convert import DEFAULT_CONVERT_FILE_NAME
 from tracetools_analysis.loading import load_file
+from tracetools_analysis.processor import Processor
 from tracetools_analysis.processor.ros2 import Ros2Handler
 from tracetools_read.trace import is_trace_directory
 
@@ -134,10 +135,11 @@ def process(
     start_time = time.time()
 
     events = load_file(converted_file_path)
-    ros2_handler = Ros2Handler.process(events)
+    processor = Processor(Ros2Handler())
+    processor.process(events)
 
     time_diff = time.time() - start_time
-    ros2_handler.data.print_model()
+    processor.print_data()
     print(f'processed {len(events)} events in {time_diff_to_str(time_diff)}')
 
 

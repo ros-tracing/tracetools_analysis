@@ -56,10 +56,10 @@ class RosDataModel(DataModel):
                                                    'topic_name',
                                                    'depth'])
         self.subscriptions.set_index(['subscription_handle'], inplace=True, drop=True)
-        self.subscriptions_objects = pd.DataFrame(columns=['subscription',
+        self.subscription_objects = pd.DataFrame(columns=['subscription',
                                                           'timestamp',
                                                           'subscription_handle'])
-        self.subscriptions_objects.set_index(['subscription'], inplace=True, drop=True)
+        self.subscription_objects.set_index(['subscription'], inplace=True, drop=True)
         self.services = pd.DataFrame(columns=['service_handle',
                                               'timestamp',
                                               'node_handle',
@@ -116,7 +116,7 @@ class RosDataModel(DataModel):
     def add_rclcpp_subscription(
         self, subscription_pointer, timestamp, subscription_handle
     ) -> None:
-        self.subscriptions_objects.loc[subscription_pointer] = [timestamp, subscription_handle]
+        self.subscription_objects.loc[subscription_pointer] = [timestamp, subscription_handle]
 
     def add_service(
         self, handle, timestamp, node_handle, rmw_handle, service_name
@@ -165,7 +165,7 @@ class RosDataModel(DataModel):
         print()
         print(f'Subscriptions:\n{self.subscriptions.to_string()}')
         print()
-        print(f'Subscription objects:\n{self.subscriptions_objects.to_string()}')
+        print(f'Subscription objects:\n{self.subscription_objects.to_string()}')
         print()
         print(f'Services:\n{self.services.to_string()}')
         print()

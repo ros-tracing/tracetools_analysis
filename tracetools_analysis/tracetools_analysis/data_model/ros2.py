@@ -154,7 +154,7 @@ class Ros2DataModel(DataModel):
         }
         self.callback_instances = self.callback_instances.append(data, ignore_index=True)
 
-    def print(self) -> None:
+    def print_data(self) -> None:
         print('====================ROS 2 DATA MODEL===================')
         print('Contexts:')
         print(self.contexts.to_string())

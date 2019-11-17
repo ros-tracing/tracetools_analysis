@@ -61,7 +61,7 @@ class ProfileDataModel(DataModel):
         }
         self.times = self.times.append(data, ignore_index=True)
 
-    def print(self) -> None:
+    def print_data(self) -> None:
         print('====================PROFILE DATA MODEL====================')
         tail = 20
         print(f'Times (tail={tail}):')

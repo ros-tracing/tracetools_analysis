@@ -137,7 +137,7 @@ def process(
     ros2_handler = Ros2Handler.process(events)
 
     time_diff = time.time() - start_time
-    ros2_handler.data.print()
+    ros2_handler.data.print_data()
     print(f'processed {len(events)} events in {time_diff_to_str(time_diff)}')
 
 

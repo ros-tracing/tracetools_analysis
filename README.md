@@ -40,24 +40,22 @@ Then navigate to the [`analysis/`](./tracetools_analysis/analysis/) directory, a
 For example:
 
 ```python
+from tracetools_analysis import loading
+from tracetools_analysis import processor
 from tracetools_analysis import utils
-from tracetools_analysis.loading import load_file
-from tracetools_analysis.processor import Processor
-from tracetools_analysis.processor.cpu_time import CpuTimeHandler
-from tracetools_analysis.processor.ros2 import Ros2Handler
 
 # Load converted trace file
-events = load_file('/path/to/converted/file')
+events = loading.load_file('/path/to/converted/file')
 
 # Process
-ros2_handler = Ros2Handler()
-cpu_handler = CpuTimeHandler()
+ros2_handler = processor.Ros2Handler()
+cpu_handler = processor.CpuTimeHandler()
 
-Processor(ros2_handler, cpu_handler).process(events)
+processor.Processor(ros2_handler, cpu_handler).process(events)
 
 # Use data model utils to extract information
-ros2_util = utils.RosDataModelUtil(ros2_handler.data)
-cpu_util = CpuTimeDataModelUtil(cpu_handler.data)
+ros2_util = utils.ros2.Ros2DataModelUtil(ros2_handler.data)
+cpu_util = utils.cpu_time.CpuTimeDataModelUtil(cpu_handler.data)
 
 callback_durations = ros2_util.get_callback_durations()
 time_per_thread = cpu_util.get_time_per_thread()

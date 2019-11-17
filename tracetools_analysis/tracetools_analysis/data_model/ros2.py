@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for ROS data model."""
+"""Module for ROS 2 data model."""
 
 import pandas as pd
 
 from . import DataModel
 
 
-class RosDataModel(DataModel):
+class Ros2DataModel(DataModel):
     """
-    Container to model pre-processed ROS data for analysis.
+    Container to model pre-processed ROS 2 data for analysis.
 
-    This aims to represent the data in a ROS-aware way.
+    This aims to represent the data in a ROS 2-aware way.
     """
 
     def __init__(self) -> None:

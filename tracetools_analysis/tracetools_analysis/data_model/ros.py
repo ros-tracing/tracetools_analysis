@@ -116,7 +116,7 @@ class RosDataModel(DataModel):
     def add_rclcpp_subscription(
         self, subscription_pointer, timestamp, subscription_handle
     ) -> None:
-        self.subscriptions_objects[subscription_pointer] = [timestamp, subscription_handle]
+        self.subscriptions_objects.loc[subscription_pointer] = [timestamp, subscription_handle]
 
     def add_service(
         self, handle, timestamp, node_handle, rmw_handle, service_name

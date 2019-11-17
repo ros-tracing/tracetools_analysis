@@ -243,7 +243,7 @@ class DependencySolver():
 
 
 class Processor():
-    """Base processor class."""
+    """Processor class, which dispatches events to event handlers."""
 
     def __init__(
         self,

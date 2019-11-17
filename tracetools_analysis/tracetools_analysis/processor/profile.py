@@ -36,6 +36,10 @@ class ProfileHandler(EventHandler):
         * lttng_ust_cyg_profile_fast:func_exit
         * sched_switch
 
+    The above events are generated when using -finstrument-functions with gcc and LD_PRELOAD-ing
+    liblttng-ust-cyg-profile-fast.so, see:
+    https://lttng.org/docs/v2.10/#doc-liblttng-ust-cyg-profile
+
     TODO get debug_info from babeltrace for
     lttng_ust_cyg_profile_fast:func_entry events
     (or resolve { address -> function } name another way)

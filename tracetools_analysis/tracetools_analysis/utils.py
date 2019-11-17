@@ -346,29 +346,29 @@ class RosDataModelUtil(DataModelUtil):
         :param callback_obj: the callback object value
         :return: information about the owner of the callback, or `None` if it fails
         """
-        # Get handle corresponding to callback object
-        handle = self.data.callback_objects.loc[
+        # Get reference corresponding to callback object
+        reference = self.data.callback_objects.loc[
             self.data.callback_objects['callback_object'] == callback_obj
         ].index.values.astype(int)[0]
 
         type_name = None
         info = None
         # Check if it's a timer first (since it's slightly different than the others)
-        if handle in self.data.timers.index:
+        if reference in self.data.timers.index:
             type_name = 'Timer'
-            info = self.get_timer_handle_info(handle)
-        elif handle in self.data.publishers.index:
+            info = self.get_timer_handle_info(reference)
+        elif reference in self.data.publishers.index:
             type_name = 'Publisher'
-            info = self.get_publisher_handle_info(handle)
-        elif handle in self.data.subscriptions.index:
+            info = self.get_publisher_handle_info(reference)
+        elif reference in self.data.subscription_objects.index:
             type_name = 'Subscription'
-            info = self.get_subscription_handle_info(handle)
-        elif handle in self.data.services.index:
+            info = self.get_subscription_reference_info(reference)
+        elif reference in self.data.services.index:
             type_name = 'Service'
-            info = self.get_service_handle_info(handle)
-        elif handle in self.data.clients.index:
+            info = self.get_service_handle_info(reference)
+        elif reference in self.data.clients.index:
             type_name = 'Client'
-            info = self.get_client_handle_info(handle)
+            info = self.get_client_handle_info(reference)
 
         if info is not None:
             info = f'{type_name} -- {self.format_info_dict(info)}'
@@ -410,25 +410,54 @@ class RosDataModelUtil(DataModelUtil):
         publisher_info = {'topic': topic_name}
         return {**node_handle_info, **publisher_info}
 
-    def get_subscription_handle_info(
-        self, subscription_handle: int,
+    def get_subscription_reference_info(
+        self, subscription_reference: int,
     ) -> Union[Mapping[str, Any], None]:
         """
         Get information about a subscription handle.
 
-        :param subscription_handle: the subscription handle value
+        :param subscription_reference: the subscription reference value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        subscriptions_info = self.data.subscriptions.merge(
-            self.data.nodes,
-            left_on='node_handle',
-            right_index=True)
-        if subscription_handle not in self.data.subscriptions.index:
+        # First check that the subscription reference exists
+        if subscription_reference not in self.data.subscription_objects.index:
             return None
 
-        node_handle = subscriptions_info.loc[subscription_handle, 'node_handle']
+        # To get information about a subscription reference, we need 3 dataframes
+        #   * subscription_objects
+        #      * subscription (reference) <--> subscription_handle
+        #   * subscriptions
+        #      * subscription_handle <--> topic_name
+        #      * subscription_handle <--> node_handle
+        #   * nodes
+        #      * node_handle <--> (node info)
+        # First, drop unnecessary common columns for debugging simplicity
+        subscription_objects_simple = self.data.subscription_objects.drop(
+            columns=['timestamp'],
+            axis=1,
+        )
+        subscriptions_simple = self.data.subscriptions.drop(
+            columns=['timestamp', 'rmw_handle'],
+            inplace=False,
+        )
+        nodes_simple = self.data.nodes.drop(
+            columns=['timestamp', 'rmw_handle'],
+            inplace=False,
+        )
+        # Then merge the 3 dataframes
+        subscriptions_info = subscription_objects_simple.merge(
+            subscriptions_simple,
+            left_on='subscription_handle',
+            right_index=True,
+        ).merge(
+            nodes_simple,
+            left_on='node_handle',
+            right_index=True,
+        )
+
+        node_handle = subscriptions_info.loc[subscription_reference, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
-        topic_name = subscriptions_info.loc[subscription_handle, 'topic_name']
+        topic_name = subscriptions_info.loc[subscription_reference, 'topic_name']
         subscription_info = {'topic': topic_name}
         return {**node_handle_info, **subscription_info}
 

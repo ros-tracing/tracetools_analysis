@@ -27,4 +27,5 @@ class ProcessVerb(VerbExtension):
         return process(
             args.input_path,
             args.force_conversion,
+            args.hide_results,
         )

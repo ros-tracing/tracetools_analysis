@@ -119,7 +119,9 @@ class Ros2Handler(EventHandler):
         rmw_handle = get_field(event, 'rmw_subscription_handle')
         topic_name = get_field(event, 'topic_name')
         depth = get_field(event, 'queue_depth')
-        self.data.add_rcl_subscription(handle, timestamp, node_handle, rmw_handle, topic_name, depth)
+        self.data.add_rcl_subscription(
+            handle, timestamp, node_handle, rmw_handle, topic_name, depth,
+        )
 
     def _handle_rclcpp_subscription_init(
         self, event: Dict, metadata: EventMetadata,

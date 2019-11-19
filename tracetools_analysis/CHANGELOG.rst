@@ -2,6 +2,12 @@
 Changelog for package tracetools_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update ROS 2 handler and data model after new tracepoint
+* Fix timestamp column conversion util method
+* Contributors: Christophe Bedard
+
 0.2.0 (2019-10-14)
 ------------------
 * Improve UX

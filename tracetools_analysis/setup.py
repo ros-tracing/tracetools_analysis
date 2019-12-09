@@ -41,6 +41,7 @@ setup(
         'console_scripts': [
             f'convert = {package_name}.convert:main',
             f'process = {package_name}.process:main',
+            f'cb_durations = {package_name}.cb_durations:main'
         ],
     },
     license='Apache 2.0',

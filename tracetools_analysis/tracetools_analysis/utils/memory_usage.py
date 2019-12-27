@@ -47,7 +47,7 @@ class MemoryUsageDataModelUtil(DataModelUtil):
         data = defaultdict(list)
         for index, row in self.data.memory_diff.iterrows():
             timestamp = row['timestamp']
-            tid = row['tid']
+            tid = int(row['tid'])
             diff = row['memory_diff']
             previous_value = previous[tid]
             next_value = previous_value + diff

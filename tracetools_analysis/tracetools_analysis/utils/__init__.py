@@ -35,7 +35,7 @@ class DataModelUtil():
         data_model: DataModel,
     ) -> None:
         """
-        Constructor.
+        Create a DataModelUtil.
 
         :param data_model: the data model
         """

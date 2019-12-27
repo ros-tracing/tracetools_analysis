@@ -27,7 +27,7 @@ class CpuTimeDataModel(DataModel):
     """
 
     def __init__(self) -> None:
-        """Constructor."""
+        """Create a CpuTimeDataModel."""
         super().__init__()
         self.times = pd.DataFrame(columns=[
             'tid',

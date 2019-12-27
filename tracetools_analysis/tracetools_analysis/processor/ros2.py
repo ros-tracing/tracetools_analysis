@@ -34,6 +34,7 @@ class Ros2Handler(EventHandler):
         self,
         **kwargs,
     ) -> None:
+        """Create a Ros2Handler."""
         # Link a ROS trace event to its corresponding handling method
         handler_map = {
             'ros2:rcl_init':

@@ -28,7 +28,7 @@ class CpuTimeDataModelUtil(DataModelUtil):
         data_model: CpuTimeDataModel,
     ) -> None:
         """
-        Constructor.
+        Create a CpuTimeDataModelUtil.
 
         :param data_model: the data model object to use
         """

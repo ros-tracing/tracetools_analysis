@@ -34,6 +34,7 @@ class CpuTimeHandler(EventHandler):
         self,
         **kwargs,
     ) -> None:
+        """Create a CpuTimeHandler."""
         # Link event to handling method
         handler_map = {
             'sched_switch':

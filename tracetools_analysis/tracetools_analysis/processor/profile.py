@@ -47,7 +47,7 @@ class ProfileHandler(EventHandler):
         **kwargs,
     ) -> None:
         """
-        Constructor.
+        Create a ProfileHandler.
 
         :param address_to_func: the mapping from function address (`int` or hex `str`) to name
         """

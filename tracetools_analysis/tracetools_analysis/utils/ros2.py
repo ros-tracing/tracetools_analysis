@@ -34,7 +34,7 @@ class Ros2DataModelUtil(DataModelUtil):
         data_model: Ros2DataModel,
     ) -> None:
         """
-        Constructor.
+        Create a Ros2DataModelUtil.
 
         :param data_model: the data model object to use
         """

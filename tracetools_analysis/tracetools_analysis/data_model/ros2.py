@@ -27,7 +27,7 @@ class Ros2DataModel(DataModel):
     """
 
     def __init__(self) -> None:
-        """Constructor."""
+        """Create a Ros2DataModel."""
         super().__init__()
         # Objects (one-time events, usually when something is created)
         self.contexts = pd.DataFrame(columns=['context_handle',

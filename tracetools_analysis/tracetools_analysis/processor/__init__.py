@@ -309,11 +309,13 @@ class Processor():
     def process(
         self,
         events: List[DictEvent],
+        erase_progress: bool = False,
     ) -> None:
         """
         Process all events.
 
         :param events: the events to process
+        :param erase_progress: whether to erase the progress message
         """
         if not self._processing_done:
             self._progress_display.set_work_total(len(events))
@@ -321,6 +323,7 @@ class Processor():
                 self._process_event(event)
                 self._progress_display.did_work()
             self._processing_done = True
+            self._progress_display.done(erase=erase_progress)
 
     def _process_event(self, event: DictEvent) -> None:
         """Process a single event."""
@@ -409,6 +412,28 @@ class ProcessingProgressDisplay():
             self.__rolling_count -= self.__work_display_period
             self._update()
 
-    def _update(self) -> None:
+    def _get_progress_message(
+        self,
+        percentage: float,
+    ) -> str:
+        return f' [{percentage:2.0f}%] {self.__info_string}'
+
+    def _update(
+        self,
+    ) -> None:
         percentage = 100.0 * (float(self.__progress_count) / float(self.__total_work))
-        sys.stdout.write(f' [{percentage:2.0f}%] {self.__info_string}\r')
+        sys.stdout.write(self._get_progress_message(percentage) + '\r')
+
+    def done(
+        self,
+        erase: bool = False,
+    ) -> None:
+        """
+        Set progress to done.
+
+        :param erase: whether to erase the progress message
+        """
+        if erase:
+            # Write spaces over progress message to "erase" it
+            sys.stdout.write(len(self._get_progress_message(100.0)) * ' ' + '\r')
+        sys.stdout.write('\n')

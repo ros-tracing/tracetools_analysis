@@ -64,4 +64,4 @@ def main():
     ]
 
     summary_df = pd.DataFrame(data, columns=['tid', 'node_names', 'max_memory_usage'])
-    print('\n\n' + summary_df.to_string(index=False))
+    print('\n' + summary_df.to_string(index=False))

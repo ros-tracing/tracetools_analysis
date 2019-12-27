@@ -114,6 +114,10 @@ class Ros2DataModelUtil(DataModelUtil):
             obj: self._prettify(callback_symbols.loc[obj, 'symbol']) for obj in callback_objects
         }
 
+    def get_tids(self) -> List[str]:
+        """Get a list of thread ids corresponding to the nodes."""
+        return self.data.nodes['tid'].unique().tolist()
+
     def get_callback_durations(
         self,
         callback_obj: int,

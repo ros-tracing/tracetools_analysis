@@ -28,7 +28,7 @@ class ProfileDataModel(DataModel):
     """
 
     def __init__(self) -> None:
-        """Constructor."""
+        """Create a ProfileDataModel."""
         super().__init__()
         self.times = pd.DataFrame(columns=[
             'tid',

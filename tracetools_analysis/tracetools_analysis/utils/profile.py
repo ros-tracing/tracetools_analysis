@@ -34,7 +34,7 @@ class ProfileDataModelUtil(DataModelUtil):
         data_model: ProfileDataModel,
     ) -> None:
         """
-        Constructor.
+        Create a ProfileDataModelUtil.
 
         :param data_model: the data model object to use
         """

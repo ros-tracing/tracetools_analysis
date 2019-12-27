@@ -40,7 +40,7 @@ class EventMetadata():
         tid: int = None,
     ) -> None:
         """
-        Constructor.
+        Create an EventMetadata.
 
         Parameters with a default value of `None` are not mandatory,
         since they are not always present.
@@ -115,7 +115,7 @@ class EventHandler(Dependant):
         **kwargs,
     ) -> None:
         """
-        Constructor.
+        Create an EventHandler.
 
         TODO make subclasses pass on their *DataModel to this class
 
@@ -173,7 +173,7 @@ class DependencySolver():
         **kwargs,
     ) -> None:
         """
-        Constructor.
+        Create a DependencySolver.
 
         :param initial_dependants: the initial dependant instances, in order
         :param kwargs: the parameters to pass on to new instances
@@ -251,7 +251,7 @@ class Processor():
         **kwargs,
     ) -> None:
         """
-        Constructor.
+        Create a Processor.
 
         :param handlers: the `EventHandler`s to use for processing
         :param kwargs: the parameters to pass on to new handlers
@@ -368,7 +368,7 @@ class ProcessingProgressDisplay():
         processing_elements: List[str],
     ) -> None:
         """
-        Constructor.
+        Create a ProcessingProgressDisplay.
 
         :param processing_elements: the list of elements doing processing
         """

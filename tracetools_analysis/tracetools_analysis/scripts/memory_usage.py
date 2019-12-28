@@ -18,7 +18,7 @@ import pandas as pd
 
 from tracetools_analysis.loading import load_file
 from tracetools_analysis.processor import Processor
-from tracetools_analysis.processor.memory_usage import MemoryUsageHandler
+from tracetools_analysis.processor.memory_usage import UserspaceMemoryUsageHandler
 from tracetools_analysis.processor.ros2 import Ros2Handler
 from tracetools_analysis.utils.memory_usage import MemoryUsageDataModelUtil
 from tracetools_analysis.utils.ros2 import Ros2DataModelUtil
@@ -43,14 +43,14 @@ def main():
     file_path = sys.argv[1]
 
     events = load_file(file_path)
-    memory_handler = MemoryUsageHandler()
+    ust_memory_handler = UserspaceMemoryUsageHandler()
     ros2_handler = Ros2Handler()
-    Processor(memory_handler, ros2_handler).process(events)
+    Processor(ust_memory_handler, ros2_handler).process(events)
 
-    memory_data_util = MemoryUsageDataModelUtil(memory_handler.data)
+    ust_memory_data_util = MemoryUsageDataModelUtil(ust_memory_handler.data)
     ros2_data_util = Ros2DataModelUtil(ros2_handler.data)
 
-    memory_usage_dfs = memory_data_util.get_absolute_memory_usage_by_tid()
+    ust_memory_usage_dfs = ust_memory_data_util.get_absolute_userspace_memory_usage_by_tid()
     tids = ros2_data_util.get_tids()
 
     data = [
@@ -59,7 +59,7 @@ def main():
             ros2_data_util.get_node_names_from_tid(tid),
             format_memory_size(memory_usage['memory_usage'].max(), precision=1),
         ]
-        for tid, memory_usage in memory_usage_dfs.items()
+        for tid, memory_usage in ust_memory_usage_dfs.items()
         if tid in tids
     ]
 

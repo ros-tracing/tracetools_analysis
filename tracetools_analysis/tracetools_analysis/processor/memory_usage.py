@@ -24,8 +24,33 @@ from ..data_model.memory_usage import MemoryUsageDataModel
 
 
 class MemoryUsageHandler(EventHandler):
+    """Generic handler for memory usage."""
+
+    def __init__(
+        self,
+        **kwargs,
+    ) -> None:
+        super().__init__(**kwargs)
+
+        self._data_model = MemoryUsageDataModel()
+
+    @property
+    def data(self) -> MemoryUsageDataModel:
+        return self._data_model
+
+    def _update(
+        self,
+        timestamp: int,
+        tid: int,
+        memory_difference: int,
+    ) -> None:
+        # Add to data model
+        self.data.add_memory_difference(timestamp, tid, memory_difference)
+
+
+class UserspaceMemoryUsageHandler(MemoryUsageHandler):
     """
-    Handler that extracts data for memory usage.
+    Handler that extracts userspace memory usage data.
 
     It uses the following events:
         * lttng_ust_libc:malloc
@@ -66,16 +91,10 @@ class MemoryUsageHandler(EventHandler):
             **kwargs,
         )
 
-        self._data_model = MemoryUsageDataModel()
-
         # Temporary buffers
         # pointer -> current memory size
         # (used to know keep track of the memory size allocated at a given pointer)
         self._memory: Dict[int, int] = {}
-
-    @property
-    def data(self) -> MemoryUsageDataModel:
-        return self._data_model
 
     def _handle_malloc(
         self, event: Dict, metadata: EventMetadata
@@ -148,5 +167,59 @@ class MemoryUsageHandler(EventHandler):
             if allocated_memory is not None:
                 memory_difference = -allocated_memory
 
-        # Add to data model
-        self.data.add_memory_difference(timestamp, tid, memory_difference)
+        self._update(timestamp, tid, memory_difference)
+
+
+class KernelMemoryUsageHandler(MemoryUsageHandler):
+    """
+    Handler that extracts userspace memory usage data.
+
+    It uses the following events:
+        * kmem_mm_page_alloc
+        * kmem_mm_page_free
+
+    Implementation inspired by Trace Compass' implementation:
+    https://git.eclipse.org/c/tracecompass/org.eclipse.tracecompass.git/tree/analysis/org.eclipse.tracecompass.analysis.os.linux.core/src/org/eclipse/tracecompass/analysis/os/linux/core/kernelmemoryusage/KernelMemoryStateProvider.java#n84
+    """
+
+    PAGE_SIZE = 4096
+
+    def __init__(
+        self,
+        **kwargs,
+    ) -> None:
+        # Link event to handling method
+        handler_map = {
+            'kmem_mm_page_alloc':
+                self._handle_malloc,
+            'kmem_mm_page_free':
+                self._handle_free,
+        }
+        super().__init__(
+            handler_map=handler_map,
+            **kwargs,
+        )
+
+    def _handle_malloc(
+        self, event: Dict, metadata: EventMetadata
+    ) -> None:
+        self._handle(event, metadata, self.PAGE_SIZE)
+
+    def _handle_free(
+        self, event: Dict, metadata: EventMetadata
+    ) -> None:
+        self._handle(event, metadata, -self.PAGE_SIZE)
+
+    def _handle(
+        self,
+        event: Dict,
+        metadata: EventMetadata,
+        inc: int,
+    ) -> None:
+        order = get_field(event, 'order')
+        inc <<= order
+
+        timestamp = metadata.timestamp
+        tid = metadata.tid
+
+        self._update(timestamp, tid, inc)

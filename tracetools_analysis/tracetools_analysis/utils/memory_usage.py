@@ -28,21 +28,47 @@ class MemoryUsageDataModelUtil(DataModelUtil):
 
     def __init__(
         self,
-        data_model: MemoryUsageDataModel,
+        *,
+        data_model_userspace: MemoryUsageDataModel = None,
+        data_model_kernel: MemoryUsageDataModel = None,
     ) -> None:
         """
         Create a MemoryUsageDataModelUtil.
 
-        :param data_model: the data model object to use
-        """
-        super().__init__(data_model)
+        At least one non-`None` `MemoryUsageDataModel` must be given
 
-    def get_absolute_memory_usage_by_tid(self) -> Dict[int, DataFrame]:
+        :param data_model_userspace: the userspace data model object to use
+        :param data_model_kernel: the kernel data model object to use
         """
-        Get absolute memory usage over time per tid.
+        # Not giving any model to the base class; we'll own them ourselves
+        super().__init__(None)
+
+        if data_model_userspace is None and data_model_kernel is None:
+            raise RuntimeError('must provide at least one (userspace or kernel) data model!')
+
+        self.data_ust = data_model_userspace
+        self.data_kernel = data_model_kernel
+
+    def get_absolute_userspace_memory_usage_by_tid(self) -> Dict[int, DataFrame]:
+        """
+        Get absolute userspace memory usage over time per tid.
 
         :return (tid -> DataFrame of absolute memory usage over time)
         """
+        return self._get_absolute_memory_usage_by_tid(self.data_ust)
+
+    def get_absolute_kernel_memory_usage_by_tid(self) -> Dict[int, DataFrame]:
+        """
+        Get absolute kernel memory usage over time per tid.
+
+        :return (tid -> DataFrame of absolute memory usage over time)
+        """
+        return self._get_absolute_memory_usage_by_tid(self.data_kernel)
+
+    def _get_absolute_memory_usage_by_tid(
+        self,
+        data: MemoryUsageDataModel,
+    ) -> Dict[int, DataFrame]:
         previous = defaultdict(int)
         data = defaultdict(list)
         for index, row in self.data.memory_diff.iterrows():

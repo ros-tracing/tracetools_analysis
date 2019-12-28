@@ -32,6 +32,10 @@ def generate_launch_description():
                 'lttng_ust_libc:memalign',
                 'lttng_ust_libc:posix_memalign',
             ] + DEFAULT_EVENTS_ROS,
+            events_kernel=[
+                'kmem_mm_page_alloc',
+                'kmem_mm_page_free',
+            ],
         ),
         Node(
             package='tracetools_test',

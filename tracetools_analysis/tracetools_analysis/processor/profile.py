@@ -87,6 +87,14 @@ class ProfileHandler(EventHandler):
         self._current_funcs: Dict[int, List[List[Union[str, int]]]] = defaultdict(list)
 
     @staticmethod
+    def required_events() -> List[str]:
+        return [
+            'lttng_ust_cyg_profile_fast:func_entry',
+            'lttng_ust_cyg_profile_fast:func_exit',
+            'sched_switch',
+        ]
+
+    @staticmethod
     def addr_to_int(addr: Union[int, str]) -> int:
         """Transform an address into an `int` if it's a hex `str`."""
         return int(addr, 16) if isinstance(addr, str) else addr

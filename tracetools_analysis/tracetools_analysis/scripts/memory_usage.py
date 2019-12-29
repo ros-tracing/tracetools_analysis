@@ -25,11 +25,11 @@ from tracetools_analysis.utils.ros2 import Ros2DataModelUtil
 
 def main():
     if len(sys.argv) < 2:
-        print('Syntax: <converted tracefile>')
+        print('Syntax: [trace directory | converted tracefile]')
         sys.exit(1)
-    file_path = sys.argv[1]
+    input_path = sys.argv[1]
 
-    events = load_file(file_path)
+    events = load_file(input_path, do_convert_if_needed=True)
     ust_memory_handler = UserspaceMemoryUsageHandler()
     kernel_memory_handler = KernelMemoryUsageHandler()
     ros2_handler = Ros2Handler()

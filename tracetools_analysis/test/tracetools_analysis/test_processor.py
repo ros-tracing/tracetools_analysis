@@ -13,11 +13,13 @@
 # limitations under the License.
 
 from typing import Dict
+from typing import List
 import unittest
 
 from tracetools_analysis.processor import EventHandler
 from tracetools_analysis.processor import EventMetadata
 from tracetools_analysis.processor import Processor
+from tracetools_analysis.processor import RequiredEventNotFoundError
 
 
 class StubHandler1(EventHandler):
@@ -64,6 +66,47 @@ class WrongHandler(EventHandler):
         pass
 
 
+class MissingEventHandler(EventHandler):
+
+    def __init__(self) -> None:
+        handler_map = {
+            'myeventname': self._handler_whatever,
+        }
+        super().__init__(handler_map=handler_map)
+
+    @staticmethod
+    def required_events() -> List[str]:
+        return [
+            'no_handler_for_this',
+            'myeventname',
+        ]
+
+    def _handler_whatever(
+        self, event: Dict, metadata: EventMetadata
+    ) -> None:
+        pass
+
+
+class EventHandlerWithRequiredEvent(EventHandler):
+
+    def __init__(self) -> None:
+        handler_map = {
+            'myrequiredevent': self._handler_whatever,
+        }
+        super().__init__(handler_map=handler_map)
+
+    @staticmethod
+    def required_events() -> List[str]:
+        return [
+            'myrequiredevent',
+        ]
+
+    def _handler_whatever(
+        self, event: Dict, metadata: EventMetadata
+    ) -> None:
+        pass
+
+
 class TestProcessor(unittest.TestCase):
 
     def __init__(self, *args) -> None:
@@ -94,6 +137,28 @@ class TestProcessor(unittest.TestCase):
         processor.process([mock_event])
         self.assertTrue(handler1.handler_called, 'event handler not called')
         self.assertTrue(handler2.handler_called, 'event handler not called')
+
+    def test_assert_handler_functions_for_required_events(self) -> None:
+        with self.assertRaises(AssertionError):
+            MissingEventHandler()
+
+    def test_check_required_events(self) -> None:
+        mock_event = {
+            '_name': 'myeventname',
+            '_timestamp': 0,
+            'cpu_id': 0,
+        }
+        # Fails check
+        with self.assertRaises(RequiredEventNotFoundError):
+            Processor(EventHandlerWithRequiredEvent()).process([mock_event])
+
+        required_mock_event = {
+            '_name': 'myrequiredevent',
+            '_timestamp': 69,
+            'cpu_id': 0,
+        }
+        # Passes check
+        Processor(EventHandlerWithRequiredEvent()).process([required_mock_event, mock_event])
 
 
 if __name__ == '__main__':

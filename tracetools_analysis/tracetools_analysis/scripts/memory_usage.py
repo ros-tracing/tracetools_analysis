@@ -14,8 +14,6 @@
 
 import sys
 
-import pandas as pd
-
 from tracetools_analysis.loading import load_file
 from tracetools_analysis.processor import Processor
 from tracetools_analysis.processor.memory_usage import KernelMemoryUsageHandler

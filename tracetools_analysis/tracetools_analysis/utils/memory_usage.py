@@ -35,7 +35,7 @@ class MemoryUsageDataModelUtil(DataModelUtil):
         """
         Create a MemoryUsageDataModelUtil.
 
-        At least one non-`None` `MemoryUsageDataModel` must be given
+        At least one non-`None` `MemoryUsageDataModel` must be given.
 
         :param userspace: the userspace data model object to use
         :param kernel: the kernel data model object to use
@@ -80,15 +80,17 @@ class MemoryUsageDataModelUtil(DataModelUtil):
         if self.data_kernel is not None:
             kernel_memory_usage_dfs = self.get_absolute_kernel_memory_usage_by_tid()
             tids_kernel = set(kernel_memory_usage_dfs.keys())
-        # Use only the userspace tid values if they're available, otherwise use the kernel tid valus
+        # Use only the userspace tid values if available, otherwise use the kernel tid values
         tids = tids_ust if self.data_ust is not None else tids_kernel
         data = [
             [
                 tid,
                 self.format_size(ust_memory_usage_dfs[tid]['memory_usage'].max(), precision=1)
-                    if self.data_ust is not None else None,
+                if self.data_ust is not None
+                else None,
                 self.format_size(kernel_memory_usage_dfs[tid]['memory_usage'].max(), precision=1)
-                    if self.data_kernel is not None and ust_memory_usage_dfs.get(tid) is not None else None,
+                if self.data_kernel is not None and ust_memory_usage_dfs.get(tid) is not None
+                else None,
             ]
             for tid in tids
         ]

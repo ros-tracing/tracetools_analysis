@@ -101,11 +101,7 @@ class UserspaceMemoryUsageHandler(MemoryUsageHandler):
     def required_events() -> List[str]:
         return [
             'lttng_ust_libc:malloc',
-            'lttng_ust_libc:calloc',
-            'lttng_ust_libc:realloc',
             'lttng_ust_libc:free',
-            'lttng_ust_libc:memalign',
-            'lttng_ust_libc:posix_memalign',
         ]
 
     def _handle_malloc(

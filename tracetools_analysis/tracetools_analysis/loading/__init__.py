@@ -93,7 +93,7 @@ def convert_if_needed(
     force_conversion: bool = False,
 ) -> str:
     """
-    Inspect input path and convert trace if necessary.
+    Inspect input path and convert trace directory to file if necessary.
 
     :param input_path: the path to a converted file or trace directory
     :param force_conversion: whether to re-create converted file even if it is found

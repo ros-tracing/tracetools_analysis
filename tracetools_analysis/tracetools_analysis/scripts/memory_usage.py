@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-
 from tracetools_analysis.loading import load_file
 from tracetools_analysis.processor import Processor
 from tracetools_analysis.processor.memory_usage import KernelMemoryUsageHandler
@@ -22,14 +20,13 @@ from tracetools_analysis.processor.ros2 import Ros2Handler
 from tracetools_analysis.utils.memory_usage import MemoryUsageDataModelUtil
 from tracetools_analysis.utils.ros2 import Ros2DataModelUtil
 
+from . import get_input_path
+
 
 def main():
-    if len(sys.argv) < 2:
-        print('Syntax: <converted tracefile>')
-        sys.exit(1)
-    file_path = sys.argv[1]
+    input_path = get_input_path()
 
-    events = load_file(file_path)
+    events = load_file(input_path)
     ust_memory_handler = UserspaceMemoryUsageHandler()
     kernel_memory_handler = KernelMemoryUsageHandler()
     ros2_handler = Ros2Handler()

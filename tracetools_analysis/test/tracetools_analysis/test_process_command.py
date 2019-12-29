@@ -18,7 +18,7 @@ import shutil
 import tempfile
 import unittest
 
-from tracetools_analysis.process import inspect_input_path
+from tracetools_analysis.loading import inspect_input_path
 
 
 class TestProcessCommand(unittest.TestCase):

@@ -26,7 +26,7 @@ from . import get_input_path
 def main():
     input_path = get_input_path()
 
-    events = load_file(input_path, do_convert_if_needed=True)
+    events = load_file(input_path)
     ust_memory_handler = UserspaceMemoryUsageHandler()
     kernel_memory_handler = KernelMemoryUsageHandler()
     ros2_handler = Ros2Handler()

@@ -114,7 +114,7 @@ def convert_if_needed(
 
 def load_file(
     input_path: str,
-    do_convert_if_needed: bool = False,
+    do_convert_if_needed: bool = True,
     force_conversion: bool = False,
 ) -> List[Dict]:
     """

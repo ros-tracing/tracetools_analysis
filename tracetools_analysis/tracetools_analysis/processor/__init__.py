@@ -253,6 +253,10 @@ class DependencySolver():
             visited.add(dep_type)
 
 
+class RequiredEventNotFoundError(RuntimeError):
+    pass
+
+
 class Processor():
     """Processor class, which dispatches events to event handlers."""
 
@@ -268,11 +272,11 @@ class Processor():
         :param kwargs: the parameters to pass on to new handlers
         """
         self._initial_handlers = list(handlers)
-        expanded_handlers = self._expand_dependencies(*handlers, **kwargs)
-        self._handler_multimap = self._get_handler_maps(expanded_handlers)
-        self._register_with_handlers(expanded_handlers)
+        self._expanded_handlers = self._expand_dependencies(*handlers, **kwargs)
+        self._handler_multimap = self._get_handler_maps(self._expanded_handlers)
+        self._register_with_handlers(self._expanded_handlers)
         self._progress_display = ProcessingProgressDisplay(
-            [type(handler).__name__ for handler in expanded_handlers],
+            [type(handler).__name__ for handler in self._expanded_handlers],
         )
         self._processing_done = False
 
@@ -317,17 +321,35 @@ class Processor():
         for handler in handlers:
             handler.register_processor(self)
 
+    def _check_required_events(
+        self,
+        events: List[DictEvent],
+    ) -> None:
+        event_names = {get_event_name(event) for event in events}
+        # Check names separately so that we can know which event from which handler is missing
+        for handler in self._expanded_handlers:
+            for name in handler.required_events():
+                if name not in event_names:
+                    raise RequiredEventNotFoundError(
+                        f'missing event {name} for {handler.__class__.__name__}'
+                    )
+
     def process(
         self,
         events: List[DictEvent],
         erase_progress: bool = False,
+        no_required_events_check: bool = False,
     ) -> None:
         """
         Process all events.
 
         :param events: the events to process
         :param erase_progress: whether to erase the progress message
+        :param no_required_events_check: whether to skip the check for required events
         """
+        if not no_required_events_check:
+            self._check_required_events(events)
+
         if not self._processing_done:
             self._progress_display.set_work_total(len(events))
             for event in events:

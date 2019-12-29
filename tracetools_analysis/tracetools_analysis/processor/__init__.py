@@ -121,7 +121,7 @@ class EventHandler(Dependant):
 
         :param handler_map: the mapping from event name to handling method
         """
-        assert handler_map is None or len(handler_map) > 0, \
+        assert handler_map is not None and len(handler_map) > 0, \
             f'empty map: {self.__class__.__name__}'
         assert all(required_name in handler_map.keys() for required_name in self.required_events())
         self._handler_map = handler_map

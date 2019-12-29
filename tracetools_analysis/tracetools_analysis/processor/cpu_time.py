@@ -15,6 +15,7 @@
 """Module for CPU time events processing."""
 
 from typing import Dict
+from typing import List
 
 from tracetools_read import get_field
 
@@ -50,6 +51,12 @@ class CpuTimeHandler(EventHandler):
         # Temporary buffers
         # cpu_id -> start timestamp of the running thread
         self._cpu_start: Dict[int, int] = {}
+
+    @staticmethod
+    def required_events() -> List[str]:
+        return [
+            'sched_switch',
+        ]
 
     @property
     def data(self) -> CpuTimeDataModel:

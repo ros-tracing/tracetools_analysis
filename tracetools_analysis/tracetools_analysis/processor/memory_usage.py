@@ -15,6 +15,7 @@
 """Module for memory usage events processing."""
 
 from typing import Dict
+from typing import List
 
 from tracetools_read import get_field
 
@@ -95,6 +96,17 @@ class UserspaceMemoryUsageHandler(MemoryUsageHandler):
         # pointer -> current memory size
         # (used to know keep track of the memory size allocated at a given pointer)
         self._memory: Dict[int, int] = {}
+
+    @staticmethod
+    def required_events() -> List[str]:
+        return [
+            'lttng_ust_libc:malloc',
+            'lttng_ust_libc:calloc',
+            'lttng_ust_libc:realloc',
+            'lttng_ust_libc:free',
+            'lttng_ust_libc:memalign',
+            'lttng_ust_libc:posix_memalign',
+        ]
 
     def _handle_malloc(
         self, event: Dict, metadata: EventMetadata
@@ -199,6 +211,13 @@ class KernelMemoryUsageHandler(MemoryUsageHandler):
             handler_map=handler_map,
             **kwargs,
         )
+
+    @staticmethod
+    def required_events() -> List[str]:
+        return [
+            'kmem_mm_page_alloc',
+            'kmem_mm_page_free',
+        ]
 
     def _handle_malloc(
         self, event: Dict, metadata: EventMetadata

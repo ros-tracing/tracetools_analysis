@@ -121,8 +121,9 @@ class EventHandler(Dependant):
 
         :param handler_map: the mapping from event name to handling method
         """
-        assert handler_map is not None and len(handler_map) > 0, \
+        assert handler_map is None or len(handler_map) > 0, \
             f'empty map: {self.__class__.__name__}'
+        assert all(required_name in handler_map.keys() for required_name in self.required_events())
         self._handler_map = handler_map
         self.processor = None
 
@@ -135,6 +136,16 @@ class EventHandler(Dependant):
     def data(self) -> None:
         """Get the data model."""
         return None
+
+    @staticmethod
+    def required_events() -> List[str]:
+        """
+        Get the list of events required by this EventHandler.
+
+        Without these events, the EventHandler would be invalid/useless. Inheriting classes can
+        decide not to declare that they require specific events.
+        """
+        return []
 
     def register_processor(self, processor: 'Processor') -> None:
         """Register processor with this `EventHandler` so that it can query other handlers."""

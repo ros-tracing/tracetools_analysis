@@ -29,25 +29,70 @@ class MemoryUsageDataModelUtil(DataModelUtil):
     def __init__(
         self,
         *,
-        data_model_userspace: MemoryUsageDataModel = None,
-        data_model_kernel: MemoryUsageDataModel = None,
+        userspace: MemoryUsageDataModel = None,
+        kernel: MemoryUsageDataModel = None,
     ) -> None:
         """
         Create a MemoryUsageDataModelUtil.
 
         At least one non-`None` `MemoryUsageDataModel` must be given
 
-        :param data_model_userspace: the userspace data model object to use
-        :param data_model_kernel: the kernel data model object to use
+        :param userspace: the userspace data model object to use
+        :param kernel: the kernel data model object to use
         """
         # Not giving any model to the base class; we'll own them ourselves
         super().__init__(None)
 
-        if data_model_userspace is None and data_model_kernel is None:
+        if userspace is None and kernel is None:
             raise RuntimeError('must provide at least one (userspace or kernel) data model!')
 
-        self.data_ust = data_model_userspace
-        self.data_kernel = data_model_kernel
+        self.data_ust = userspace
+        self.data_kernel = kernel
+
+    @staticmethod
+    def format_size(size: int, precision: int = 2):
+        """
+        Format a memory size to a string with a units suffix.
+
+        From: https://stackoverflow.com/a/32009595/6476709
+
+        :param size: the memory size, in bytes
+        :param precision: the number of digits to display after the period
+        """
+        suffixes = ['B', 'KB', 'MB', 'GB', 'TB']
+        suffixIndex = 0
+        while size > 1024 and suffixIndex < 4:
+            # Increment the index of the suffix
+            suffixIndex += 1
+            # Apply the division
+            size = size / 1024.0
+        return f'{size:.{precision}f} {suffixes[suffixIndex]}'
+
+    def get_max_memory_usage_per_tid(self) -> DataFrame:
+        """
+        Get the maximum memory usage per tid.
+
+        :return dataframe with maximum memory usage (userspace & kernel) per tid
+        """
+        if self.data_ust is not None:
+            ust_memory_usage_dfs = self.get_absolute_userspace_memory_usage_by_tid()
+            tids_ust = set(ust_memory_usage_dfs.keys())
+        if self.data_kernel is not None:
+            kernel_memory_usage_dfs = self.get_absolute_kernel_memory_usage_by_tid()
+            tids_kernel = set(kernel_memory_usage_dfs.keys())
+        # Use only the userspace tid values if they're available, otherwise use the kernel tid valus
+        tids = tids_ust if self.data_ust is not None else tids_kernel
+        data = [
+            [
+                tid,
+                self.format_size(ust_memory_usage_dfs[tid]['memory_usage'].max(), precision=1)
+                    if self.data_ust is not None else None,
+                self.format_size(kernel_memory_usage_dfs[tid]['memory_usage'].max(), precision=1)
+                    if self.data_kernel is not None and ust_memory_usage_dfs.get(tid) is not None else None,
+            ]
+            for tid in tids
+        ]
+        return DataFrame(data, columns=['tid', 'max_memory_usage_ust', 'max_memory_usage_kernel'])
 
     def get_absolute_userspace_memory_usage_by_tid(self) -> Dict[int, DataFrame]:
         """
@@ -67,11 +112,11 @@ class MemoryUsageDataModelUtil(DataModelUtil):
 
     def _get_absolute_memory_usage_by_tid(
         self,
-        data: MemoryUsageDataModel,
+        data_model: MemoryUsageDataModel,
     ) -> Dict[int, DataFrame]:
         previous = defaultdict(int)
         data = defaultdict(list)
-        for index, row in self.data.memory_diff.iterrows():
+        for index, row in data_model.memory_diff.iterrows():
             timestamp = row['timestamp']
             tid = int(row['tid'])
             diff = row['memory_diff']

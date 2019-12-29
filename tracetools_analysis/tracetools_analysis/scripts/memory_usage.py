@@ -18,50 +18,32 @@ import pandas as pd
 
 from tracetools_analysis.loading import load_file
 from tracetools_analysis.processor import Processor
+from tracetools_analysis.processor.memory_usage import KernelMemoryUsageHandler
 from tracetools_analysis.processor.memory_usage import UserspaceMemoryUsageHandler
 from tracetools_analysis.processor.ros2 import Ros2Handler
 from tracetools_analysis.utils.memory_usage import MemoryUsageDataModelUtil
 from tracetools_analysis.utils.ros2 import Ros2DataModelUtil
 
 
-# From: https://stackoverflow.com/a/32009595/6476709
-def format_memory_size(size: int, precision: int = 2):
-    suffixes = ['B', 'KB', 'MB', 'GB', 'TB']
-    suffixIndex = 0
-    while size > 1024 and suffixIndex < 4:
-        # Increment the index of the suffix
-        suffixIndex += 1
-        # Apply the division
-        size = size / 1024.0
-    return f'{size:.{precision}f} {suffixes[suffixIndex]}'
-
-
 def main():
     if len(sys.argv) < 2:
         print('Syntax: <converted tracefile>')
-        sys.exit(-1)
+        sys.exit(1)
     file_path = sys.argv[1]
 
     events = load_file(file_path)
     ust_memory_handler = UserspaceMemoryUsageHandler()
+    kernel_memory_handler = KernelMemoryUsageHandler()
     ros2_handler = Ros2Handler()
-    Processor(ust_memory_handler, ros2_handler).process(events)
+    Processor(ust_memory_handler, kernel_memory_handler, ros2_handler).process(events)
 
-    ust_memory_data_util = MemoryUsageDataModelUtil(ust_memory_handler.data)
+    memory_data_util = MemoryUsageDataModelUtil(
+        userspace=ust_memory_handler.data,
+        kernel=kernel_memory_handler.data,
+    )
     ros2_data_util = Ros2DataModelUtil(ros2_handler.data)
 
-    ust_memory_usage_dfs = ust_memory_data_util.get_absolute_userspace_memory_usage_by_tid()
+    summary_df = memory_data_util.get_max_memory_usage_per_tid()
     tids = ros2_data_util.get_tids()
-
-    data = [
-        [
-            tid,
-            ros2_data_util.get_node_names_from_tid(tid),
-            format_memory_size(memory_usage['memory_usage'].max(), precision=1),
-        ]
-        for tid, memory_usage in ust_memory_usage_dfs.items()
-        if tid in tids
-    ]
-
-    summary_df = pd.DataFrame(data, columns=['tid', 'node_names', 'max_memory_usage'])
-    print('\n' + summary_df.to_string(index=False))
+    filtered_df = summary_df.loc[summary_df['tid'].isin(tids)]
+    print('\n' + filtered_df.to_string(index=False))

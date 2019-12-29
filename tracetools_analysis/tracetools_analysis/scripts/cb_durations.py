@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-
 import pandas as pd
 
 from tracetools_analysis.loading import load_file
 from tracetools_analysis.processor.ros2 import Ros2Handler
 from tracetools_analysis.utils.ros2 import Ros2DataModelUtil
+
+from . import get_input_path
 
 
 removals = [
@@ -40,11 +40,9 @@ def format_fn(fname: str):
 
 
 def main():
-    if len(sys.argv) < 2:
-        print('Syntax: <tracefile>')
-        sys.exit(-1)
+    input_path = get_input_path()
 
-    events = load_file(sys.argv[1])
+    events = load_file(input_path)
     handler = Ros2Handler.process(events)
     du = Ros2DataModelUtil(handler.data)
 

@@ -17,6 +17,7 @@
 from collections import defaultdict
 from typing import Dict
 from typing import List
+from typing import Set
 from typing import Union
 
 from tracetools_read import get_field
@@ -87,12 +88,12 @@ class ProfileHandler(EventHandler):
         self._current_funcs: Dict[int, List[List[Union[str, int]]]] = defaultdict(list)
 
     @staticmethod
-    def required_events() -> List[str]:
-        return [
+    def required_events() -> Set[str]:
+        return {
             'lttng_ust_cyg_profile_fast:func_entry',
             'lttng_ust_cyg_profile_fast:func_exit',
             'sched_switch',
-        ]
+        }
 
     @staticmethod
     def addr_to_int(addr: Union[int, str]) -> int:

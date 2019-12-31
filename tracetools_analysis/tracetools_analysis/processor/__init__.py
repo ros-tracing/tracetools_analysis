@@ -138,14 +138,14 @@ class EventHandler(Dependant):
         return None
 
     @staticmethod
-    def required_events() -> List[str]:
+    def required_events() -> Set[str]:
         """
-        Get the list of events required by this EventHandler.
+        Get the set of events required by this EventHandler.
 
         Without these events, the EventHandler would be invalid/useless. Inheriting classes can
         decide not to declare that they require specific events.
         """
-        return []
+        return {}
 
     def register_processor(self, processor: 'Processor') -> None:
         """Register processor with this `EventHandler` so that it can query other handlers."""

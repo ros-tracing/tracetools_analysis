@@ -502,11 +502,14 @@ class AutoProcessor():
         }
 
     @staticmethod
-    def _import_event_handler_submodules(recursive=True):
+    def _import_event_handler_submodules(
+        name: str = __name__,
+        recursive=True,
+    ):
         """Force import of EventHandler submodules."""
         import importlib
         import pkgutil
-        package = importlib.import_module(__name__)
+        package = importlib.import_module(name)
         results = {}
         for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
             full_name = package.__name__ + '.' + name

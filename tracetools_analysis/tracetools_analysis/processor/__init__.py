@@ -480,7 +480,7 @@ class AutoProcessor():
         :return: the list of concrete instances
         """
         # Doing this manually to catch exceptions, e.g. when a given EventHandler subclass is
-        # abstract and thus should not be instanciated
+        # abstract and thus should not be instantiated
         handlers = []
         for handler_class in handler_classes:
             try:

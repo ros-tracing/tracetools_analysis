@@ -405,6 +405,116 @@ class Processor():
                 handler.data.print_data()
 
 
+class AutoProcessor():
+    """
+    Automatic processor, which takes a list of events and enables all relevant handlers.
+
+    It checks each existing EventHandler, and, if its required events are in the events list, it
+    uses that handler.
+    """
+
+    def __init__(
+        self,
+        events: List[DictEvent],
+        **kwargs,
+    ) -> None:
+        """
+        Create an AutoProcessor.
+
+        :param events: the list of events to process
+        :param kwargs: the kwargs to provide when instanciating EventHandler subclasses
+        """
+        handlers = self.get_applicable_event_handlers(events)
+        processor = Processor(
+            *handlers,
+            **kwargs,
+        )
+        processor.process(events)
+
+    @staticmethod
+    def get_applicable_event_handlers(
+        events: List[DictEvent],
+    ) -> List[EventHandler]:
+        """
+        Get applicable EventHandler instances for a list of events.
+
+        :param events: the list of events
+        :return the concrete EventHandler instances which are applicable
+        """
+        event_names = Processor.get_event_names(events)
+        # Force import of all processor submodules (i.e. files) so that we can find all
+        # EventHandler subclasses
+        AutoProcessor._import_event_handler_submodules()
+        all_handler_classes = AutoProcessor._get_subclasses(EventHandler)
+        applicable_handler_classes = AutoProcessor._get_applicable_event_handler_classes(
+            event_names,
+            all_handler_classes,
+        )
+        return AutoProcessor._get_event_handler_instances(applicable_handler_classes)
+
+    @staticmethod
+    def _get_applicable_event_handler_classes(
+        event_names: List[str],
+        handler_classes: List[Type[EventHandler]],
+    ) -> List[Type[EventHandler]]:
+        """
+        Get applicable EventHandler subclasses for a list of event names.
+
+        :param event_names: the list of event names
+        :return: a list of EventHandler subclasses for which requirements are met
+        """
+        return [
+            handler for handler in handler_classes
+            if set(handler.required_events()).issubset(event_names)
+        ]
+
+    @staticmethod
+    def _get_event_handler_instances(
+        handler_classes: List[Type[EventHandler]],
+        **kwargs,
+    ) -> List[EventHandler]:
+        """
+        Create instances from a list of EventHandlers (sub)classes.
+
+        :param handler_classes: the list of EventHandler subclasses
+        :param kwargs: the kwargs to provide when instanciating EventHandler subclasses
+        :return: the list of concrete instances
+        """
+        # Doing this manually to catch exceptions, e.g. when a given EventHandler subclass is
+        # abstract and thus should not be instanciated
+        handlers = []
+        for handler_class in handler_classes:
+            try:
+                instance = handler_class(**kwargs)
+                handlers.append(instance)
+            except:
+                pass
+        return handlers
+
+    @staticmethod
+    def _get_subclasses(
+        cls: Type,
+    ) -> Set[Type]:
+        """Get all subclasses of a class recursively."""
+        return set(cls.__subclasses__()) | {
+            subsubcls for subcls in cls.__subclasses__() for subsubcls in AutoProcessor._get_subclasses(subcls)
+        }
+
+    @staticmethod
+    def _import_event_handler_submodules(recursive=True):
+        """Force import of EventHandler submodules."""
+        import importlib
+        import pkgutil
+        package = importlib.import_module(__name__)
+        results = {}
+        for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
+            full_name = package.__name__ + '.' + name
+            results[full_name] = importlib.import_module(full_name)
+            if recursive and is_pkg:
+                results.update(_import_event_handler_submodules(full_name))
+        return results
+
+
 class ProcessingProgressDisplay():
     """Display processing progress periodically on stdout."""
 

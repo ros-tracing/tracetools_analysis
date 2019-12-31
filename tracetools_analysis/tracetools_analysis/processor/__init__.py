@@ -425,11 +425,10 @@ class AutoProcessor():
         :param kwargs: the kwargs to provide when instanciating EventHandler subclasses
         """
         handlers = self.get_applicable_event_handlers(events)
-        processor = Processor(
+        Processor(
             *handlers,
             **kwargs,
-        )
-        processor.process(events)
+        ).process(events)
 
     @staticmethod
     def get_applicable_event_handlers(
@@ -487,7 +486,7 @@ class AutoProcessor():
             try:
                 instance = handler_class(**kwargs)
                 handlers.append(instance)
-            except:
+            except RuntimeError:
                 pass
         return handlers
 
@@ -497,7 +496,9 @@ class AutoProcessor():
     ) -> Set[Type]:
         """Get all subclasses of a class recursively."""
         return set(cls.__subclasses__()) | {
-            subsubcls for subcls in cls.__subclasses__() for subsubcls in AutoProcessor._get_subclasses(subcls)
+            subsubcls
+            for subcls in cls.__subclasses__()
+            for subsubcls in AutoProcessor._get_subclasses(subcls)
         }
 
     @staticmethod
@@ -511,7 +512,7 @@ class AutoProcessor():
             full_name = package.__name__ + '.' + name
             results[full_name] = importlib.import_module(full_name)
             if recursive and is_pkg:
-                results.update(_import_event_handler_submodules(full_name))
+                results.update(AutoProcessor._import_event_handler_submodules(full_name))
         return results
 
 

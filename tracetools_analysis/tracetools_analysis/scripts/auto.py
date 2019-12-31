@@ -22,4 +22,4 @@ def main():
     input_path = get_input_path()
 
     events = load_file(input_path)
-    processor = AutoProcessor(events)
+    AutoProcessor(events)

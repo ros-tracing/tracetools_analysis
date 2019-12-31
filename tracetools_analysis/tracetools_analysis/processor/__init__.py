@@ -430,6 +430,11 @@ class AutoProcessor():
             **kwargs,
         ).process(events)
 
+    def print_data(self) -> None:
+        """Print data models of all handlers."""
+        for handler in self.handlers:
+            handler.data.print_data()
+
     @staticmethod
     def get_applicable_event_handlers(
         events: List[DictEvent],

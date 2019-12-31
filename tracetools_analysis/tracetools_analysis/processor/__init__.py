@@ -424,9 +424,9 @@ class AutoProcessor():
         :param events: the list of events to process
         :param kwargs: the kwargs to provide when instanciating EventHandler subclasses
         """
-        handlers = self.get_applicable_event_handlers(events)
+        self.handlers = self.get_applicable_event_handlers(events)
         Processor(
-            *handlers,
+            *self.handlers,
             **kwargs,
         ).process(events)
 

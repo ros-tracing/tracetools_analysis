@@ -272,6 +272,8 @@ class Processor():
         :param kwargs: the parameters to pass on to new handlers
         """
         self._initial_handlers = list(handlers)
+        if len(self._initial_handlers) == 0:
+            raise RuntimeError('Must provide at least one handler!')
         self._expanded_handlers = self._expand_dependencies(*handlers, **kwargs)
         self._handler_multimap = self._get_handler_maps(self._expanded_handlers)
         self._register_with_handlers(self._expanded_handlers)

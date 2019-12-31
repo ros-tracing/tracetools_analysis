@@ -31,6 +31,8 @@ class MemoryUsageHandler(EventHandler):
         self,
         **kwargs,
     ) -> None:
+        if type(self) is MemoryUsageHandler:
+            raise RuntimeError('Do not instanciate MemoryUsageHandler directly!')
         super().__init__(**kwargs)
 
         self._data_model = MemoryUsageDataModel()

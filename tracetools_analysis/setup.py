@@ -43,6 +43,7 @@ setup(
         'console_scripts': [
             f'convert = {package_name}.convert:main',
             f'process = {package_name}.process:main',
+            f'auto = {package_name}.scripts.auto:main',
             f'cb_durations = {package_name}.scripts.cb_durations:main',
             f'memory_usage = {package_name}.scripts.memory_usage:main',
         ],

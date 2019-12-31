@@ -321,11 +321,18 @@ class Processor():
         for handler in handlers:
             handler.register_processor(self)
 
+    @staticmethod
+    def get_event_names(
+        events: List[DictEvent],
+    ) -> Set[str]:
+        """Get set of names from a list of events."""
+        return {get_event_name(event) for event in events}
+
     def _check_required_events(
         self,
         events: List[DictEvent],
     ) -> None:
-        event_names = {get_event_name(event) for event in events}
+        event_names = self.get_event_names(events)
         # Check names separately so that we can know which event from which handler is missing
         for handler in self._expanded_handlers:
             for name in handler.required_events():

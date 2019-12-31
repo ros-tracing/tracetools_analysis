@@ -455,21 +455,21 @@ class AutoProcessor():
     def _get_applicable_event_handler_classes(
         event_names: List[str],
         handler_classes: List[Type[EventHandler]],
-    ) -> List[Type[EventHandler]]:
+    ) -> Set[Type[EventHandler]]:
         """
         Get applicable EventHandler subclasses for a list of event names.
 
         :param event_names: the list of event names
         :return: a list of EventHandler subclasses for which requirements are met
         """
-        return [
+        return {
             handler for handler in handler_classes
             if set(handler.required_events()).issubset(event_names)
-        ]
+        }
 
     @staticmethod
     def _get_event_handler_instances(
-        handler_classes: List[Type[EventHandler]],
+        handler_classes: Set[Type[EventHandler]],
         **kwargs,
     ) -> List[EventHandler]:
         """

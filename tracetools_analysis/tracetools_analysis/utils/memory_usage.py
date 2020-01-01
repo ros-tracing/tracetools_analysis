@@ -40,11 +40,11 @@ class MemoryUsageDataModelUtil(DataModelUtil):
         :param userspace: the userspace data model object to use
         :param kernel: the kernel data model object to use
         """
-        # Not giving any model to the base class; we'll own them ourselves
-        super().__init__(None)
-
         if userspace is None and kernel is None:
             raise RuntimeError('must provide at least one (userspace or kernel) data model!')
+
+        # Not giving any model to the base class; we'll own them ourselves
+        super().__init__(None)
 
         self.data_ust = userspace
         self.data_kernel = kernel

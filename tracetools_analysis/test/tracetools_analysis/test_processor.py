@@ -113,6 +113,11 @@ class TestProcessor(unittest.TestCase):
             *args,
         )
 
+    def test_event_handler_process(self) -> None:
+        # Should not be called directly
+        with self.assertRaises(AssertionError):
+            EventHandler.process([])
+
     def test_handler_wrong_signature(self) -> None:
         handler = WrongHandler()
         mock_event = {
@@ -158,6 +163,13 @@ class TestProcessor(unittest.TestCase):
         }
         # Passes check
         Processor(EventHandlerWithRequiredEvent()).process([required_mock_event, mock_event])
+
+    def test_get_handler_by_type(self) -> None:
+        handler1 = StubHandler1()
+        handler2 = StubHandler2()
+        processor = Processor(handler1, handler2)
+        result = processor.get_handler_by_type(StubHandler1)
+        self.assertTrue(result is handler1)
 
 
 if __name__ == '__main__':

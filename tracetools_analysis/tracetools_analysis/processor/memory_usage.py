@@ -15,7 +15,7 @@
 """Module for memory usage events processing."""
 
 from typing import Dict
-from typing import List
+from typing import Set
 
 from tracetools_read import get_field
 
@@ -31,6 +31,8 @@ class MemoryUsageHandler(EventHandler):
         self,
         **kwargs,
     ) -> None:
+        if type(self) is MemoryUsageHandler:
+            raise RuntimeError('Do not instanciate MemoryUsageHandler directly!')
         super().__init__(**kwargs)
 
         self._data_model = MemoryUsageDataModel()
@@ -98,11 +100,11 @@ class UserspaceMemoryUsageHandler(MemoryUsageHandler):
         self._memory: Dict[int, int] = {}
 
     @staticmethod
-    def required_events() -> List[str]:
-        return [
+    def required_events() -> Set[str]:
+        return {
             'lttng_ust_libc:malloc',
             'lttng_ust_libc:free',
-        ]
+        }
 
     def _handle_malloc(
         self, event: Dict, metadata: EventMetadata
@@ -209,11 +211,11 @@ class KernelMemoryUsageHandler(MemoryUsageHandler):
         )
 
     @staticmethod
-    def required_events() -> List[str]:
-        return [
+    def required_events() -> Set[str]:
+        return {
             'kmem_mm_page_alloc',
             'kmem_mm_page_free',
-        ]
+        }
 
     def _handle_malloc(
         self, event: Dict, metadata: EventMetadata

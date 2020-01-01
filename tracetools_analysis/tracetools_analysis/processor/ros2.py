@@ -15,6 +15,7 @@
 """Module for trace events processor and ROS model creation."""
 
 from typing import Dict
+from typing import Set
 
 from tracetools_read import get_field
 
@@ -75,6 +76,12 @@ class Ros2Handler(EventHandler):
 
         # Temporary buffers
         self._callback_instances = {}
+
+    @staticmethod
+    def required_events() -> Set[str]:
+        return {
+            'ros2:rcl_init',
+        }
 
     @property
     def data(self) -> Ros2DataModel:

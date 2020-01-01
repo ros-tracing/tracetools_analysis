@@ -138,14 +138,14 @@ class EventHandler(Dependant):
         return None
 
     @staticmethod
-    def required_events() -> List[str]:
+    def required_events() -> Set[str]:
         """
-        Get the list of events required by this EventHandler.
+        Get the set of events required by this EventHandler.
 
         Without these events, the EventHandler would be invalid/useless. Inheriting classes can
         decide not to declare that they require specific events.
         """
-        return []
+        return {}
 
     def register_processor(self, processor: 'Processor') -> None:
         """Register processor with this `EventHandler` so that it can query other handlers."""
@@ -272,6 +272,8 @@ class Processor():
         :param kwargs: the parameters to pass on to new handlers
         """
         self._initial_handlers = list(handlers)
+        if len(self._initial_handlers) == 0:
+            raise RuntimeError('Must provide at least one handler!')
         self._expanded_handlers = self._expand_dependencies(*handlers, **kwargs)
         self._handler_multimap = self._get_handler_maps(self._expanded_handlers)
         self._register_with_handlers(self._expanded_handlers)
@@ -321,11 +323,18 @@ class Processor():
         for handler in handlers:
             handler.register_processor(self)
 
+    @staticmethod
+    def get_event_names(
+        events: List[DictEvent],
+    ) -> Set[str]:
+        """Get set of names from a list of events."""
+        return {get_event_name(event) for event in events}
+
     def _check_required_events(
         self,
         events: List[DictEvent],
     ) -> None:
-        event_names = {get_event_name(event) for event in events}
+        event_names = self.get_event_names(events)
         # Check names separately so that we can know which event from which handler is missing
         for handler in self._expanded_handlers:
             for name in handler.required_events():
@@ -394,6 +403,125 @@ class Processor():
         if self._processing_done:
             for handler in self._initial_handlers:
                 handler.data.print_data()
+
+
+class AutoProcessor():
+    """
+    Automatic processor, which takes a list of events and enables all relevant handlers.
+
+    It checks each existing EventHandler, and, if its required events are in the events list, it
+    uses that handler.
+    """
+
+    def __init__(
+        self,
+        events: List[DictEvent],
+        **kwargs,
+    ) -> None:
+        """
+        Create an AutoProcessor.
+
+        :param events: the list of events to process
+        :param kwargs: the kwargs to provide when instanciating EventHandler subclasses
+        """
+        self.handlers = self.get_applicable_event_handlers(events)
+        Processor(
+            *self.handlers,
+            **kwargs,
+        ).process(events)
+
+    def print_data(self) -> None:
+        """Print data models of all handlers."""
+        for handler in self.handlers:
+            handler.data.print_data()
+
+    @staticmethod
+    def get_applicable_event_handlers(
+        events: List[DictEvent],
+    ) -> List[EventHandler]:
+        """
+        Get applicable EventHandler instances for a list of events.
+
+        :param events: the list of events
+        :return the concrete EventHandler instances which are applicable
+        """
+        event_names = Processor.get_event_names(events)
+        # Force import of all processor submodules (i.e. files) so that we can find all
+        # EventHandler subclasses
+        AutoProcessor._import_event_handler_submodules()
+        all_handler_classes = AutoProcessor._get_subclasses(EventHandler)
+        applicable_handler_classes = AutoProcessor._get_applicable_event_handler_classes(
+            event_names,
+            all_handler_classes,
+        )
+        return AutoProcessor._get_event_handler_instances(applicable_handler_classes)
+
+    @staticmethod
+    def _get_applicable_event_handler_classes(
+        event_names: List[str],
+        handler_classes: List[Type[EventHandler]],
+    ) -> Set[Type[EventHandler]]:
+        """
+        Get applicable EventHandler subclasses for a list of event names.
+
+        :param event_names: the list of event names
+        :return: a list of EventHandler subclasses for which requirements are met
+        """
+        return {
+            handler for handler in handler_classes
+            if set(handler.required_events()).issubset(event_names)
+        }
+
+    @staticmethod
+    def _get_event_handler_instances(
+        handler_classes: Set[Type[EventHandler]],
+        **kwargs,
+    ) -> List[EventHandler]:
+        """
+        Create instances from a list of EventHandlers (sub)classes.
+
+        :param handler_classes: the list of EventHandler subclasses
+        :param kwargs: the kwargs to provide when instanciating EventHandler subclasses
+        :return: the list of concrete instances
+        """
+        # Doing this manually to catch exceptions, e.g. when a given EventHandler subclass is
+        # abstract and thus should not be instantiated
+        handlers = []
+        for handler_class in handler_classes:
+            try:
+                instance = handler_class(**kwargs)
+                handlers.append(instance)
+            except RuntimeError:
+                pass
+        return handlers
+
+    @staticmethod
+    def _get_subclasses(
+        cls: Type,
+    ) -> Set[Type]:
+        """Get all subclasses of a class recursively."""
+        return set(cls.__subclasses__()) | {
+            subsubcls
+            for subcls in cls.__subclasses__()
+            for subsubcls in AutoProcessor._get_subclasses(subcls)
+        }
+
+    @staticmethod
+    def _import_event_handler_submodules(
+        name: str = __name__,
+        recursive=True,
+    ):
+        """Force import of EventHandler submodules."""
+        import importlib
+        import pkgutil
+        package = importlib.import_module(name)
+        results = {}
+        for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
+            full_name = package.__name__ + '.' + name
+            results[full_name] = importlib.import_module(full_name)
+            if recursive and is_pkg:
+                results.update(AutoProcessor._import_event_handler_submodules(full_name))
+        return results
 
 
 class ProcessingProgressDisplay():

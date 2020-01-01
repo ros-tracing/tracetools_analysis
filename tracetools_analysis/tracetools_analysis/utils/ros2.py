@@ -24,6 +24,7 @@ from pandas import DataFrame
 
 from . import DataModelUtil
 from ..data_model.ros2 import Ros2DataModel
+from ..processor.ros2 import Ros2Handler
 
 
 class Ros2DataModelUtil(DataModelUtil):
@@ -31,14 +32,14 @@ class Ros2DataModelUtil(DataModelUtil):
 
     def __init__(
         self,
-        data_model: Ros2DataModel,
+        data_object: Union[Ros2DataModel, Ros2Handler],
     ) -> None:
         """
         Create a Ros2DataModelUtil.
 
-        :param data_model: the data model object to use
+        :param data_object: the data model or the event handler which has a data model
         """
-        super().__init__(data_model)
+        super().__init__(data_object)
 
     def _prettify(
         self,

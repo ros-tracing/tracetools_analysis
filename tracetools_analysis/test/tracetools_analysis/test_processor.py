@@ -113,6 +113,11 @@ class TestProcessor(unittest.TestCase):
             *args,
         )
 
+    def test_event_handler_process(self) -> None:
+        # Should not be called directly
+        with self.assertRaises(AssertionError):
+            EventHandler.process([])
+
     def test_handler_wrong_signature(self) -> None:
         handler = WrongHandler()
         mock_event = {

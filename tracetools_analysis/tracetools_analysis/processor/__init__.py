@@ -21,6 +21,7 @@ from typing import Dict
 from typing import List
 from typing import Set
 from typing import Type
+from typing import Union
 
 from tracetools_read import DictEvent
 from tracetools_read import get_event_name
@@ -125,7 +126,7 @@ class EventHandler(Dependant):
             f'empty map: {self.__class__.__name__}'
         assert all(required_name in handler_map.keys() for required_name in self.required_events())
         self._handler_map = handler_map
-        self.processor = None
+        self._processor = None
 
     @property
     def handler_map(self) -> HandlerMap:
@@ -137,6 +138,10 @@ class EventHandler(Dependant):
         """Get the data model."""
         return None
 
+    @property
+    def processor(self) -> Processor:
+        return self._processor
+
     @staticmethod
     def required_events() -> Set[str]:
         """
@@ -147,9 +152,12 @@ class EventHandler(Dependant):
         """
         return {}
 
-    def register_processor(self, processor: 'Processor') -> None:
+    def register_processor(
+        self,
+        processor: 'Processor',
+    ) -> None:
         """Register processor with this `EventHandler` so that it can query other handlers."""
-        self.processor = processor
+        self._processor = processor
 
     @staticmethod
     def int_to_hex_str(addr: int) -> str:

@@ -253,12 +253,13 @@ class DependencySolver():
             visited.add(dep_type)
 
 
-class RequiredEventNotFoundError(RuntimeError):
-    pass
-
-
 class Processor():
     """Processor class, which dispatches events to event handlers."""
+
+    class RequiredEventNotFoundError(RuntimeError):
+        """When a trace does not contain one event required by an EventHandler."""
+
+        pass
 
     def __init__(
         self,
@@ -339,7 +340,7 @@ class Processor():
         for handler in self._expanded_handlers:
             for name in handler.required_events():
                 if name not in event_names:
-                    raise RequiredEventNotFoundError(
+                    raise self.RequiredEventNotFoundError(
                         f'missing event {name} for {handler.__class__.__name__}'
                     )
 

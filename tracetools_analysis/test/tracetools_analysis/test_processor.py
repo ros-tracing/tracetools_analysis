@@ -19,7 +19,6 @@ import unittest
 from tracetools_analysis.processor import EventHandler
 from tracetools_analysis.processor import EventMetadata
 from tracetools_analysis.processor import Processor
-from tracetools_analysis.processor import RequiredEventNotFoundError
 
 
 class StubHandler1(EventHandler):
@@ -149,7 +148,7 @@ class TestProcessor(unittest.TestCase):
             'cpu_id': 0,
         }
         # Fails check
-        with self.assertRaises(RequiredEventNotFoundError):
+        with self.assertRaises(Processor.RequiredEventNotFoundError):
             Processor(EventHandlerWithRequiredEvent()).process([mock_event])
 
         required_mock_event = {

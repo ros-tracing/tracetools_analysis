@@ -14,11 +14,15 @@
 
 from datetime import datetime
 from datetime import timezone
+from typing import Dict
 import unittest
 
 from pandas import DataFrame
 from pandas.util.testing import assert_frame_equal
 
+from tracetools_analysis.data_model import DataModel
+from tracetools_analysis.processor import EventHandler
+from tracetools_analysis.processor import EventMetadata
 from tracetools_analysis.utils import DataModelUtil
 
 
@@ -108,6 +112,38 @@ class TestDataModelUtil(unittest.TestCase):
             'diff',
         )
         assert_frame_equal(input_df, expected_df)
+
+    def test_creation(self) -> None:
+        def handler_whatever(
+            self, event: Dict, metadata: EventMetadata
+        ) -> None:
+            pass
+
+        handler_map = {'fake': handler_whatever}
+        data_model = DataModel()
+
+        # Should handle the event handler not having any data model
+        handler_none = EventHandler(
+            handler_map=handler_map,
+        )
+        data_model_util_none = DataModelUtil(handler_none)
+        self.assertIsNone(data_model_util_none.data)
+
+        # Should work when given an event handler with a data model
+        handler_data = EventHandler(
+            handler_map=handler_map,
+            data_model=data_model,
+        )
+        data_model_util_data = DataModelUtil(handler_data)
+        self.assertTrue(data_model_util_data.data is data_model)
+
+        # Should work when given a data model directly
+        handler_data_direct = EventHandler(
+            handler_map=handler_map,
+            data_model=data_model,
+        )
+        data_model_util_direct = DataModelUtil(handler_data_direct.data)
+        self.assertTrue(data_model_util_direct.data is data_model)
 
 
 if __name__ == '__main__':

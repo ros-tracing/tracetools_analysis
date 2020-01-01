@@ -16,11 +16,14 @@
 
 from collections import defaultdict
 from typing import Dict
+from typing import Union
 
 from pandas import DataFrame
 
 from . import DataModelUtil
 from ..data_model.memory_usage import MemoryUsageDataModel
+from ..processor.memory_usage import KernelMemoryUsageHandler
+from ..processor.memory_usage import UserspaceMemoryUsageHandler
 
 
 class MemoryUsageDataModelUtil(DataModelUtil):
@@ -29,25 +32,27 @@ class MemoryUsageDataModelUtil(DataModelUtil):
     def __init__(
         self,
         *,
-        userspace: MemoryUsageDataModel = None,
-        kernel: MemoryUsageDataModel = None,
+        userspace: Union[MemoryUsageDataModel, UserspaceMemoryUsageHandler, None] = None,
+        kernel: Union[MemoryUsageDataModel, KernelMemoryUsageHandler, None] = None,
     ) -> None:
         """
         Create a MemoryUsageDataModelUtil.
 
         At least one non-`None` `MemoryUsageDataModel` must be given.
 
-        :param userspace: the userspace data model object to use
-        :param kernel: the kernel data model object to use
+        :param userspace: the userspace data model object to use or the event handler
+        :param kernel: the kernel data model object to use or the event handler
         """
-        # Not giving any model to the base class; we'll own them ourselves
-        super().__init__(None)
-
         if userspace is None and kernel is None:
             raise RuntimeError('must provide at least one (userspace or kernel) data model!')
 
-        self.data_ust = userspace
-        self.data_kernel = kernel
+        # Not giving any model to the base class; we'll own them ourselves
+        super().__init__(None)
+
+        self.data_ust = userspace.data \
+            if isinstance(userspace, UserspaceMemoryUsageHandler) else userspace
+        self.data_kernel = kernel.data \
+            if isinstance(kernel, KernelMemoryUsageHandler) else kernel
 
     @staticmethod
     def format_size(size: int, precision: int = 2):

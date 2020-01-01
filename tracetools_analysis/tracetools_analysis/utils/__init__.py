@@ -21,6 +21,7 @@ from typing import Union
 from pandas import DataFrame
 
 from ..data_model import DataModel
+from ..processor import EventHandler
 
 
 class DataModelUtil():
@@ -32,17 +33,17 @@ class DataModelUtil():
 
     def __init__(
         self,
-        data_model: DataModel,
+        data_object: Union[DataModel, EventHandler, None],
     ) -> None:
         """
         Create a DataModelUtil.
 
-        :param data_model: the data model
+        :param data_object: the data model or the event handler which has a data model
         """
-        self.__data = data_model
+        self.__data = data_object.data if isinstance(data_object, EventHandler) else data_object
 
     @property
-    def data(self) -> DataModel:
+    def data(self) -> Union[DataModel, None]:
         return self.__data
 
     @staticmethod

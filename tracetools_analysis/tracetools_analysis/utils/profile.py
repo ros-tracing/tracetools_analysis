@@ -24,6 +24,7 @@ from pandas import DataFrame
 
 from . import DataModelUtil
 from ..data_model.profile import ProfileDataModel
+from ..processor.profile import ProfileHandler
 
 
 class ProfileDataModelUtil(DataModelUtil):
@@ -31,14 +32,14 @@ class ProfileDataModelUtil(DataModelUtil):
 
     def __init__(
         self,
-        data_model: ProfileDataModel,
+        data_object: Union[ProfileDataModel, ProfileHandler],
     ) -> None:
         """
         Create a ProfileDataModelUtil.
 
-        :param data_model: the data model object to use
+        :param data_object: the data model or the event handler which has a data model
         """
-        super().__init__(data_model)
+        super().__init__(data_object)
 
     def with_tid(
         self,

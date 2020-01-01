@@ -107,8 +107,9 @@ class EventHandler(Dependant):
     """
     Base event handling class.
 
-    Provides handling functions for some events, depending on the name.
-    Passes that on to a data model. To be subclassed.
+    Provides handling functions for some events, depending on the name. Passes that on to a data
+    model. Should be subclassed, but it is not necessary since the handling functions can be
+    anything; therefore it does not raise any error if it is directly instantiated.
     """
 
     def __init__(

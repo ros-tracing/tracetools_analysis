@@ -22,6 +22,6 @@ build:
   script:
     - colcon build --symlink-install --packages-up-to $PACKAGES_LIST
     - . install/local_setup.sh
-    - colcon test --packages-select $PACKAGES_LIST
+    - colcon test --packages-select $PACKAGES_LIST --pytest-args -o addopts=
     - colcon test-result --all
   <<: *global_artifacts

@@ -44,8 +44,8 @@ from tracetools_analysis import loading
 from tracetools_analysis import processor
 from tracetools_analysis import utils
 
-# Load converted trace file
-events = loading.load_file('/path/to/converted/file')
+# Load trace directory or converted trace file
+events = loading.load_file('/path/to/trace/or/converted/file')
 
 # Process
 ros2_handler = processor.Ros2Handler()

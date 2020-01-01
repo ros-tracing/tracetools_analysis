@@ -165,14 +165,19 @@ class EventHandler(Dependant):
         return f'0x{addr:X}'
 
     @classmethod
-    def process(cls, events: List[DictEvent], **kwargs) -> 'EventHandler':
+    def process(
+        cls,
+        events: List[DictEvent],
+        **kwargs,
+    ) -> 'EventHandler':
         """
         Create a `Processor` and process an instance of the class.
 
         :param events: the list of events
         :return: the processor object after processing
         """
-        assert cls != EventHandler, 'only call process() from inheriting classes'
+        if cls == EventHandler:
+            raise AssertionError('only call EventHandler.process() from inheriting classes')
         handler_object = cls(**kwargs)  # pylint: disable=all
         processor = Processor(handler_object, **kwargs)
         processor.process(events)

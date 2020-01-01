@@ -139,7 +139,7 @@ class EventHandler(Dependant):
         return None
 
     @property
-    def processor(self) -> Processor:
+    def processor(self) -> 'Processor':
         return self._processor
 
     @staticmethod

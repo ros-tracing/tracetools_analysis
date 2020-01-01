@@ -33,13 +33,10 @@ class MemoryUsageHandler(EventHandler):
     ) -> None:
         if type(self) is MemoryUsageHandler:
             raise RuntimeError('Do not instanciate MemoryUsageHandler directly!')
-        super().__init__(**kwargs)
-
-        self._data_model = MemoryUsageDataModel()
-
-    @property
-    def data(self) -> MemoryUsageDataModel:
-        return self._data_model
+        super().__init__(
+            data_model=MemoryUsageDataModel(),
+            **kwargs,
+        )
 
     def _update(
         self,

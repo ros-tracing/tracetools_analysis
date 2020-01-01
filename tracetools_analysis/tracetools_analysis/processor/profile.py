@@ -66,10 +66,10 @@ class ProfileHandler(EventHandler):
         }
         super().__init__(
             handler_map=handler_map,
+            data_model=ProfileDataModel(),
             **kwargs,
         )
 
-        self._data_model = ProfileDataModel()
         self._address_to_func = {
             self.addr_to_int(addr): name for addr, name in address_to_func.items()
         }
@@ -99,10 +99,6 @@ class ProfileHandler(EventHandler):
     def addr_to_int(addr: Union[int, str]) -> int:
         """Transform an address into an `int` if it's a hex `str`."""
         return int(addr, 16) if isinstance(addr, str) else addr
-
-    @property
-    def data(self) -> ProfileDataModel:
-        return self._data_model
 
     def _handle_sched_switch(
         self, event: Dict, metadata: EventMetadata

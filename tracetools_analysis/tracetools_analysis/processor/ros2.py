@@ -69,10 +69,9 @@ class Ros2Handler(EventHandler):
         }
         super().__init__(
             handler_map=handler_map,
+            data_model=Ros2DataModel(),
             **kwargs,
         )
-
-        self._data_model = Ros2DataModel()
 
         # Temporary buffers
         self._callback_instances = {}
@@ -82,10 +81,6 @@ class Ros2Handler(EventHandler):
         return {
             'ros2:rcl_init',
         }
-
-    @property
-    def data(self) -> Ros2DataModel:
-        return self._data_model
 
     def _handle_rcl_init(
         self, event: Dict, metadata: EventMetadata,

@@ -27,6 +27,8 @@ from tracetools_read import DictEvent
 from tracetools_read import get_event_name
 from tracetools_read import get_field
 
+from ..data_model import DataModel
+
 
 class EventMetadata():
     """Container for event metadata."""
@@ -113,19 +115,20 @@ class EventHandler(Dependant):
         self,
         *,
         handler_map: HandlerMap,
+        data_model: DataModel = None,
         **kwargs,
     ) -> None:
         """
         Create an EventHandler.
 
-        TODO make subclasses pass on their *DataModel to this class
-
         :param handler_map: the mapping from event name to handling method
+        :param data_model: the data model
         """
         assert handler_map is not None and len(handler_map) > 0, \
             f'empty map: {self.__class__.__name__}'
         assert all(required_name in handler_map.keys() for required_name in self.required_events())
         self._handler_map = handler_map
+        self._data_model = data_model
         self._processor = None
 
     @property
@@ -134,9 +137,9 @@ class EventHandler(Dependant):
         return self._handler_map
 
     @property
-    def data(self) -> None:
+    def data(self) -> Union[DataModel, None]:
         """Get the data model."""
-        return None
+        return self._data_model
 
     @property
     def processor(self) -> 'Processor':

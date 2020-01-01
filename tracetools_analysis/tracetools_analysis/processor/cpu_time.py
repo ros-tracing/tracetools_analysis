@@ -43,10 +43,9 @@ class CpuTimeHandler(EventHandler):
         }
         super().__init__(
             handler_map=handler_map,
+            data_model=CpuTimeDataModel(),
             **kwargs,
         )
-
-        self._data_model = CpuTimeDataModel()
 
         # Temporary buffers
         # cpu_id -> start timestamp of the running thread
@@ -57,10 +56,6 @@ class CpuTimeHandler(EventHandler):
         return {
             'sched_switch',
         }
-
-    @property
-    def data(self) -> CpuTimeDataModel:
-        return self._data_model
 
     def _handle_sched_switch(
         self, event: Dict, metadata: EventMetadata

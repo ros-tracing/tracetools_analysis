@@ -346,8 +346,11 @@ class Processor():
 
         :param handler_type: the type of EventHandler subclass to find
         :return: the EventHandler instance if found, otherwise `None`
-        """ 
-        return next((handler for handler in self._expanded_handlers if type(handler) is handler_type), None)
+        """
+        return next(
+            (handler for handler in self._expanded_handlers if type(handler) is handler_type),
+            None,
+        )
 
     @staticmethod
     def get_event_names(

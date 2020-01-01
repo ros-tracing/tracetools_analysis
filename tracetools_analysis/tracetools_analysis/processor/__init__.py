@@ -332,6 +332,18 @@ class Processor():
         for handler in handlers:
             handler.register_processor(self)
 
+    def get_handler_by_type(
+        self,
+        handler_type: Type,
+    ) -> Union[EventHandler, None]:
+        """
+        Get an existing EventHandler instance from its type.
+
+        :param handler_type: the type of EventHandler subclass to find
+        :return: the EventHandler instance if found, otherwise `None`
+        """ 
+        return next((handler for handler in self._expanded_handlers if type(handler) is handler_type), None)
+
     @staticmethod
     def get_event_names(
         events: List[DictEvent],

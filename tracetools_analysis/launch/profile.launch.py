@@ -37,8 +37,15 @@ def generate_launch_description():
             ],
         ),
         Node(
-            package='ros_performance',
-            node_executable='ros',
+            package='tracetools_test',
+            node_executable='test_ping',
+            arguments=['do_more'],
+            output='screen',
+        ),
+        Node(
+            package='tracetools_test',
+            node_executable='test_pong',
+            arguments=['do_more'],
             output='screen',
         ),
     ])

@@ -17,6 +17,7 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from tracetools_launch.action import Trace
+from tracetools_trace.tools.names import DEFAULT_CONTEXT
 from tracetools_trace.tools.names import DEFAULT_EVENTS_ROS
 
 
@@ -35,6 +36,9 @@ def generate_launch_description():
             events_kernel=[
                 'sched_switch',
             ],
+            context_names=[
+                'ip',
+            ] + DEFAULT_CONTEXT,
         ),
         Node(
             package='tracetools_test',

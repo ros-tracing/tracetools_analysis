@@ -4,6 +4,13 @@ Analysis tools for [ROS 2 tracing](https://gitlab.com/micro-ROS/ros_tracing/ros2
 
 ## Setup
 
+Install:
+
+* `pandas`
+    ```
+    $ sudo apt-get install python3-pandas
+    ```
+
 To display results, install:
 
 * [Jupyter](https://jupyter.org/install)

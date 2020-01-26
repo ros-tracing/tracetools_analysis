@@ -1,5 +1,7 @@
 # tracetools_analysis
 
+[![pipeline status](https://gitlab.com/micro-ROS/ros_tracing/tracetools_analysis/badges/master/pipeline.svg)](https://gitlab.com/micro-ROS/ros_tracing/tracetools_analysis/commits/master)
+
 Analysis tools for [ROS 2 tracing](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing).
 
 ## Setup

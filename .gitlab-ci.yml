@@ -2,8 +2,8 @@ variables:
   DOCKER_DRIVER: overlay2
   PACKAGES_LIST: tracetools_analysis ros2trace_analysis
   BASE_IMAGE_ID: registry.gitlab.com/micro-ros/ros_tracing/ci_base
-  DISTRO: foxy
-  ROS2TRACING_BRANCH: master
+  DISTRO: eloquent
+  ROS2TRACING_BRANCH: $DISTRO
 
 .global_artifacts: &global_artifacts
   artifacts:

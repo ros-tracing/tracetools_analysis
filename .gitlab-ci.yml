@@ -1,7 +1,8 @@
 variables:
   DOCKER_DRIVER: overlay2
   PACKAGES_LIST: tracetools_analysis ros2trace_analysis
-  base_image_id: registry.gitlab.com/micro-ros/ros_tracing/ci_base
+  BASE_IMAGE_ID: registry.gitlab.com/micro-ros/ros_tracing/ci_base
+  DISTRO: foxy
 
 .global_artifacts: &global_artifacts
   artifacts:
@@ -15,7 +16,7 @@ variables:
         - build/*/pytest.xml
 
 build:
-  image: $base_image_id
+  image: $BASE_IMAGE_ID:$DISTRO
   before_script:
     - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
     - . /root/ws/install/local_setup.sh

@@ -3,6 +3,7 @@ variables:
   PACKAGES_LIST: tracetools_analysis ros2trace_analysis
   BASE_IMAGE_ID: registry.gitlab.com/micro-ros/ros_tracing/ci_base
   DISTRO: foxy
+  ROS2TRACING_BRANCH: master
 
 .global_artifacts: &global_artifacts
   artifacts:
@@ -18,7 +19,7 @@ variables:
 build:
   image: $BASE_IMAGE_ID:$DISTRO
   before_script:
-    - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
+    - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git --branch $ROS2TRACING_BRANCH
     - . /root/ws/install/local_setup.sh
   script:
     - colcon build --symlink-install --packages-up-to $PACKAGES_LIST

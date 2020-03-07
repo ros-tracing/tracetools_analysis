@@ -22,7 +22,7 @@ build:
     - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git --branch $ROS2TRACING_BRANCH
     - . /root/ws/install/local_setup.sh
   script:
-    - colcon build --symlink-install --packages-up-to $PACKAGES_LIST
-    - colcon test --packages-select $PACKAGES_LIST --pytest-args -o addopts=
+    - colcon build --symlink-install --event-handlers console_cohesion+ --packages-up-to $PACKAGES_LIST
+    - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST --pytest-args -o addopts=
     - colcon test-result --all
   <<: *global_artifacts

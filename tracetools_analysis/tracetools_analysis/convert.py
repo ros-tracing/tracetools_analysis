@@ -17,6 +17,7 @@
 
 import argparse
 import os
+import sys
 import time
 from typing import Optional
 
@@ -58,8 +59,13 @@ def convert(
     :param trace_directory: the path to the trace directory to import
     :param outout_file_name: the name of the output file
     """
+    trace_directory = os.path.expanduser(trace_directory)
+    if not os.path.isdir(trace_directory):
+        print(f'trace directory does not exist: {trace_directory}', file=sys.stderr)
+        return 1
+
     print(f'converting trace directory: {trace_directory}')
-    output_file_path = os.path.join(os.path.expanduser(trace_directory), output_file_name)
+    output_file_path = os.path.join(trace_directory, output_file_name)
     start_time = time.time()
     count = ctf.convert(trace_directory, output_file_path)
     time_diff = time.time() - start_time

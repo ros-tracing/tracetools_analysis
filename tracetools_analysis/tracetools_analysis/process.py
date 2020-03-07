@@ -16,6 +16,8 @@
 """Entrypoint/script to process events from a converted file to build a ROS model."""
 
 import argparse
+import os
+import sys
 import time
 from typing import Optional
 
@@ -60,6 +62,11 @@ def process(
     :param force_conversion: whether to re-creating converted file even if it is found
     :param hide_results: whether to hide results and not print them
     """
+    input_path = os.path.expanduser(input_path)
+    if not os.path.exists(input_path):
+        print(f'input path does not exist: {input_path}', file=sys.stderr)
+        return 1
+
     start_time = time.time()
 
     events = load_file(input_path, do_convert_if_needed=True, force_conversion=force_conversion)

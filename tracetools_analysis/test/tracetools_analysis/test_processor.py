@@ -13,18 +13,19 @@
 # limitations under the License.
 
 from typing import Dict
-from typing import List
+from typing import Set
 import unittest
 
 from tracetools_analysis.processor import EventHandler
 from tracetools_analysis.processor import EventMetadata
+from tracetools_analysis.processor import HandlerMap
 from tracetools_analysis.processor import Processor
 
 
 class StubHandler1(EventHandler):
 
     def __init__(self) -> None:
-        handler_map = {
+        handler_map: HandlerMap = {
             'myeventname': self._handler_whatever,
         }
         super().__init__(handler_map=handler_map)
@@ -39,7 +40,7 @@ class StubHandler1(EventHandler):
 class StubHandler2(EventHandler):
 
     def __init__(self) -> None:
-        handler_map = {
+        handler_map: HandlerMap = {
             'myeventname': self._handler_whatever,
         }
         super().__init__(handler_map=handler_map)
@@ -54,8 +55,8 @@ class StubHandler2(EventHandler):
 class WrongHandler(EventHandler):
 
     def __init__(self) -> None:
-        handler_map = {
-            'myeventname': self._handler_wrong,
+        handler_map: HandlerMap = {
+            'myeventname': self._handler_wrong,  # type: ignore # intentionally wrong
         }
         super().__init__(handler_map=handler_map)
 
@@ -68,17 +69,17 @@ class WrongHandler(EventHandler):
 class MissingEventHandler(EventHandler):
 
     def __init__(self) -> None:
-        handler_map = {
+        handler_map: HandlerMap = {
             'myeventname': self._handler_whatever,
         }
         super().__init__(handler_map=handler_map)
 
     @staticmethod
-    def required_events() -> List[str]:
-        return [
+    def required_events() -> Set[str]:
+        return {
             'no_handler_for_this',
             'myeventname',
-        ]
+        }
 
     def _handler_whatever(
         self, event: Dict, metadata: EventMetadata
@@ -89,16 +90,16 @@ class MissingEventHandler(EventHandler):
 class EventHandlerWithRequiredEvent(EventHandler):
 
     def __init__(self) -> None:
-        handler_map = {
+        handler_map: HandlerMap = {
             'myrequiredevent': self._handler_whatever,
         }
         super().__init__(handler_map=handler_map)
 
     @staticmethod
-    def required_events() -> List[str]:
-        return [
+    def required_events() -> Set[str]:
+        return {
             'myrequiredevent',
-        ]
+        }
 
     def _handler_whatever(
         self, event: Dict, metadata: EventMetadata

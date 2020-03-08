@@ -19,6 +19,7 @@ import pickle
 import sys
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Tuple
 
 from tracetools_read.trace import is_trace_directory
@@ -30,7 +31,7 @@ from ..convert import DEFAULT_CONVERT_FILE_NAME
 def inspect_input_path(
     input_path: str,
     force_conversion: bool = False,
-) -> Tuple[str, bool]:
+) -> Tuple[Optional[str], bool]:
     """
     Check input path for a converted file or a trace directory.
 
@@ -75,7 +76,7 @@ def inspect_input_path(
                 print(
                     f'cannot find either a trace directory or a converted file: {input_directory}',
                     file=sys.stderr)
-                return None, None
+                return None, False
     else:
         converted_file_path = input_path
         if force_conversion:
@@ -91,12 +92,13 @@ def inspect_input_path(
 def convert_if_needed(
     input_path: str,
     force_conversion: bool = False,
-) -> str:
+) -> Optional[str]:
     """
     Inspect input path and convert trace directory to file if necessary.
 
     :param input_path: the path to a converted file or trace directory
     :param force_conversion: whether to re-create converted file even if it is found
+    :return: the path to the converted file, or `None` if it failed
     """
     converted_file_path, create_converted_file = inspect_input_path(input_path, force_conversion)
 
@@ -129,6 +131,9 @@ def load_file(
         file_path = convert_if_needed(input_path, force_conversion)
     else:
         file_path = input_path
+
+    if file_path is None:
+        raise RuntimeError(f'could not use input path: {input_path}')
 
     events = []
     with open(os.path.expanduser(file_path), 'rb') as f:

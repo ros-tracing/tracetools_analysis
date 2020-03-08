@@ -16,9 +16,11 @@
 
 from collections import defaultdict
 import sys
+from types import ModuleType
 from typing import Callable
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Set
 from typing import Type
 from typing import Union
@@ -80,8 +82,9 @@ class EventMetadata():
         return self._tid
 
 
-HandlerMap = Dict[str, Callable[[DictEvent, EventMetadata], None]]
-HandlerMultimap = Dict[str, List[Callable[[DictEvent, EventMetadata], None]]]
+HandlerMethod = Callable[[DictEvent, EventMetadata], None]
+HandlerMap = Dict[str, HandlerMethod]
+HandlerMultimap = Dict[str, List[HandlerMethod]]
 
 
 class Dependant():
@@ -91,6 +94,12 @@ class Dependant():
     A dependant depends on other types which might have dependencies themselves.
     Dependencies are type-related only.
     """
+
+    def __init__(
+        self,
+        **kwargs,
+    ) -> None:
+        pass
 
     @staticmethod
     def dependencies() -> List[Type['Dependant']]:
@@ -116,7 +125,7 @@ class EventHandler(Dependant):
         self,
         *,
         handler_map: HandlerMap,
-        data_model: DataModel = None,
+        data_model: Optional[DataModel] = None,
         **kwargs,
     ) -> None:
         """
@@ -130,7 +139,7 @@ class EventHandler(Dependant):
         assert all(required_name in handler_map.keys() for required_name in self.required_events())
         self._handler_map = handler_map
         self._data_model = data_model
-        self._processor = None
+        self._processor: Optional[Processor] = None
 
     @property
     def handler_map(self) -> HandlerMap:
@@ -138,12 +147,12 @@ class EventHandler(Dependant):
         return self._handler_map
 
     @property
-    def data(self) -> Union[DataModel, None]:
+    def data(self) -> DataModel:
         """Get the data model."""
-        return self._data_model
+        return self._data_model  # type: ignore
 
     @property
-    def processor(self) -> 'Processor':
+    def processor(self) -> Optional['Processor']:
         return self._processor
 
     @staticmethod
@@ -154,7 +163,7 @@ class EventHandler(Dependant):
         Without these events, the EventHandler would be invalid/useless. Inheriting classes can
         decide not to declare that they require specific events.
         """
-        return {}
+        return set()
 
     def register_processor(
         self,
@@ -261,12 +270,11 @@ class DependencySolver():
                     solution,
                 )
             # If an instance of this type was given initially, use it instead
-            new_instance = None
-            if dep_type in initial_map:
-                new_instance = initial_map.get(dep_type)
+            dep_type_instance = initial_map.get(dep_type, None)
+            if dep_type_instance is not None:
+                solution.append(dep_type_instance)
             else:
-                new_instance = dep_type(**self._kwargs)
-            solution.append(new_instance)
+                solution.append(dep_type(**self._kwargs))
             visited.add(dep_type)
 
 
@@ -311,7 +319,7 @@ class Processor():
         :param handlers: the list of primary `EventHandler`s
         :param kwargs: the parameters to pass on to new instances
         """
-        return DependencySolver(*handlers, **kwargs).solve()
+        return DependencySolver(*handlers, **kwargs).solve()  # type: ignore
 
     @staticmethod
     def _get_handler_maps(
@@ -323,10 +331,10 @@ class Processor():
         :param handlers: the list of handlers
         :return: the merged multimap
         """
-        handler_multimap = defaultdict(list)
+        handler_multimap: HandlerMultimap = defaultdict(list)
         for handler in handlers:
-            for event_name, handler in handler.handler_map.items():
-                handler_multimap[event_name].append(handler)
+            for event_name, handler_method in handler.handler_map.items():
+                handler_multimap[event_name].append(handler_method)
         return handler_multimap
 
     def _register_with_handlers(
@@ -491,13 +499,13 @@ class AutoProcessor():
 
     @staticmethod
     def _get_applicable_event_handler_classes(
-        event_names: List[str],
-        handler_classes: List[Type[EventHandler]],
+        event_names: Set[str],
+        handler_classes: Set[Type[EventHandler]],
     ) -> Set[Type[EventHandler]]:
         """
-        Get applicable EventHandler subclasses for a list of event names.
+        Get applicable EventHandler subclasses for a set of event names.
 
-        :param event_names: the list of event names
+        :param event_names: the set of event names
         :return: a list of EventHandler subclasses for which requirements are met
         """
         return {
@@ -542,14 +550,19 @@ class AutoProcessor():
     @staticmethod
     def _import_event_handler_submodules(
         name: str = __name__,
-        recursive=True,
-    ):
-        """Force import of EventHandler submodules."""
+        recursive: bool = True,
+    ) -> Dict[str, ModuleType]:
+        """
+        Force import of EventHandler submodules.
+
+        :param name: the base module name
+        :param recursive: `True` if importing recursively, `False` otherwise
+        """
         import importlib
         import pkgutil
         package = importlib.import_module(name)
         results = {}
-        for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
+        for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):  # type: ignore #1422
             full_name = package.__name__ + '.' + name
             results[full_name] = importlib.import_module(full_name)
             if recursive and is_pkg:
@@ -570,10 +583,10 @@ class ProcessingProgressDisplay():
         :param processing_elements: the list of elements doing processing
         """
         self.__info_string = '[' + ', '.join(processing_elements) + ']'
-        self.__total_work = None
-        self.__progress_count = None
-        self.__rolling_count = None
-        self.__work_display_period = None
+        self.__total_work: int = 0
+        self.__progress_count: int = 0
+        self.__rolling_count: int = 0
+        self.__work_display_period: int = 0
 
     def set_work_total(
         self,

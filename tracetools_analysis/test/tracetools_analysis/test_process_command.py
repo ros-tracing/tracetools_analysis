@@ -73,10 +73,10 @@ class TestProcessCommand(unittest.TestCase):
         # Should fail to find converted file under directory
         file_path, create_file = inspect_input_path(self.without_converted_file_dir, False)
         self.assertIsNone(file_path)
-        self.assertIsNone(create_file)
+        self.assertFalse(create_file)
         file_path, create_file = inspect_input_path(self.without_converted_file_dir, True)
         self.assertIsNone(file_path)
-        self.assertIsNone(create_file)
+        self.assertFalse(create_file)
 
         # Should accept any file path if it exists
         file_path, create_file = inspect_input_path(self.random_file_path, False)

@@ -19,7 +19,6 @@ import argparse
 import os
 import sys
 import time
-from typing import Optional
 
 from tracetools_analysis.conversion import ctf
 
@@ -50,7 +49,7 @@ def parse_args():
 def convert(
     trace_directory: str,
     output_file_name: str = DEFAULT_CONVERT_FILE_NAME,
-) -> Optional[int]:
+) -> int:
     """
     Convert trace directory to a file.
 
@@ -71,6 +70,7 @@ def convert(
     time_diff = time.time() - start_time
     print(f'converted {count} events in {time_diff_to_str(time_diff)}')
     print(f'output written to: {output_file_path}')
+    return 0
 
 
 def main():

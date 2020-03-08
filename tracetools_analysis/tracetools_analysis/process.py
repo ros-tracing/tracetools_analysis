@@ -19,7 +19,6 @@ import argparse
 import os
 import sys
 import time
-from typing import Optional
 
 from tracetools_analysis.loading import load_file
 from tracetools_analysis.processor import Processor
@@ -54,7 +53,7 @@ def process(
     input_path: str,
     force_conversion: bool = False,
     hide_results: bool = False,
-) -> Optional[int]:
+) -> int:
     """
     Process converted trace file.
 
@@ -77,6 +76,7 @@ def process(
     if not hide_results:
         processor.print_data()
     print(f'processed {len(events)} events in {time_diff_to_str(time_diff)}')
+    return 0
 
 
 def main():

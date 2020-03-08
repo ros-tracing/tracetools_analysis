@@ -111,7 +111,7 @@ class TestDependencySolver(unittest.TestCase):
         # Pass parameter and check that the new instance has it
         solution = DependencySolver(depone_instance, myparam='myvalue').solve()
         self.assertEqual(len(solution), 2, 'solution length invalid')
-        self.assertEqual(solution[0].myparam, 'myvalue', 'parameter not passed on')
+        self.assertEqual(solution[0].myparam, 'myvalue', 'parameter not passed on')  # type: ignore
 
 
 if __name__ == '__main__':

@@ -41,6 +41,10 @@ class ProfileDataModelUtil(DataModelUtil):
         """
         super().__init__(data_object)
 
+    @property
+    def data(self) -> ProfileDataModel:
+        return super().data  # type: ignore
+
     def with_tid(
         self,
         tid: int,
@@ -54,12 +58,12 @@ class ProfileDataModelUtil(DataModelUtil):
     def get_call_tree(
         self,
         tid: int,
-    ) -> Dict[str, List[str]]:
+    ) -> Dict[str, Set[str]]:
         depth_names = self.with_tid(tid)[
             ['depth', 'function_name', 'parent_name']
         ].drop_duplicates()
         # print(depth_names.to_string())
-        tree = defaultdict(set)
+        tree: Dict[str, Set[str]] = defaultdict(set)
         for _, row in depth_names.iterrows():
             depth = row['depth']
             name = row['function_name']

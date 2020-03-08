@@ -16,11 +16,13 @@
 
 from typing import Dict
 from typing import Set
+from typing import Tuple
 
 from tracetools_read import get_field
 
 from . import EventHandler
 from . import EventMetadata
+from . import HandlerMap
 from ..data_model.ros2 import Ros2DataModel
 
 
@@ -37,7 +39,7 @@ class Ros2Handler(EventHandler):
     ) -> None:
         """Create a Ros2Handler."""
         # Link a ROS trace event to its corresponding handling method
-        handler_map = {
+        handler_map: HandlerMap = {
             'ros2:rcl_init':
                 self._handle_rcl_init,
             'ros2:rcl_node_init':
@@ -74,13 +76,17 @@ class Ros2Handler(EventHandler):
         )
 
         # Temporary buffers
-        self._callback_instances = {}
+        self._callback_instances: Dict[int, Tuple[Dict, EventMetadata]] = {}
 
     @staticmethod
     def required_events() -> Set[str]:
         return {
             'ros2:rcl_init',
         }
+
+    @property
+    def data(self) -> Ros2DataModel:
+        return super().data  # type: ignore
 
     def _handle_rcl_init(
         self, event: Dict, metadata: EventMetadata,
@@ -207,8 +213,9 @@ class Ros2Handler(EventHandler):
     ) -> None:
         # Fetch from dict
         callback_object = get_field(event, 'callback')
-        (event_start, metadata_start) = self._callback_instances.get(callback_object)
-        if event_start is not None and metadata_start is not None:
+        callback_instance_data = self._callback_instances.get(callback_object)
+        if callback_instance_data is not None:
+            (event_start, metadata_start) = callback_instance_data
             del self._callback_instances[callback_object]
             duration = metadata.timestamp - metadata_start.timestamp
             is_intra_process = get_field(event_start, 'is_intra_process', raise_if_not_found=False)

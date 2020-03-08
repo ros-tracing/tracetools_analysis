@@ -16,6 +16,7 @@
 
 from datetime import datetime as dt
 from typing import List
+from typing import Optional
 from typing import Union
 
 from pandas import DataFrame
@@ -43,7 +44,7 @@ class DataModelUtil():
         self.__data = data_object.data if isinstance(data_object, EventHandler) else data_object
 
     @property
-    def data(self) -> Union[DataModel, None]:
+    def data(self) -> Optional[DataModel]:
         return self.__data
 
     @staticmethod

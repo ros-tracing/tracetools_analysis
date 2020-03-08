@@ -23,6 +23,7 @@ from pandas.util.testing import assert_frame_equal
 from tracetools_analysis.data_model import DataModel
 from tracetools_analysis.processor import EventHandler
 from tracetools_analysis.processor import EventMetadata
+from tracetools_analysis.processor import HandlerMap
 from tracetools_analysis.utils import DataModelUtil
 
 
@@ -113,13 +114,13 @@ class TestDataModelUtil(unittest.TestCase):
         )
         assert_frame_equal(input_df, expected_df)
 
-    def test_creation(self) -> None:
-        def handler_whatever(
-            self, event: Dict, metadata: EventMetadata
-        ) -> None:
-            pass
+    def handler_whatever(
+        self, event: Dict, metadata: EventMetadata
+    ) -> None:
+        pass
 
-        handler_map = {'fake': handler_whatever}
+    def test_creation(self) -> None:
+        handler_map: HandlerMap = {'fake': self.handler_whatever}
         data_model = DataModel()
 
         # Should handle the event handler not having any data model

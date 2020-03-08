@@ -316,8 +316,8 @@ class TestProfileHandler(unittest.TestCase):
         cls.processor.process(input_events)
 
     def test_profiling(self) -> None:
-        handler = self.__class__.handler
-        expected_df = self.__class__.expected
+        handler = self.__class__.handler  # type: ignore
+        expected_df = self.__class__.expected  # type: ignore
         result_df = handler.data.times
         assert_frame_equal(result_df, expected_df)
 

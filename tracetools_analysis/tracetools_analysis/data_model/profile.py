@@ -14,6 +14,8 @@
 
 """Module for profile data model."""
 
+from typing import Optional
+
 import pandas as pd
 
 from . import DataModel
@@ -45,7 +47,7 @@ class ProfileDataModel(DataModel):
         tid: int,
         depth: int,
         function_name: str,
-        parent_name: str,
+        parent_name: Optional[str],
         start_timestamp: int,
         duration: int,
         actual_duration: int,

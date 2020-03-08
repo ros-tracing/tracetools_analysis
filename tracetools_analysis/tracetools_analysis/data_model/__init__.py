@@ -28,4 +28,4 @@ class DataModel():
 
     def print_data(self) -> None:
         """Print the data model."""
-        return None
+        raise NotImplementedError

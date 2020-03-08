@@ -21,6 +21,7 @@ from tracetools_read import get_field
 
 from . import EventHandler
 from . import EventMetadata
+from . import HandlerMap
 from ..data_model.cpu_time import CpuTimeDataModel
 
 
@@ -37,7 +38,7 @@ class CpuTimeHandler(EventHandler):
     ) -> None:
         """Create a CpuTimeHandler."""
         # Link event to handling method
-        handler_map = {
+        handler_map: HandlerMap = {
             'sched_switch':
                 self._handle_sched_switch,
         }
@@ -56,6 +57,10 @@ class CpuTimeHandler(EventHandler):
         return {
             'sched_switch',
         }
+
+    @property
+    def data(self) -> CpuTimeDataModel:
+        return super().data  # type: ignore
 
     def _handle_sched_switch(
         self, event: Dict, metadata: EventMetadata

@@ -16,6 +16,8 @@
 
 from collections import defaultdict
 from typing import Dict
+from typing import List
+from typing import Optional
 from typing import Union
 
 from pandas import DataFrame
@@ -66,12 +68,13 @@ class MemoryUsageDataModelUtil(DataModelUtil):
         """
         suffixes = ['B', 'KB', 'MB', 'GB', 'TB']
         suffixIndex = 0
-        while size > 1024 and suffixIndex < 4:
+        mem_size = float(size)
+        while mem_size > 1024.0 and suffixIndex < 4:
             # Increment the index of the suffix
             suffixIndex += 1
             # Apply the division
-            size = size / 1024.0
-        return f'{size:.{precision}f} {suffixes[suffixIndex]}'
+            mem_size = mem_size / 1024.0
+        return f'{mem_size:.{precision}f} {suffixes[suffixIndex]}'
 
     def get_max_memory_usage_per_tid(self) -> DataFrame:
         """
@@ -79,50 +82,61 @@ class MemoryUsageDataModelUtil(DataModelUtil):
 
         :return dataframe with maximum memory usage (userspace & kernel) per tid
         """
-        if self.data_ust is not None:
-            ust_memory_usage_dfs = self.get_absolute_userspace_memory_usage_by_tid()
+        tids_ust = None
+        tids_kernel = None
+        ust_memory_usage_dfs = self.get_absolute_userspace_memory_usage_by_tid()
+        if ust_memory_usage_dfs is not None:
             tids_ust = set(ust_memory_usage_dfs.keys())
-        if self.data_kernel is not None:
-            kernel_memory_usage_dfs = self.get_absolute_kernel_memory_usage_by_tid()
+        kernel_memory_usage_dfs = self.get_absolute_kernel_memory_usage_by_tid()
+        if kernel_memory_usage_dfs is not None:
             tids_kernel = set(kernel_memory_usage_dfs.keys())
         # Use only the userspace tid values if available, otherwise use the kernel tid values
-        tids = tids_ust if self.data_ust is not None else tids_kernel
+        tids = tids_ust or tids_kernel
+        # Should not happen, since it is checked in __init__
+        if tids is None:
+            raise RuntimeError('no data')
         data = [
             [
                 tid,
                 self.format_size(ust_memory_usage_dfs[tid]['memory_usage'].max(), precision=1)
-                if self.data_ust is not None
+                if ust_memory_usage_dfs is not None
+                and ust_memory_usage_dfs.get(tid) is not None
                 else None,
                 self.format_size(kernel_memory_usage_dfs[tid]['memory_usage'].max(), precision=1)
-                if self.data_kernel is not None and ust_memory_usage_dfs.get(tid) is not None
+                if kernel_memory_usage_dfs is not None
+                and kernel_memory_usage_dfs.get(tid) is not None
                 else None,
             ]
             for tid in tids
         ]
         return DataFrame(data, columns=['tid', 'max_memory_usage_ust', 'max_memory_usage_kernel'])
 
-    def get_absolute_userspace_memory_usage_by_tid(self) -> Dict[int, DataFrame]:
+    def get_absolute_userspace_memory_usage_by_tid(self) -> Optional[Dict[int, DataFrame]]:
         """
         Get absolute userspace memory usage over time per tid.
 
         :return (tid -> DataFrame of absolute memory usage over time)
         """
+        if self.data_ust is None:
+            return None
         return self._get_absolute_memory_usage_by_tid(self.data_ust)
 
-    def get_absolute_kernel_memory_usage_by_tid(self) -> Dict[int, DataFrame]:
+    def get_absolute_kernel_memory_usage_by_tid(self) -> Optional[Dict[int, DataFrame]]:
         """
         Get absolute kernel memory usage over time per tid.
 
         :return (tid -> DataFrame of absolute memory usage over time)
         """
+        if self.data_kernel is None:
+            return None
         return self._get_absolute_memory_usage_by_tid(self.data_kernel)
 
     def _get_absolute_memory_usage_by_tid(
         self,
         data_model: MemoryUsageDataModel,
     ) -> Dict[int, DataFrame]:
-        previous = defaultdict(int)
-        data = defaultdict(list)
+        previous: Dict[int, int] = defaultdict(int)
+        data: Dict[int, List[Dict[str, int]]] = defaultdict(list)
         for index, row in data_model.memory_diff.iterrows():
             timestamp = row['timestamp']
             tid = int(row['tid'])

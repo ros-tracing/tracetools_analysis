@@ -24,7 +24,7 @@ from tracetools_read import get_field
 
 from . import EventHandler
 from . import EventMetadata
-
+from . import HandlerMap
 from ..data_model.profile import ProfileDataModel
 
 
@@ -56,7 +56,7 @@ class ProfileHandler(EventHandler):
 
         :param address_to_func: the mapping from function address (`int` or hex `str`) to name
         """
-        handler_map = {
+        handler_map: HandlerMap = {
             'lttng_ust_cyg_profile_fast:func_entry':
                 self._handle_function_entry,
             'lttng_ust_cyg_profile_fast:func_exit':
@@ -95,6 +95,10 @@ class ProfileHandler(EventHandler):
             'sched_switch',
         }
 
+    @property
+    def data(self) -> ProfileDataModel:
+        return super().data  # type: ignore
+
     @staticmethod
     def addr_to_int(addr: Union[int, str]) -> int:
         """Transform an address into an `int` if it's a hex `str`."""
@@ -106,20 +110,22 @@ class ProfileHandler(EventHandler):
         timestamp = metadata.timestamp
         # If function(s) currently running stop(s) executing
         prev_tid = get_field(event, 'prev_tid')
-        if prev_tid in self._current_funcs:
+        prev_info_list = self._current_funcs.get(prev_tid, None)
+        if prev_info_list is not None:
             # Increment durations using last start timestamp
-            for info in self._current_funcs.get(prev_tid):
+            for info in prev_info_list:
                 last_start = info[2]
                 total_duration = info[3]
                 total_duration += timestamp - last_start
-                info[2] = None
+                info[2] = -1
                 info[3] = total_duration
         # If stopped function(s) start(s) executing again
         next_tid = get_field(event, 'next_tid')
-        if next_tid in self._current_funcs:
+        next_info_list = self._current_funcs.get(next_tid, None)
+        if next_info_list is not None:
             # Set last start timestamp to now
-            for info in self._current_funcs.get(next_tid):
-                assert info[2] is None
+            for info in next_info_list:
+                assert info[2] == -1
                 info[2] = timestamp
 
     def _handle_function_entry(
@@ -153,9 +159,9 @@ class ProfileHandler(EventHandler):
         self.data.add_duration(
             tid,
             function_depth,
-            function_name,
-            parent_name,
-            start_timestamp,
+            function_name,  # type: ignore
+            parent_name,  # type: ignore
+            start_timestamp,  # type: ignore
             duration,
             actual_duration,
         )

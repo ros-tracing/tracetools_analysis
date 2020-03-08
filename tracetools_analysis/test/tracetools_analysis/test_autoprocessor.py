@@ -13,12 +13,13 @@
 # limitations under the License.
 
 from typing import Dict
-from typing import List
+from typing import Set
 import unittest
 
 from tracetools_analysis.processor import AutoProcessor
 from tracetools_analysis.processor import EventHandler
 from tracetools_analysis.processor import EventMetadata
+from tracetools_analysis.processor import HandlerMap
 
 
 class AbstractEventHandler(EventHandler):
@@ -32,18 +33,18 @@ class AbstractEventHandler(EventHandler):
 class SubSubEventHandler(AbstractEventHandler):
 
     def __init__(self) -> None:
-        handler_map = {
+        handler_map: HandlerMap = {
             'myeventname': self._handler_whatever,
             'myeventname69': self._handler_whatever,
         }
         super().__init__(handler_map=handler_map)
 
     @staticmethod
-    def required_events() -> List[str]:
-        return [
+    def required_events() -> Set[str]:
+        return {
             'myeventname',
             'myeventname69',
-        ]
+        }
 
     def _handler_whatever(
         self, event: Dict, metadata: EventMetadata
@@ -54,16 +55,16 @@ class SubSubEventHandler(AbstractEventHandler):
 class SubSubEventHandler2(AbstractEventHandler):
 
     def __init__(self) -> None:
-        handler_map = {
+        handler_map: HandlerMap = {
             'myeventname2': self._handler_whatever,
         }
         super().__init__(handler_map=handler_map)
 
     @staticmethod
-    def required_events() -> List[str]:
-        return [
+    def required_events() -> Set[str]:
+        return {
             'myeventname2',
-        ]
+        }
 
     def _handler_whatever(
         self, event: Dict, metadata: EventMetadata
@@ -74,16 +75,16 @@ class SubSubEventHandler2(AbstractEventHandler):
 class SubEventHandler(EventHandler):
 
     def __init__(self) -> None:
-        handler_map = {
+        handler_map: HandlerMap = {
             'myeventname3': self._handler_whatever,
         }
         super().__init__(handler_map=handler_map)
 
     @staticmethod
-    def required_events() -> List[str]:
-        return [
+    def required_events() -> Set[str]:
+        return {
             'myeventname3',
-        ]
+        }
 
     def _handler_whatever(
         self, event: Dict, metadata: EventMetadata

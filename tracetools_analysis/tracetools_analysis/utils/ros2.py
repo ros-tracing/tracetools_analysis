@@ -18,6 +18,7 @@
 from typing import Any
 from typing import List
 from typing import Mapping
+from typing import Optional
 from typing import Union
 
 from pandas import DataFrame
@@ -40,6 +41,10 @@ class Ros2DataModelUtil(DataModelUtil):
         :param data_object: the data model or the event handler which has a data model
         """
         super().__init__(data_object)
+
+    @property
+    def data(self) -> Ros2DataModel:
+        return super().data  # type: ignore
 
     def _prettify(
         self,
@@ -140,7 +145,7 @@ class Ros2DataModelUtil(DataModelUtil):
     def get_node_tid_from_name(
         self,
         node_name: str,
-    ) -> Union[int, None]:
+    ) -> Optional[int]:
         """
         Get the tid corresponding to a node.
 
@@ -157,7 +162,7 @@ class Ros2DataModelUtil(DataModelUtil):
     def get_node_names_from_tid(
         self,
         tid: str,
-    ) -> Union[List[str], None]:
+    ) -> Optional[List[str]]:
         """
         Get the list of node names corresponding to a tid.
 
@@ -171,7 +176,7 @@ class Ros2DataModelUtil(DataModelUtil):
     def get_callback_owner_info(
         self,
         callback_obj: int,
-    ) -> Union[str, None]:
+    ) -> Optional[str]:
         """
         Get information about the owner of a callback.
 
@@ -207,9 +212,9 @@ class Ros2DataModelUtil(DataModelUtil):
             type_name = 'Client'
             info = self.get_client_handle_info(reference)
 
-        if info is not None:
-            info = f'{type_name} -- {self.format_info_dict(info)}'
-        return info
+        if info is None:
+            return None
+        return f'{type_name} -- {self.format_info_dict(info)}'
 
     def get_timer_handle_info(
         self,
@@ -245,6 +250,8 @@ class Ros2DataModelUtil(DataModelUtil):
 
         node_handle = self.data.publishers.loc[publisher_handle, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
+        if node_handle_info is None:
+            return None
         topic_name = self.data.publishers.loc[publisher_handle, 'topic_name']
         publisher_info = {'topic': topic_name}
         return {**node_handle_info, **publisher_info}
@@ -252,7 +259,7 @@ class Ros2DataModelUtil(DataModelUtil):
     def get_subscription_reference_info(
         self,
         subscription_reference: int,
-    ) -> Union[Mapping[str, Any], None]:
+    ) -> Optional[Mapping[str, Any]]:
         """
         Get information about a subscription handle.
 
@@ -297,6 +304,8 @@ class Ros2DataModelUtil(DataModelUtil):
 
         node_handle = subscriptions_info.loc[subscription_reference, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
+        if node_handle_info is None:
+            return None
         topic_name = subscriptions_info.loc[subscription_reference, 'topic_name']
         subscription_info = {'topic': topic_name}
         return {**node_handle_info, **subscription_info}
@@ -304,7 +313,7 @@ class Ros2DataModelUtil(DataModelUtil):
     def get_service_handle_info(
         self,
         service_handle: int,
-    ) -> Union[Mapping[str, Any], None]:
+    ) -> Optional[Mapping[str, Any]]:
         """
         Get information about a service handle.
 
@@ -316,6 +325,8 @@ class Ros2DataModelUtil(DataModelUtil):
 
         node_handle = self.data.services.loc[service_handle, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
+        if node_handle_info is None:
+            return None
         service_name = self.data.services.loc[service_handle, 'service_name']
         service_info = {'service': service_name}
         return {**node_handle_info, **service_info}
@@ -323,7 +334,7 @@ class Ros2DataModelUtil(DataModelUtil):
     def get_client_handle_info(
         self,
         client_handle: int,
-    ) -> Union[Mapping[str, Any], None]:
+    ) -> Optional[Mapping[str, Any]]:
         """
         Get information about a client handle.
 
@@ -335,6 +346,8 @@ class Ros2DataModelUtil(DataModelUtil):
 
         node_handle = self.data.clients.loc[client_handle, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
+        if node_handle_info is None:
+            return None
         service_name = self.data.clients.loc[client_handle, 'service_name']
         service_info = {'service': service_name}
         return {**node_handle_info, **service_info}
@@ -342,7 +355,7 @@ class Ros2DataModelUtil(DataModelUtil):
     def get_node_handle_info(
         self,
         node_handle: int,
-    ) -> Union[Mapping[str, Any], None]:
+    ) -> Optional[Mapping[str, Any]]:
         """
         Get information about a node handle.
 

@@ -52,5 +52,5 @@ class MemoryUsageDataModel(DataModel):
     def print_data(self) -> None:
         print('==================MEMORY USAGE DATA MODEL==================')
         tail = 20
-        print(f'Memory difference (tail={tail}):\n{self.times.tail(tail).to_string()}')
+        print(f'Memory difference (tail={tail}):\n{self.memory_diff.tail(tail).to_string()}')
         print('===========================================================')

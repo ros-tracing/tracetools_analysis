@@ -37,6 +37,10 @@ class CpuTimeDataModelUtil(DataModelUtil):
         """
         super().__init__(data_object)
 
+    @property
+    def data(self) -> CpuTimeDataModel:
+        return super().data  # type: ignore
+
     def get_time_per_thread(self) -> DataFrame:
         """Get a DataFrame of total duration for each thread."""
         return self.data.times.loc[:, ['tid', 'duration']].groupby(by='tid').sum()

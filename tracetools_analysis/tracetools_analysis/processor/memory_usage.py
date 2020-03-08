@@ -21,6 +21,7 @@ from tracetools_read import get_field
 
 from . import EventHandler
 from . import EventMetadata
+from . import HandlerMap
 from ..data_model.memory_usage import MemoryUsageDataModel
 
 
@@ -37,6 +38,10 @@ class MemoryUsageHandler(EventHandler):
             data_model=MemoryUsageDataModel(),
             **kwargs,
         )
+
+    @property
+    def data(self) -> MemoryUsageDataModel:
+        return super().data  # type: ignore
 
     def _update(
         self,
@@ -72,7 +77,7 @@ class UserspaceMemoryUsageHandler(MemoryUsageHandler):
         **kwargs,
     ) -> None:
         # Link event to handling method
-        handler_map = {
+        handler_map: HandlerMap = {
             'lttng_ust_libc:malloc':
                 self._handle_malloc,
             'lttng_ust_libc:calloc':
@@ -196,7 +201,7 @@ class KernelMemoryUsageHandler(MemoryUsageHandler):
         **kwargs,
     ) -> None:
         # Link event to handling method
-        handler_map = {
+        handler_map: HandlerMap = {
             'kmem_mm_page_alloc':
                 self._handle_malloc,
             'kmem_mm_page_free':

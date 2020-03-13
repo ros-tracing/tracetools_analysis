@@ -33,7 +33,7 @@ def add_args(parser: argparse.ArgumentParser) -> None:
         'trace_directory',
         help='the path to the main trace directory')
     parser.add_argument(
-        '-o', '--output-file-name', dest='output_file_name',
+        '-o', '--output-file', dest='output_file_name', metavar='OUTPUT',
         default=DEFAULT_CONVERT_FILE_NAME,
         help='the name of the output file to generate, '
         'under $trace_directory (default: %(default)s)')

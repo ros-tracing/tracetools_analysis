@@ -19,9 +19,10 @@ variables:
 build:
   image: $BASE_IMAGE_ID:$DISTRO
   before_script:
-    - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git --branch $ROS2TRACING_BRANCH
     - . /root/ws/install/local_setup.sh
   script:
+    - python3 get_branch.py --check
+    - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git --branch $(python3 get_branch.py)
     - colcon build --symlink-install --event-handlers console_cohesion+ --packages-up-to $PACKAGES_LIST
     - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST
     - colcon test-result --all

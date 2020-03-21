@@ -109,11 +109,8 @@ def main() -> int:
     )
 
     # Print value
-    prefix = 'branch: ' if check else ''
-    if branch is None:
-        print(prefix + default_branch)
-    else:
-        print(prefix + branch)
+    prefix = 'ros2_tracing branch: ' if check else ''
+    print(prefix + (branch or default_branch))
 
     return 0
 

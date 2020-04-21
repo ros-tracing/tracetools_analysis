@@ -26,13 +26,13 @@ def generate_launch_description():
         ),
         Node(
             package='tracetools_test',
-            node_executable='test_ping',
+            executable='test_ping',
             arguments=['do_more'],
             output='screen',
         ),
         Node(
             package='tracetools_test',
-            node_executable='test_pong',
+            executable='test_pong',
             arguments=['do_more'],
             output='screen',
         ),

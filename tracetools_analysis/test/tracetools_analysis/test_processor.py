@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
+from io import StringIO
 from typing import Dict
 from typing import Set
 import unittest
@@ -171,6 +173,21 @@ class TestProcessor(unittest.TestCase):
         processor = Processor(handler1, handler2)
         result = processor.get_handler_by_type(StubHandler1)
         self.assertTrue(result is handler1)
+
+    def test_processor_quiet(self) -> None:
+        handler1 = StubHandler1()
+        mock_event = {
+            '_name': 'myeventname',
+            '_timestamp': 0,
+            'cpu_id': 0,
+        }
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            processor = Processor(handler1, quiet=True)
+            processor.process([mock_event])
+        # Shouldn't be any output
+        output = temp_stdout.getvalue()
+        self.assertEqual(0, len(output), f'Processor was not quiet: "{output}"')
 
 
 if __name__ == '__main__':

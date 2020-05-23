@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright 2019 Apex.AI, Inc.
+# Copyright 2020 Christophe Bedard
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
+from io import StringIO
 import os
 import shutil
 import tempfile
@@ -21,7 +24,7 @@ import unittest
 from tracetools_analysis.loading import inspect_input_path
 
 
-class TestProcessCommand(unittest.TestCase):
+class TestLoading(unittest.TestCase):
 
     def __init__(self, *args) -> None:
         super().__init__(
@@ -60,31 +63,43 @@ class TestProcessCommand(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.test_dir_path)
 
-    def test_inspect_input_path(self) -> None:
+    def test_inspect_input_path(
+        self,
+        quiet: bool = False,
+    ) -> None:
         # Should find converted file under directory
-        file_path, create_file = inspect_input_path(self.with_converted_file_dir, False)
+        file_path, create_file = inspect_input_path(self.with_converted_file_dir, False, quiet)
         self.assertEqual(self.converted_file_path, file_path)
         self.assertFalse(create_file)
         # Should find it but set it to be re-created
-        file_path, create_file = inspect_input_path(self.with_converted_file_dir, True)
+        file_path, create_file = inspect_input_path(self.with_converted_file_dir, True, quiet)
         self.assertEqual(self.converted_file_path, file_path)
         self.assertTrue(create_file)
 
         # Should fail to find converted file under directory
-        file_path, create_file = inspect_input_path(self.without_converted_file_dir, False)
+        file_path, create_file = inspect_input_path(self.without_converted_file_dir, False, quiet)
         self.assertIsNone(file_path)
         self.assertFalse(create_file)
-        file_path, create_file = inspect_input_path(self.without_converted_file_dir, True)
+        file_path, create_file = inspect_input_path(self.without_converted_file_dir, True, quiet)
         self.assertIsNone(file_path)
         self.assertFalse(create_file)
 
         # Should accept any file path if it exists
-        file_path, create_file = inspect_input_path(self.random_file_path, False)
+        file_path, create_file = inspect_input_path(self.random_file_path, False, quiet)
         self.assertEqual(self.random_file_path, file_path)
         self.assertFalse(create_file)
         # Should set it to be re-created
-        file_path, create_file = inspect_input_path(self.random_file_path, True)
+        file_path, create_file = inspect_input_path(self.random_file_path, True, quiet)
         self.assertEqual(self.random_file_path, file_path)
         self.assertTrue(create_file)
 
         # TODO try with a trace directory
+
+    def test_inspect_input_path_quiet(self) -> None:
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            # Just run the other test again
+            self.test_inspect_input_path(quiet=True)
+        # Shouldn't be any output
+        output = temp_stdout.getvalue()
+        self.assertEqual(0, len(output), f'was not quiet: "{output}"')

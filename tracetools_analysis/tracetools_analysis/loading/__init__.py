@@ -31,6 +31,7 @@ from ..convert import DEFAULT_CONVERT_FILE_NAME
 def inspect_input_path(
     input_path: str,
     force_conversion: bool = False,
+    quiet: bool = False,
 ) -> Tuple[Optional[str], bool]:
     """
     Check input path for a converted file or a trace directory.
@@ -43,6 +44,7 @@ def inspect_input_path(
 
     :param input_path: the path to a converted file or trace directory
     :param force_conversion: whether to re-create converted file even if it is found
+    :param quiet: whether to not print any normal output
     :return:
         the path to a converted file (or `None` if could not find),
         `True` if the given converted file should be (re-)created, `False` otherwise
@@ -59,10 +61,14 @@ def inspect_input_path(
             # Use that as the converted input file
             converted_file_path = prospective_converted_file
             if force_conversion:
-                print(f'found converted file but will re-create it: {prospective_converted_file}')
+                if not quiet:
+                    print(
+                        f'found converted file but will re-create it: {prospective_converted_file}'
+                    )
                 return prospective_converted_file, True
             else:
-                print(f'found converted file: {prospective_converted_file}')
+                if not quiet:
+                    print(f'found converted file: {prospective_converted_file}')
                 return prospective_converted_file, False
         else:
             # Check if it is a trace directory
@@ -81,7 +87,8 @@ def inspect_input_path(
         converted_file_path = input_path
         if force_conversion:
             # It's a file, but re-create it anyway
-            print(f'found converted file but will re-create it: {converted_file_path}')
+            if not quiet:
+                print(f'found converted file but will re-create it: {converted_file_path}')
             return converted_file_path, True
         else:
             # Simplest use-case: given path is an existing converted file
@@ -92,15 +99,21 @@ def inspect_input_path(
 def convert_if_needed(
     input_path: str,
     force_conversion: bool = False,
+    quiet: bool = False,
 ) -> Optional[str]:
     """
     Inspect input path and convert trace directory to file if necessary.
 
     :param input_path: the path to a converted file or trace directory
     :param force_conversion: whether to re-create converted file even if it is found
+    :param quiet: whether to not print any output
     :return: the path to the converted file, or `None` if it failed
     """
-    converted_file_path, create_converted_file = inspect_input_path(input_path, force_conversion)
+    converted_file_path, create_converted_file = inspect_input_path(
+        input_path,
+        force_conversion,
+        quiet,
+    )
 
     if converted_file_path is None:
         return None
@@ -118,6 +131,7 @@ def load_file(
     input_path: str,
     do_convert_if_needed: bool = True,
     force_conversion: bool = False,
+    quiet: bool = False,
 ) -> List[Dict]:
     """
     Load file containing converted trace events.
@@ -125,10 +139,11 @@ def load_file(
     :param input_path: the path to a converted file or trace directory
     :param do_convert_if_needed: whether to create the converted file if needed (else, let it fail)
     :param force_conversion: whether to re-create converted file even if it is found
+    :param quiet: whether to not print any output
     :return: the list of events read from the file
     """
     if do_convert_if_needed or force_conversion:
-        file_path = convert_if_needed(input_path, force_conversion)
+        file_path = convert_if_needed(input_path, force_conversion, quiet)
     else:
         file_path = input_path
 

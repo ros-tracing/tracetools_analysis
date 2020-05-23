@@ -289,12 +289,14 @@ class Processor():
     def __init__(
         self,
         *handlers: EventHandler,
+        quiet: bool = False,
         **kwargs,
     ) -> None:
         """
         Create a Processor.
 
         :param handlers: the `EventHandler`s to use for processing
+        :param quiet: whether to not print any output, like progress information
         :param kwargs: the parameters to pass on to new handlers
         """
         self._initial_handlers = list(handlers)
@@ -303,9 +305,10 @@ class Processor():
         self._expanded_handlers = self._expand_dependencies(*handlers, **kwargs)
         self._handler_multimap = self._get_handler_maps(self._expanded_handlers)
         self._register_with_handlers(self._expanded_handlers)
+        self._quiet = quiet
         self._progress_display = ProcessingProgressDisplay(
             [type(handler).__name__ for handler in self._expanded_handlers],
-        )
+        ) if not self._quiet else None
         self._processing_done = False
 
     @staticmethod
@@ -401,12 +404,17 @@ class Processor():
             self._check_required_events(events)
 
         if not self._processing_done:
-            self._progress_display.set_work_total(len(events))
-            for event in events:
-                self._process_event(event)
-                self._progress_display.did_work()
+            # Split into two versions so that performance is optimal
+            if self._progress_display is None:
+                for event in events:
+                    self._process_event(event)
+            else:
+                self._progress_display.set_work_total(len(events))
+                for event in events:
+                    self._process_event(event)
+                    self._progress_display.did_work()
+                self._progress_display.done(erase=erase_progress)
             self._processing_done = True
-            self._progress_display.done(erase=erase_progress)
 
     def _process_event(self, event: DictEvent) -> None:
         """Process a single event."""

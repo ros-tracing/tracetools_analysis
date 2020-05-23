@@ -24,7 +24,7 @@ import unittest
 from tracetools_analysis.loading import inspect_input_path
 
 
-class TestProcessCommand(unittest.TestCase):
+class TestLoading(unittest.TestCase):
 
     def __init__(self, *args) -> None:
         super().__init__(

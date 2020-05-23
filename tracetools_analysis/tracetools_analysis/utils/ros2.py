@@ -64,13 +64,13 @@ class Ros2DataModelUtil(DataModelUtil):
         # remove spaces
         pretty = pretty.replace(' ', '')
         # allocator
-        STD_ALLOCATOR = '_<std::allocator<void>>'
-        pretty = pretty.replace(STD_ALLOCATOR, '')
+        std_allocator = '_<std::allocator<void>>'
+        pretty = pretty.replace(std_allocator, '')
         # default_delete
-        STD_DEFAULTDELETE = 'std::default_delete'
-        if STD_DEFAULTDELETE in pretty:
-            dd_start = pretty.find(STD_DEFAULTDELETE)
-            template_param_open = dd_start + len(STD_DEFAULTDELETE)
+        std_defaultdelete = 'std::default_delete'
+        if std_defaultdelete in pretty:
+            dd_start = pretty.find(std_defaultdelete)
+            template_param_open = dd_start + len(std_defaultdelete)
             # find index of matching/closing GT sign
             template_param_close = template_param_open
             level = 0
@@ -86,10 +86,10 @@ class Ros2DataModelUtil(DataModelUtil):
                         level -= 1
             pretty = pretty[:dd_start] + pretty[(template_param_close + 1):]
         # bind
-        STD_BIND = 'std::_Bind<'
-        if pretty.startswith(STD_BIND):
+        std_bind = 'std::_Bind<'
+        if pretty.startswith(std_bind):
             # remove bind<>
-            pretty = pretty.replace(STD_BIND, '')
+            pretty = pretty.replace(std_bind, '')
             pretty = pretty[:-1]
             # remove placeholder stuff
             placeholder_from = pretty.find('*')

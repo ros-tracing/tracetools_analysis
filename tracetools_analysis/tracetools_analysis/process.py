@@ -42,7 +42,7 @@ def add_args(parser: argparse.ArgumentParser) -> None:
         help='hide/suppress results from being printed')
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Process a file converted from a trace '
                                                  'directory and output model data.')
     add_args(parser)

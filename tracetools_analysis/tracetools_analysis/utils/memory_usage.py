@@ -67,14 +67,14 @@ class MemoryUsageDataModelUtil(DataModelUtil):
         :param precision: the number of digits to display after the period
         """
         suffixes = ['B', 'KB', 'MB', 'GB', 'TB']
-        suffixIndex = 0
+        suffix_index = 0
         mem_size = float(size)
-        while mem_size > 1024.0 and suffixIndex < 4:
+        while mem_size > 1024.0 and suffix_index < 4:
             # Increment the index of the suffix
-            suffixIndex += 1
+            suffix_index += 1
             # Apply the division
             mem_size = mem_size / 1024.0
-        return f'{mem_size:.{precision}f} {suffixes[suffixIndex]}'
+        return f'{mem_size:.{precision}f} {suffixes[suffix_index]}'
 
     def get_max_memory_usage_per_tid(self) -> DataFrame:
         """

@@ -39,7 +39,7 @@ def add_args(parser: argparse.ArgumentParser) -> None:
         'under $trace_directory (default: %(default)s)')
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description='Convert trace data to a file.')
     add_args(parser)

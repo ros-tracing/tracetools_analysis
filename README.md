@@ -4,20 +4,6 @@
 
 Analysis tools for [ROS 2 tracing](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing).
 
-## Setup
-
-Install:
-
-* `pandas`
-    ```
-    $ sudo apt-get install python3-pandas
-    ```
-
-To display results, install:
-
-* [Jupyter](https://jupyter.org/install)
-* [Bokeh](https://bokeh.pydata.org/en/latest/docs/user_guide/quickstart.html#userguide-quickstart-install)
-
 ## Trace analysis
 
 After generating a trace (see [`ros2_tracing`](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing#tracing)), we can analyze it to extract useful execution data.
@@ -40,7 +26,7 @@ $ ros2 trace-analysis process /path/to/trace/directory
 
 The last command will process and output the raw data models, but to actually display results, process and analyze using a Jupyter Notebook.
 
-```
+```shell
 $ jupyter notebook
 ```
 

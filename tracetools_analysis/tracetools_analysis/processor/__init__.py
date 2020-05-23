@@ -282,7 +282,7 @@ class Processor():
     """Processor class, which dispatches events to event handlers."""
 
     class RequiredEventNotFoundError(RuntimeError):
-        """When a trace does not contain one event required by an EventHandler."""
+        """When a trace does not contain at least one event required by an EventHandler."""
 
         pass
 
@@ -380,12 +380,15 @@ class Processor():
     ) -> None:
         event_names = self.get_event_names(events)
         # Check names separately so that we can know which event from which handler is missing
+        missing_events: Dict[str, Set[str]] = defaultdict(set)
         for handler in self._expanded_handlers:
             for name in handler.required_events():
                 if name not in event_names:
-                    raise self.RequiredEventNotFoundError(
-                        f'missing event {name} for {handler.__class__.__name__}'
-                    )
+                    missing_events[handler.__class__.__name__].add(name)
+        if missing_events:
+            raise self.RequiredEventNotFoundError(
+                f'missing events: {dict(missing_events)}'
+            )
 
     def process(
         self,

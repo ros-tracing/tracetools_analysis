@@ -21,7 +21,7 @@ import shutil
 import tempfile
 import unittest
 
-from tracetools_analysis.loading import inspect_input_path
+from tracetools_analysis.loading import _inspect_input_path
 
 
 class TestLoading(unittest.TestCase):
@@ -68,28 +68,28 @@ class TestLoading(unittest.TestCase):
         quiet: bool = False,
     ) -> None:
         # Should find converted file under directory
-        file_path, create_file = inspect_input_path(self.with_converted_file_dir, False, quiet)
+        file_path, create_file = _inspect_input_path(self.with_converted_file_dir, False, quiet)
         self.assertEqual(self.converted_file_path, file_path)
         self.assertFalse(create_file)
         # Should find it but set it to be re-created
-        file_path, create_file = inspect_input_path(self.with_converted_file_dir, True, quiet)
+        file_path, create_file = _inspect_input_path(self.with_converted_file_dir, True, quiet)
         self.assertEqual(self.converted_file_path, file_path)
         self.assertTrue(create_file)
 
         # Should fail to find converted file under directory
-        file_path, create_file = inspect_input_path(self.without_converted_file_dir, False, quiet)
+        file_path, create_file = _inspect_input_path(self.without_converted_file_dir, False, quiet)
         self.assertIsNone(file_path)
         self.assertFalse(create_file)
-        file_path, create_file = inspect_input_path(self.without_converted_file_dir, True, quiet)
+        file_path, create_file = _inspect_input_path(self.without_converted_file_dir, True, quiet)
         self.assertIsNone(file_path)
         self.assertFalse(create_file)
 
         # Should accept any file path if it exists
-        file_path, create_file = inspect_input_path(self.random_file_path, False, quiet)
+        file_path, create_file = _inspect_input_path(self.random_file_path, False, quiet)
         self.assertEqual(self.random_file_path, file_path)
         self.assertFalse(create_file)
         # Should set it to be re-created
-        file_path, create_file = inspect_input_path(self.random_file_path, True, quiet)
+        file_path, create_file = _inspect_input_path(self.random_file_path, True, quiet)
         self.assertEqual(self.random_file_path, file_path)
         self.assertTrue(create_file)
 

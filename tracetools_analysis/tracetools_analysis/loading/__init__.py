@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for converted trace file loading."""
+"""Module for loading traces."""
 
 import os
 import pickle
@@ -28,7 +28,7 @@ from ..convert import convert
 from ..convert import DEFAULT_CONVERT_FILE_NAME
 
 
-def inspect_input_path(
+def _inspect_input_path(
     input_path: str,
     force_conversion: bool = False,
     quiet: bool = False,
@@ -96,7 +96,7 @@ def inspect_input_path(
             return converted_file_path, False
 
 
-def convert_if_needed(
+def _convert_if_needed(
     input_path: str,
     force_conversion: bool = False,
     quiet: bool = False,
@@ -109,7 +109,7 @@ def convert_if_needed(
     :param quiet: whether to not print any output
     :return: the path to the converted file, or `None` if it failed
     """
-    converted_file_path, create_converted_file = inspect_input_path(
+    converted_file_path, create_converted_file = _inspect_input_path(
         input_path,
         force_conversion,
         quiet,
@@ -143,7 +143,7 @@ def load_file(
     :return: the list of events read from the file
     """
     if do_convert_if_needed or force_conversion:
-        file_path = convert_if_needed(input_path, force_conversion, quiet)
+        file_path = _convert_if_needed(input_path, force_conversion, quiet)
     else:
         file_path = input_path
 

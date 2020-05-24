@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for trace events processor and ROS model creation."""
+"""Module for trace events processor and ROS 2 model creation."""
 
 from typing import Dict
 from typing import Set

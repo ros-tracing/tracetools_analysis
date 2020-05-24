@@ -63,3 +63,15 @@ time_per_thread = cpu_util.get_time_per_thread()
 ## Design
 
 See the [`ros2_tracing` design document](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/blob/master/doc/design_ros_2.md), especially the [*Goals and requirements*](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/blob/master/doc/design_ros_2.md#goals-and-requirements) and [*Analysis*](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/blob/master/doc/design_ros_2.md#analysis) sections.
+
+## Packages
+
+### ros2trace_analysis
+
+Package containing a `ros2cli` extension to perform trace analysis.
+
+### tracetools_analysis
+
+Package containing tools for analyzing trace data.
+
+See the [API documentation](https://micro-ros.gitlab.io/ros_tracing/tracetools_analysis-api/).

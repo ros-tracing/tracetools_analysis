@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'tracetools_test'
+project = 'tracetools_analysis'
 copyright = '2019-2020, Robert Bosch GmbH & Christophe Bedard'  # noqa
 author = 'Robert Bosch GmbH, Christophe Bedard'
 

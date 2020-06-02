@@ -18,7 +18,7 @@ setup(
         'Christophe Bedard'
     ),
     maintainer_email=(
-        'christophe.bedard@apex.ai'
+        'bedard.christophe@gmail.com'
     ),
     author='Christophe Bedard',
     author_email='christophe.bedard@apex.ai',

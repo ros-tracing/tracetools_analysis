@@ -24,9 +24,9 @@ setup(
     author_email='christophe.bedard@apex.ai',
     url='https://gitlab.com/micro-ROS/ros_tracing/tracetools_analysis',
     keywords=[],
-    description='The trace analysis command for ROS 2 command line tools.',
+    description='The trace-analysis command for ROS 2 command line tools.',
     long_description=(
-        'The package provides the trace analysis '
+        'The package provides the trace-analysis '
         'command for the ROS 2 command line tools.'
     ),
     license='Apache 2.0',

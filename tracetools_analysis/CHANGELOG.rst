@@ -2,8 +2,8 @@
 Changelog for package tracetools_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2020-06-02)
+------------------
 * Add sphinx documentation for tracetools_analysis
 * Improve RequiredEventNotFoundError message
 * Add 'quiet' option to loading-related functions

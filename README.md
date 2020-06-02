@@ -60,6 +60,12 @@ time_per_thread = cpu_util.get_time_per_thread()
 # ...
 ```
 
+Note: bokeh has to be installed manually, e.g. with `pip`:
+
+```shell
+$ pip3 install bokeh
+```
+
 ## Design
 
 See the [`ros2_tracing` design document](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/blob/master/doc/design_ros_2.md), especially the [*Goals and requirements*](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/blob/master/doc/design_ros_2.md#goals-and-requirements) and [*Analysis*](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/blob/master/doc/design_ros_2.md#analysis) sections.

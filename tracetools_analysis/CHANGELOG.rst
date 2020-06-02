@@ -2,6 +2,28 @@
 Changelog for package tracetools_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.0 (2020-06-02)
+------------------
+* Add sphinx documentation for tracetools_analysis
+* Improve RequiredEventNotFoundError message
+* Add 'quiet' option to loading-related functions
+* Declare dependencies on jupyter & bokeh, and restore pandas dependency
+* Fix deprecation warnings by using executable instead of node_executable
+* Define output metavar to simplify ros2 trace-analysis convert usage info
+* Validate convert/process paths
+* Add 'ip' context to example profiling launch file
+* Switch to using ping/pong nodes for profile example launch file
+* Add option to simply give an EventHandler when creating a DataModelUtil
+* Do check before calling super().__init_\_()
+* Add AutoProcessor and script entrypoint
+* Make sure Processor is given at least one EventHandler
+* Make do_convert_if_needed True by default
+* Allow EventHandlers to declare set of required events
+* Add cleanup method for ProcessingProgressDisplay
+* Add memory usage analysis and entrypoint script
+* Add callback-durations analysis script
+* Contributors: Christophe Bedard, Ingo Lütkebohle
+
 0.2.2 (2019-11-19)
 ------------------
 * Update ROS 2 handler and data model after new tracepoint

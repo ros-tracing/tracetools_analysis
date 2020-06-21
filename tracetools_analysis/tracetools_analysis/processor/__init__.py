@@ -495,7 +495,7 @@ class AutoProcessor():
         Get applicable EventHandler instances for a list of events.
 
         :param events: the list of events
-        :return the concrete EventHandler instances which are applicable
+        :return: the concrete EventHandler instances which are applicable
         """
         event_names = Processor.get_event_names(events)
         # Force import of all processor submodules (i.e. files) so that we can find all

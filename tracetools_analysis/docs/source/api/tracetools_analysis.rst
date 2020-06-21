@@ -1,6 +1,8 @@
 tracetools_analysis
 ===================
 
+.. automodule:: tracetools_analysis
+
 loading
 #######
 

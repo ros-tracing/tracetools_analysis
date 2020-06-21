@@ -133,7 +133,7 @@ class Ros2DataModelUtil(DataModelUtil):
 
         :param callback_obj: the callback object value
         :return: a dataframe containing the start timestamp (datetime)
-        and duration (ms) of all callback instances for that object
+            and duration (ms) of all callback instances for that object
         """
         data = self.data.callback_instances.loc[
             self.data.callback_instances.loc[:, 'callback_object'] == callback_obj,

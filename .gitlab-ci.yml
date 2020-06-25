@@ -46,6 +46,13 @@ coverage:
   allow_failure: true
   <<: *global_artifacts
 
+dco:
+  stage: report
+  image: $BASE_IMAGE_ID:$DISTRO-base
+  before_script: []
+  script:
+    - dco-check --verbose
+
 trigger_gen_docs:
   stage: report
   only:

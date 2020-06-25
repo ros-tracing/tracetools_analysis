@@ -3,7 +3,7 @@ variables:
   PACKAGES_LIST: tracetools_analysis ros2trace_analysis
   BASE_IMAGE_ID: registry.gitlab.com/micro-ros/ros_tracing/ci_base
   DISTRO: foxy
-  ROS2TRACING_BRANCH: master
+  ROS2TRACING_BRANCH: foxy
 
 stages:
   - build_test

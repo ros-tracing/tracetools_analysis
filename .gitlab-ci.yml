@@ -2,7 +2,7 @@ variables:
   DOCKER_DRIVER: overlay2
   PACKAGES_LIST: tracetools_analysis ros2trace_analysis
   BASE_IMAGE_ID: registry.gitlab.com/micro-ros/ros_tracing/ci_base
-  DISTRO: galactic
+  DISTRO: rolling
   ROS2TRACING_BRANCH: master
 
 stages:

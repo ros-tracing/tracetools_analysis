@@ -21,6 +21,8 @@ from typing import Mapping
 from typing import Optional
 from typing import Union
 
+import numpy as np
+from pandas import concat
 from pandas import DataFrame
 
 from . import DataModelUtil
@@ -368,6 +370,81 @@ class Ros2DataModelUtil(DataModelUtil):
         node_name = self.data.nodes.loc[node_handle, 'name']
         tid = self.data.nodes.loc[node_handle, 'tid']
         return {'node': node_name, 'tid': tid}
+
+    def get_lifecycle_node_handle_info(
+        self,
+        lifecycle_node_handle: int,
+    ) -> Optional[Mapping[str, Any]]:
+        """
+        Get information about a lifecycle node handle.
+
+        :param lifecycle_node_handle: the lifecycle node handle value
+        :return: a dictionary with name:value info, or `None` if it fails
+        """
+        node_info = self.get_node_handle_info(lifecycle_node_handle)
+        if not node_info:
+            return None
+        # TODO(christophebedard) validate that it is an actual lifecycle node and not just a node
+        node_info['lifecycle node'] = node_info.pop('node')  # type: ignore
+        return node_info
+
+    def get_lifecycle_node_state_intervals(
+        self,
+    ) -> DataFrame:
+        """
+        Get state intervals (start, end) for all lifecycle nodes.
+
+        The returned dictionary contains a dataframe for each lifecycle node handle:
+            (lifecycle node handle -> [state string, start timestamp, end timestamp])
+
+        In cases where there is no explicit timestamp (e.g. end of state),
+        `np.nan` is used instead.
+        The node creation timestamp is used as the start timestamp of the first state.
+        TODO(christophebedard) do the same with context shutdown for the last end time
+
+        :return: dictionary with a dataframe (with each row containing state interval information)
+            for each lifecycle node
+        """
+        data = {}
+        lifecycle_transitions = self.data.lifecycle_transitions.copy()
+        state_machine_handles = set(lifecycle_transitions['state_machine_handle'])
+        for state_machine_handle in state_machine_handles:
+            transitions = lifecycle_transitions.loc[
+                lifecycle_transitions.loc[:, 'state_machine_handle'] == state_machine_handle,
+                ['start_label', 'goal_label', 'timestamp']
+            ]
+            # Get lifecycle node handle from state machine handle
+            lifecycle_node_handle = self.data.lifecycle_state_machines.loc[
+                state_machine_handle, 'node_handle'
+            ]
+
+            # Infer first start time from node creation timestamp
+            node_creation_timestamp = self.data.nodes.loc[lifecycle_node_handle, 'timestamp']
+
+            # Add initial and final timestamps
+            # Last states has an unknown end timestamp
+            first_state_label = transitions.loc[0, 'start_label']
+            last_state_label = transitions.loc[transitions.index[-1], 'goal_label']
+            transitions.loc[-1] = ['', first_state_label, node_creation_timestamp]
+            transitions.index = transitions.index + 1
+            transitions.sort_index(inplace=True)
+            transitions.loc[transitions.index.max() + 1] = [last_state_label, '', np.nan]
+
+            # Process transitions to get start/end timestamp of each instance of a state
+            end_timestamps = transitions[['timestamp']].shift(periods=-1)
+            end_timestamps.rename(
+                columns={end_timestamps.columns[0]: 'end_timestamp'}, inplace=True)
+            states = concat([transitions, end_timestamps], axis=1)
+            states.drop(['start_label'], axis=1, inplace=True)
+            states.rename(
+                columns={'goal_label': 'state', 'timestamp': 'start_timestamp'}, inplace=True)
+            states.drop(states.tail(1).index, inplace=True)
+
+            # Convert time columns
+            self.convert_time_columns(states, [], ['start_timestamp', 'end_timestamp'], True)
+
+            data[lifecycle_node_handle] = states
+        return data
 
     def format_info_dict(
         self,

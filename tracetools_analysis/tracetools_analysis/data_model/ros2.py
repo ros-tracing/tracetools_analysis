@@ -1,4 +1,5 @@
 # Copyright 2019 Robert Bosch GmbH
+# Copyright 2020 Christophe Bedard
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -86,12 +87,20 @@ class Ros2DataModel(DataModel):
                                                       'timestamp',
                                                       'symbol'])
         self.callback_symbols.set_index(['callback_object'], inplace=True, drop=True)
+        self.lifecycle_state_machines = pd.DataFrame(columns=['state_machine_handle',
+                                                              'node_handle'])
+        self.lifecycle_state_machines.set_index(['state_machine_handle'], inplace=True, drop=True)
 
         # Events (multiple instances, may not have a meaningful index)
         self.callback_instances = pd.DataFrame(columns=['callback_object',
                                                         'timestamp',
                                                         'duration',
                                                         'intra_process'])
+        # Lifecycle state transitions (may not have a meaningful index)
+        self.lifecycle_transitions = pd.DataFrame(columns=['state_machine_handle',
+                                                           'start_label',
+                                                           'goal_label',
+                                                           'timestamp'])
 
     def add_context(
         self, context_handle, timestamp, pid, version
@@ -154,6 +163,22 @@ class Ros2DataModel(DataModel):
         }
         self.callback_instances = self.callback_instances.append(data, ignore_index=True)
 
+    def add_lifecycle_state_machine(
+        self, handle, node_handle
+    ) -> None:
+        self.lifecycle_state_machines.loc[handle] = [node_handle]
+
+    def add_lifecycle_state_transition(
+        self, state_machine_handle, start_label, goal_label, timestamp
+    ) -> None:
+        data = {
+            'state_machine_handle': state_machine_handle,
+            'start_label': start_label,
+            'goal_label': goal_label,
+            'timestamp': timestamp,
+        }
+        self.lifecycle_transitions = self.lifecycle_transitions.append(data, ignore_index=True)
+
     def print_data(self) -> None:
         print('====================ROS 2 DATA MODEL===================')
         print('Contexts:')
@@ -188,4 +213,11 @@ class Ros2DataModel(DataModel):
         print()
         print('Callback instances:')
         print(self.callback_instances.to_string())
+        print()
+        print('Lifecycle state machines:')
+        print()
+        print(self.lifecycle_state_machines.to_string())
+        print()
+        print('Lifecycle transitions:')
+        print(self.lifecycle_transitions.to_string())
         print('==================================================')

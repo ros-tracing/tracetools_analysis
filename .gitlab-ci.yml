@@ -31,7 +31,7 @@ build:
   script:
     - colcon build --symlink-install --event-handlers console_cohesion+ --packages-up-to $PACKAGES_LIST
     - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST
-    - colcon test-result --all
+    - colcon test-result --all --verbose
   <<: *global_artifacts
 
 coverage:
@@ -41,7 +41,7 @@ coverage:
     - pip3 install -U codecov
     - colcon build --symlink-install --event-handlers console_cohesion+ --packages-up-to $PACKAGES_LIST --mixin coverage-pytest --cmake-args -DBUILD_TESTING=ON --no-warn-unused-cli
     - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST --mixin coverage-pytest
-    - colcon test-result --all
+    - colcon test-result --all --verbose
     - colcon coveragepy-result --packages-select $PACKAGES_LIST --verbose --coverage-report-args -m
     - codecov --file coveragepy/.coverage
   allow_failure: true

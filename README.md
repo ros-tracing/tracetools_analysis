@@ -1,13 +1,13 @@
 # tracetools_analysis
 
-[![pipeline status](https://gitlab.com/micro-ROS/ros_tracing/tracetools_analysis/badges/master/pipeline.svg)](https://gitlab.com/micro-ROS/ros_tracing/tracetools_analysis/commits/master)
-[![codecov](https://codecov.io/gl/micro-ROS:ros_tracing/tracetools_analysis/branch/master/graph/badge.svg)](https://codecov.io/gl/micro-ROS:ros_tracing/tracetools_analysis)
+[![pipeline status](https://gitlab.com/ros-tracing/tracetools_analysis/badges/master/pipeline.svg)](https://gitlab.com/ros-tracing/tracetools_analysis/commits/master)
+[![codecov](https://codecov.io/gl/ros-tracing/tracetools_analysis/branch/master/graph/badge.svg)](https://codecov.io/gl/ros-tracing/tracetools_analysis)
 
-Analysis tools for [ROS 2 tracing](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing).
+Analysis tools for [ROS 2 tracing](https://gitlab.com/ros-tracing/ros2_tracing).
 
 ## Trace analysis
 
-After generating a trace (see [`ros2_tracing`](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing#tracing)), we can analyze it to extract useful execution data.
+After generating a trace (see [`ros2_tracing`](https://gitlab.com/ros-tracing/ros2_tracing#tracing)), we can analyze it to extract useful execution data.
 
 ### Commands
 
@@ -69,7 +69,7 @@ $ pip3 install bokeh
 
 ## Design
 
-See the [`ros2_tracing` design document](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/blob/master/doc/design_ros_2.md), especially the [*Goals and requirements*](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/blob/master/doc/design_ros_2.md#goals-and-requirements) and [*Analysis*](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/blob/master/doc/design_ros_2.md#analysis) sections.
+See the [`ros2_tracing` design document](https://gitlab.com/ros-tracing/ros2_tracing/blob/master/doc/design_ros_2.md), especially the [*Goals and requirements*](https://gitlab.com/ros-tracing/ros2_tracing/blob/master/doc/design_ros_2.md#goals-and-requirements) and [*Analysis*](https://gitlab.com/ros-tracing/ros2_tracing/blob/master/doc/design_ros_2.md#analysis) sections.
 
 ## Packages
 
@@ -81,4 +81,4 @@ Package containing a `ros2cli` extension to perform trace analysis.
 
 Package containing tools for analyzing trace data.
 
-See the [API documentation](https://micro-ros.gitlab.io/ros_tracing/tracetools_analysis-api/).
+See the [API documentation](https://ros-tracing.gitlab.io/tracetools_analysis-api/).

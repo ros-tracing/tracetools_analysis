@@ -19,6 +19,7 @@ from typing import List
 from typing import Optional
 from typing import Union
 
+import numpy as np
 from pandas import DataFrame
 
 from ..data_model import DataModel
@@ -72,12 +73,12 @@ class DataModelUtil():
         # Convert from ns to ms
         if len(columns_ns_to_ms) > 0:
             df[columns_ns_to_ms] = df[columns_ns_to_ms].applymap(
-                lambda t: t / 1000000.0
+                lambda t: t / 1000000.0 if not np.isnan(t) else t
             )
         # Convert from ns to ms + ms to datetime, as UTC
         if len(columns_ns_to_datetime) > 0:
             df[columns_ns_to_datetime] = df[columns_ns_to_datetime].applymap(
-                lambda t: dt.utcfromtimestamp(t / 1000000000.0)
+                lambda t: dt.utcfromtimestamp(t / 1000000000.0) if not np.isnan(t) else t
             )
         return df
 

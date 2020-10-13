@@ -1,4 +1,5 @@
 # Copyright 2019 Robert Bosch GmbH
+# Copyright 2020 Christophe Bedard
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -68,6 +69,10 @@ class Ros2Handler(EventHandler):
                 self._handle_callback_start,
             'ros2:callback_end':
                 self._handle_callback_end,
+            'ros2:rcl_lifecycle_state_machine_init':
+                self._handle_rcl_lifecycle_state_machine_init,
+            'ros2:rcl_lifecycle_transition':
+                self._handle_rcl_lifecycle_transition,
         }
         super().__init__(
             handler_map=handler_map,
@@ -226,3 +231,19 @@ class Ros2Handler(EventHandler):
                 bool(is_intra_process))
         else:
             print(f'No matching callback start for callback object "{callback_object}"')
+
+    def _handle_rcl_lifecycle_state_machine_init(
+        self, event: Dict, metadata: EventMetadata,
+    ) -> None:
+        node_handle = get_field(event, 'node_handle')
+        state_machine = get_field(event, 'state_machine')
+        self.data.add_lifecycle_state_machine(state_machine, node_handle)
+
+    def _handle_rcl_lifecycle_transition(
+        self, event: Dict, metadata: EventMetadata,
+    ) -> None:
+        timestamp = metadata.timestamp
+        state_machine = get_field(event, 'state_machine')
+        start_label = get_field(event, 'start_label')
+        goal_label = get_field(event, 'goal_label')
+        self.data.add_lifecycle_state_transition(state_machine, start_label, goal_label, timestamp)

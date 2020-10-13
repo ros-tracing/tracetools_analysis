@@ -1,2 +1,2 @@
 fixes:
-  - "/builds/micro-ROS/ros_tracing/tracetools_analysis/::"
+  - "/builds/ros-tracing/tracetools_analysis/::"

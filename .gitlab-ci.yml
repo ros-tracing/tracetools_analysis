@@ -1,7 +1,7 @@
 variables:
   DOCKER_DRIVER: overlay2
   PACKAGES_LIST: tracetools_analysis ros2trace_analysis
-  BASE_IMAGE_ID: registry.gitlab.com/micro-ros/ros_tracing/ci_base
+  BASE_IMAGE_ID: registry.gitlab.com/ros-tracing/ci_base
   DISTRO: rolling
   ROS2TRACING_BRANCH: master
 
@@ -23,7 +23,7 @@ stages:
 before_script:
   - . /root/ws/install/local_setup.sh
   - python3 get_branch.py --check
-  - git clone https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git --branch $(python3 get_branch.py)
+  - git clone https://gitlab.com/ros-tracing/ros2_tracing.git --branch $(python3 get_branch.py)
 
 build:
   stage: build_test
@@ -61,4 +61,4 @@ trigger_gen_docs:
     refs:
       - master
       - foxy
-  trigger: micro-ROS/ros_tracing/tracetools_analysis-api
+  trigger: ros-tracing/tracetools_analysis-api

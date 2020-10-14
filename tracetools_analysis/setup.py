@@ -32,7 +32,7 @@ setup(
         'fixed-term.christophe.bourquebedard@de.bosch.com, '
         'ingo.luetkebohle@de.bosch.com'
     ),
-    url='https://gitlab.com/micro-ROS/ros_tracing/tracetools_analysis',
+    url='https://gitlab.com/ros-tracing/tracetools_analysis',
     keywords=[],
     description='Tools for analysing trace data.',
     long_description=(

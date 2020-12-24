@@ -63,6 +63,8 @@ class Ros2Handler(EventHandler):
                 self._handle_rcl_timer_init,
             'ros2:rclcpp_timer_callback_added':
                 self._handle_rclcpp_timer_callback_added,
+            'ros2:rclcpp_timer_link_node':
+                self._handle_rclcpp_timer_link_node,
             'ros2:rclcpp_callback_register':
                 self._handle_rclcpp_callback_register,
             'ros2:callback_start':
@@ -197,6 +199,14 @@ class Ros2Handler(EventHandler):
         timestamp = metadata.timestamp
         callback_object = get_field(event, 'callback')
         self.data.add_callback_object(handle, timestamp, callback_object)
+
+    def _handle_rclcpp_timer_link_node(
+        self, event: Dict, metadata: EventMetadata,
+    ) -> None:
+        handle = get_field(event, 'timer_handle')
+        timestamp = metadata.timestamp
+        node_handle = get_field(event, 'node_handle')
+        self.data.add_timer_node_link(handle, timestamp, node_handle)
 
     def _handle_rclcpp_callback_register(
         self, event: Dict, metadata: EventMetadata,

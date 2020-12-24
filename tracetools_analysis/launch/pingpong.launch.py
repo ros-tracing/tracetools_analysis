@@ -23,6 +23,7 @@ def generate_launch_description():
     return LaunchDescription([
         Trace(
             session_name='pingpong',
+            events_kernel=[],
         ),
         Node(
             package='tracetools_test',

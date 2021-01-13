@@ -228,14 +228,18 @@ class Ros2DataModelUtil(DataModelUtil):
         :param timer_handle: the timer handle value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        # TODO find a way to link a timer to a specific node
         if timer_handle not in self.data.timers.index:
+            return None
+
+        node_handle = self.data.timer_node_links.loc[timer_handle, 'node_handle']
+        node_handle_info = self.get_node_handle_info(node_handle)
+        if node_handle_info is None:
             return None
 
         tid = self.data.timers.loc[timer_handle, 'tid']
         period_ns = self.data.timers.loc[timer_handle, 'period']
         period_ms = period_ns / 1000000.0
-        return {'tid': tid, 'period': f'{period_ms:.0f} ms'}
+        return {**node_handle_info, 'tid': tid, 'period': f'{period_ms:.0f} ms'}
 
     def get_publisher_handle_info(
         self,

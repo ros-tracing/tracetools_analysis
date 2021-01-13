@@ -78,6 +78,10 @@ class Ros2DataModel(DataModel):
                                             'period',
                                             'tid'])
         self.timers.set_index(['timer_handle'], inplace=True, drop=True)
+        self.timer_node_links = pd.DataFrame(columns=['timer_handle',
+                                                      'timestamp',
+                                                      'node_handle'])
+        self.timer_node_links.set_index(['timer_handle'], inplace=True, drop=True)
 
         self.callback_objects = pd.DataFrame(columns=['reference',
                                                       'timestamp',
@@ -142,6 +146,11 @@ class Ros2DataModel(DataModel):
     ) -> None:
         self.timers.loc[handle] = [timestamp, period, tid]
 
+    def add_timer_node_link(
+        self, handle, timestamp, node_handle
+    ) -> None:
+        self.timer_node_links.loc[handle] = [timestamp, node_handle]
+
     def add_callback_object(
         self, reference, timestamp, callback_object
     ) -> None:
@@ -205,6 +214,9 @@ class Ros2DataModel(DataModel):
         print('Timers:')
         print(self.timers.to_string())
         print()
+        print('Timer-node links:')
+        print(self.timer_node_links.to_string())
+        print()
         print('Callback objects:')
         print(self.callback_objects.to_string())
         print()
@@ -215,7 +227,6 @@ class Ros2DataModel(DataModel):
         print(self.callback_instances.to_string())
         print()
         print('Lifecycle state machines:')
-        print()
         print(self.lifecycle_state_machines.to_string())
         print()
         print('Lifecycle transitions:')

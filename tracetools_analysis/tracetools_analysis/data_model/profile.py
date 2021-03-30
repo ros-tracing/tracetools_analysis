@@ -20,6 +20,7 @@ from typing import Optional
 import pandas as pd
 
 from . import DataModel
+from . import DataModelIntermediateStorage
 
 
 class ProfileDataModel(DataModel):
@@ -33,10 +34,7 @@ class ProfileDataModel(DataModel):
     def __init__(self) -> None:
         """Create a ProfileDataModel."""
         super().__init__()
-        # Intermediate
-        self._times = []
-        # Final
-        self.times = None
+        self._times: DataModelIntermediateStorage = []
 
     def add_duration(
         self,

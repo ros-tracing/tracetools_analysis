@@ -18,6 +18,7 @@
 import pandas as pd
 
 from . import DataModel
+from . import DataModelIntermediateStorage
 
 
 class CpuTimeDataModel(DataModel):
@@ -30,10 +31,7 @@ class CpuTimeDataModel(DataModel):
     def __init__(self) -> None:
         """Create a CpuTimeDataModel."""
         super().__init__()
-        # Intermediate
-        self._times = []
-        # Final
-        self.times = None
+        self._times: DataModelIntermediateStorage = []
 
     def add_duration(
         self,

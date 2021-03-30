@@ -15,6 +15,13 @@
 
 """Base data model module."""
 
+from typing import Any
+from typing import Dict
+from typing import List
+
+
+DataModelIntermediateStorage = List[Dict[str, Any]]
+
 
 class DataModel():
     """

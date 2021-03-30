@@ -18,6 +18,7 @@
 import pandas as pd
 
 from . import DataModel
+from . import DataModelIntermediateStorage
 
 
 class MemoryUsageDataModel(DataModel):
@@ -31,10 +32,7 @@ class MemoryUsageDataModel(DataModel):
     def __init__(self) -> None:
         """Create a MemoryUsageDataModel."""
         super().__init__()
-        # Intermediate
-        self._memory_diff = []
-        # Final
-        self.memory_diff = None
+        self._memory_diff: DataModelIntermediateStorage = []
 
     def add_memory_difference(
         self,

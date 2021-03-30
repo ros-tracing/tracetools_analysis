@@ -18,6 +18,7 @@
 import pandas as pd
 
 from . import DataModel
+from . import DataModelIntermediateStorage
 
 
 class Ros2DataModel(DataModel):
@@ -30,43 +31,22 @@ class Ros2DataModel(DataModel):
     def __init__(self) -> None:
         """Create a Ros2DataModel."""
         super().__init__()
-
-        # Intermediate
-        self._contexts = []
-        self._nodes = []
-        self._publishers = []
-        self._subscriptions = []
-        self._subscription_objects = []
-        self._services = []
-        self._clients = []
-        self._timers = []
-        self._timer_node_links = []
-        self._callback_objects = []
-        self._callback_symbols = []
-        self._lifecycle_state_machines = []
-        self._callback_instances = []
-        self._lifecycle_transitions = []
-
-        # Final
         # Objects (one-time events, usually when something is created)
-        self.contexts = None
-        self.nodes = None
-        self.publishers = None
-        self.subscriptions = None
-        self.subscription_objects = None
-        self.services = None
-        self.clients = None
-        self.timers = None
-        self.timer_node_links = None
-
-        self.callback_objects = None
-        self.callback_symbols = None
-        self.lifecycle_state_machines = None
-
+        self._contexts: DataModelIntermediateStorage = []
+        self._nodes: DataModelIntermediateStorage = []
+        self._publishers: DataModelIntermediateStorage = []
+        self._subscriptions: DataModelIntermediateStorage = []
+        self._subscription_objects: DataModelIntermediateStorage = []
+        self._services: DataModelIntermediateStorage = []
+        self._clients: DataModelIntermediateStorage = []
+        self._timers: DataModelIntermediateStorage = []
+        self._timer_node_links: DataModelIntermediateStorage = []
+        self._callback_objects: DataModelIntermediateStorage = []
+        self._callback_symbols: DataModelIntermediateStorage = []
+        self._lifecycle_state_machines: DataModelIntermediateStorage = []
         # Events (multiple instances, may not have a meaningful index)
-        self.callback_instances = None
-        # Lifecycle state transitions (may not have a meaningful index)
-        self.lifecycle_transitions = None
+        self._callback_instances: DataModelIntermediateStorage = []
+        self._lifecycle_transitions: DataModelIntermediateStorage = []
 
     def add_context(
         self, context_handle, timestamp, pid, version
@@ -250,9 +230,7 @@ class Ros2DataModel(DataModel):
         if self._lifecycle_state_machines:
             self.lifecycle_state_machines.set_index(
                 'state_machine_handle', inplace=True, drop=True)
-        # Events (multiple instances, may not have a meaningful index)
         self.callback_instances = pd.DataFrame.from_dict(self._callback_instances)
-        # Lifecycle state transitions (may not have a meaningful index)
         self.lifecycle_transitions = pd.DataFrame.from_dict(self._lifecycle_transitions)
 
     def print_data(self) -> None:

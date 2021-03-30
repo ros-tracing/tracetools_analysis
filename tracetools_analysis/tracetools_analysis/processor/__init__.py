@@ -1,4 +1,5 @@
 # Copyright 2019 Robert Bosch GmbH
+# Copyright 2021 Christophe Bedard
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -195,6 +196,15 @@ class EventHandler(Dependant):
         processor = Processor(handler_object, **kwargs)
         processor.process(events)
         return handler_object
+
+    def finalize(self) -> None:
+        """
+        Finalize the event handler.
+
+        This should be called at the end, once all events have been processed.
+        """
+        if self._data_model:
+            self._data_model.finalize()
 
 
 class DependencySolver():
@@ -417,6 +427,7 @@ class Processor():
                     self._process_event(event)
                     self._progress_display.did_work()
                 self._progress_display.done(erase=erase_progress)
+            self._finalize_processing()
             self._processing_done = True
 
     def _process_event(self, event: DictEvent) -> None:
@@ -449,6 +460,11 @@ class Processor():
                     raise_if_not_found=False)
                 metadata = EventMetadata(event_name, timestamp, cpu_id, procname, pid, tid)
                 handler_function(event, metadata)
+
+    def _finalize_processing(self) -> None:
+        """Notify handlers that processing is done by calling corresponding method."""
+        for handler in self._expanded_handlers:
+            handler.finalize()
 
     def print_data(self) -> None:
         """Print processed data."""

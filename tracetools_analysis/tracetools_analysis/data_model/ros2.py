@@ -1,5 +1,5 @@
 # Copyright 2019 Robert Bosch GmbH
-# Copyright 2020 Christophe Bedard
+# Copyright 2020-2021 Christophe Bedard
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,163 +30,230 @@ class Ros2DataModel(DataModel):
     def __init__(self) -> None:
         """Create a Ros2DataModel."""
         super().__init__()
-        # Objects (one-time events, usually when something is created)
-        self.contexts = pd.DataFrame(columns=['context_handle',
-                                              'timestamp',
-                                              'pid',
-                                              'version'])
-        self.contexts.set_index(['context_handle'], inplace=True, drop=True)
-        self.nodes = pd.DataFrame(columns=['node_handle',
-                                           'timestamp',
-                                           'tid',
-                                           'rmw_handle',
-                                           'name',
-                                           'namespace'])
-        self.nodes.set_index(['node_handle'], inplace=True, drop=True)
-        self.publishers = pd.DataFrame(columns=['publisher_handle',
-                                                'timestamp',
-                                                'node_handle',
-                                                'rmw_handle',
-                                                'topic_name',
-                                                'depth'])
-        self.publishers.set_index(['publisher_handle'], inplace=True, drop=True)
-        self.subscriptions = pd.DataFrame(columns=['subscription_handle',
-                                                   'timestamp',
-                                                   'node_handle',
-                                                   'rmw_handle',
-                                                   'topic_name',
-                                                   'depth'])
-        self.subscriptions.set_index(['subscription_handle'], inplace=True, drop=True)
-        self.subscription_objects = pd.DataFrame(columns=['subscription',
-                                                          'timestamp',
-                                                          'subscription_handle'])
-        self.subscription_objects.set_index(['subscription'], inplace=True, drop=True)
-        self.services = pd.DataFrame(columns=['service_handle',
-                                              'timestamp',
-                                              'node_handle',
-                                              'rmw_handle',
-                                              'service_name'])
-        self.services.set_index(['service_handle'], inplace=True, drop=True)
-        self.clients = pd.DataFrame(columns=['client_handle',
-                                             'timestamp',
-                                             'node_handle',
-                                             'rmw_handle',
-                                             'service_name'])
-        self.clients.set_index(['client_handle'], inplace=True, drop=True)
-        self.timers = pd.DataFrame(columns=['timer_handle',
-                                            'timestamp',
-                                            'period',
-                                            'tid'])
-        self.timers.set_index(['timer_handle'], inplace=True, drop=True)
-        self.timer_node_links = pd.DataFrame(columns=['timer_handle',
-                                                      'timestamp',
-                                                      'node_handle'])
-        self.timer_node_links.set_index(['timer_handle'], inplace=True, drop=True)
 
-        self.callback_objects = pd.DataFrame(columns=['reference',
-                                                      'timestamp',
-                                                      'callback_object'])
-        self.callback_objects.set_index(['reference'], inplace=True, drop=True)
-        self.callback_symbols = pd.DataFrame(columns=['callback_object',
-                                                      'timestamp',
-                                                      'symbol'])
-        self.callback_symbols.set_index(['callback_object'], inplace=True, drop=True)
-        self.lifecycle_state_machines = pd.DataFrame(columns=['state_machine_handle',
-                                                              'node_handle'])
-        self.lifecycle_state_machines.set_index(['state_machine_handle'], inplace=True, drop=True)
+        # Intermediate
+        self._contexts = []
+        self._nodes = []
+        self._publishers = []
+        self._subscriptions = []
+        self._subscription_objects = []
+        self._services = []
+        self._clients = []
+        self._timers = []
+        self._timer_node_links = []
+        self._callback_objects = []
+        self._callback_symbols = []
+        self._lifecycle_state_machines = []
+        self._callback_instances = []
+        self._lifecycle_transitions = []
+
+        # Final
+        # Objects (one-time events, usually when something is created)
+        self.contexts = None
+        self.nodes = None
+        self.publishers = None
+        self.subscriptions = None
+        self.subscription_objects = None
+        self.services = None
+        self.clients = None
+        self.timers = None
+        self.timer_node_links = None
+
+        self.callback_objects = None
+        self.callback_symbols = None
+        self.lifecycle_state_machines = None
 
         # Events (multiple instances, may not have a meaningful index)
-        self.callback_instances = pd.DataFrame(columns=['callback_object',
-                                                        'timestamp',
-                                                        'duration',
-                                                        'intra_process'])
+        self.callback_instances = None
         # Lifecycle state transitions (may not have a meaningful index)
-        self.lifecycle_transitions = pd.DataFrame(columns=['state_machine_handle',
-                                                           'start_label',
-                                                           'goal_label',
-                                                           'timestamp'])
+        self.lifecycle_transitions = None
 
     def add_context(
         self, context_handle, timestamp, pid, version
     ) -> None:
-        self.contexts.loc[context_handle] = [timestamp, pid, version]
+        self._contexts.append({
+            'context_handle': context_handle,
+            'timestamp': timestamp,
+            'pid': pid,
+            'version': version,
+        })
 
     def add_node(
         self, node_handle, timestamp, tid, rmw_handle, name, namespace
     ) -> None:
-        self.nodes.loc[node_handle] = [timestamp, tid, rmw_handle, name, namespace]
+        self._nodes.append({
+            'node_handle': node_handle,
+            'timestamp': timestamp,
+            'tid': tid,
+            'rmw_handle': rmw_handle,
+            'name': name,
+            'namespace': namespace,
+        })
 
     def add_publisher(
         self, handle, timestamp, node_handle, rmw_handle, topic_name, depth
     ) -> None:
-        self.publishers.loc[handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
+        self._publishers.append({
+            'publisher_handle': handle,
+            'timestamp': timestamp,
+            'node_handle': node_handle,
+            'rmw_handle': rmw_handle,
+            'topic_name': topic_name,
+            'depth': depth,
+        })
 
     def add_rcl_subscription(
         self, handle, timestamp, node_handle, rmw_handle, topic_name, depth
     ) -> None:
-        self.subscriptions.loc[handle] = [timestamp, node_handle, rmw_handle, topic_name, depth]
+        self._subscriptions.append({
+            'subscription_handle': handle,
+            'timestamp': timestamp,
+            'node_handle': node_handle,
+            'rmw_handle': rmw_handle,
+            'topic_name': topic_name,
+            'depth': depth,
+        })
 
     def add_rclcpp_subscription(
         self, subscription_pointer, timestamp, subscription_handle
     ) -> None:
-        self.subscription_objects.loc[subscription_pointer] = [timestamp, subscription_handle]
+        self._subscription_objects.append({
+            'subscription': subscription_pointer,
+            'timestamp': timestamp,
+            'subscription_handle': subscription_handle,
+        })
 
     def add_service(
         self, handle, timestamp, node_handle, rmw_handle, service_name
     ) -> None:
-        self.services.loc[handle] = [timestamp, node_handle, rmw_handle, service_name]
+        self._services.append({
+            'service_handle': timestamp,
+            'timestamp': timestamp,
+            'node_handle': node_handle,
+            'rmw_handle': rmw_handle,
+            'service_name': service_name,
+        })
 
     def add_client(
         self, handle, timestamp, node_handle, rmw_handle, service_name
     ) -> None:
-        self.clients.loc[handle] = [timestamp, node_handle, rmw_handle, service_name]
+        self._clients.append({
+            'client_handle': handle,
+            'timestamp': timestamp,
+            'node_handle': node_handle,
+            'rmw_handle': rmw_handle,
+            'service_name': service_name,
+        })
 
     def add_timer(
         self, handle, timestamp, period, tid
     ) -> None:
-        self.timers.loc[handle] = [timestamp, period, tid]
+        self._timers.append({
+            'timer_handle': handle,
+            'timestamp': timestamp,
+            'period': period,
+            'tid': tid,
+        })
 
     def add_timer_node_link(
         self, handle, timestamp, node_handle
     ) -> None:
-        self.timer_node_links.loc[handle] = [timestamp, node_handle]
+        self._timer_node_links.append({
+            'timer_handle': handle,
+            'timestamp': timestamp,
+            'node_handle': node_handle,
+        })
 
     def add_callback_object(
         self, reference, timestamp, callback_object
     ) -> None:
-        self.callback_objects.loc[reference] = [timestamp, callback_object]
+        self._callback_objects.append({
+            'reference': reference,
+            'timestamp': timestamp,
+            'callback_object': callback_object,
+        })
 
     def add_callback_symbol(
         self, callback_object, timestamp, symbol
     ) -> None:
-        self.callback_symbols.loc[callback_object] = [timestamp, symbol]
+        self._callback_symbols.append({
+            'callback_object': callback_object,
+            'timestamp': timestamp,
+            'symbol': symbol,
+        })
 
     def add_callback_instance(
         self, callback_object, timestamp, duration, intra_process
     ) -> None:
-        data = {
+        self._callback_instances.append({
             'callback_object': callback_object,
             'timestamp': timestamp,
             'duration': duration,
             'intra_process': intra_process,
-        }
-        self.callback_instances = self.callback_instances.append(data, ignore_index=True)
+        })
 
     def add_lifecycle_state_machine(
         self, handle, node_handle
     ) -> None:
-        self.lifecycle_state_machines.loc[handle] = [node_handle]
+        self._lifecycle_state_machines.append({
+            'state_machine_handle': handle,
+            'node_handle': node_handle,
+        })
 
     def add_lifecycle_state_transition(
         self, state_machine_handle, start_label, goal_label, timestamp
     ) -> None:
-        data = {
+        self._lifecycle_transitions.append({
             'state_machine_handle': state_machine_handle,
             'start_label': start_label,
             'goal_label': goal_label,
             'timestamp': timestamp,
-        }
-        self.lifecycle_transitions = self.lifecycle_transitions.append(data, ignore_index=True)
+        })
+
+    def _finalize(self) -> None:
+        # Some of the lists of dicts might be empty, and setting
+        # the index for an empty dataframe leads to an error
+        self.contexts = pd.DataFrame.from_dict(self._contexts)
+        if self._contexts:
+            self.contexts.set_index('context_handle', inplace=True, drop=True)
+        self.nodes = pd.DataFrame.from_dict(self._nodes)
+        if self._nodes:
+            self.nodes.set_index('node_handle', inplace=True, drop=True)
+        self.publishers = pd.DataFrame.from_dict(self._publishers)
+        if self._publishers:
+            self.publishers.set_index('publisher_handle', inplace=True, drop=True)
+        self.subscriptions = pd.DataFrame.from_dict(self._subscriptions)
+        if self._subscriptions:
+            self.subscriptions.set_index('subscription_handle', inplace=True, drop=True)
+        self.subscription_objects = pd.DataFrame.from_dict(self._subscription_objects)
+        if self._subscription_objects:
+            self.subscription_objects.set_index('subscription', inplace=True, drop=True)
+        self.services = pd.DataFrame.from_dict(self._services)
+        if self._services:
+            self.services.set_index('service_handle', inplace=True, drop=True)
+        self.clients = pd.DataFrame.from_dict(self._clients)
+        if self._clients:
+            self.clients.set_index('client_handle', inplace=True, drop=True)
+        self.timers = pd.DataFrame.from_dict(self._timers)
+        if self._timers:
+            self.timers.set_index('timer_handle', inplace=True, drop=True)
+        self.timer_node_links = pd.DataFrame.from_dict(self._timer_node_links)
+        if self._timer_node_links:
+            self.timer_node_links.set_index('timer_handle', inplace=True, drop=True)
+        self.callback_objects = pd.DataFrame.from_dict(self._callback_objects)
+        if self._callback_objects:
+            self.callback_objects.set_index('reference', inplace=True, drop=True)
+        self.callback_symbols = pd.DataFrame.from_dict(self._callback_symbols)
+        if self._callback_symbols:
+            self.callback_symbols.set_index('callback_object', inplace=True, drop=True)
+        self.lifecycle_state_machines = pd.DataFrame.from_dict(self._lifecycle_state_machines)
+        if self._lifecycle_state_machines:
+            self.lifecycle_state_machines.set_index(
+                'state_machine_handle', inplace=True, drop=True)
+        # Events (multiple instances, may not have a meaningful index)
+        self.callback_instances = pd.DataFrame.from_dict(self._callback_instances)
+        # Lifecycle state transitions (may not have a meaningful index)
+        self.lifecycle_transitions = pd.DataFrame.from_dict(self._lifecycle_transitions)
 
     def print_data(self) -> None:
         print('====================ROS 2 DATA MODEL===================')

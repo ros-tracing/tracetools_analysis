@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import numpy as np
 import pandas as pd
 
 from tracetools_analysis.loading import load_file
@@ -48,7 +49,8 @@ def main():
 
     stat_data = []
     for ptr, name in du.get_callback_symbols().items():
-        durations = du.get_callback_durations(ptr)['duration']
+        # Convert to milliseconds to display it
+        durations = du.get_callback_durations(ptr)['duration'] * 1000 / np.timedelta64(1, 's')
         stat_data.append((
             durations.count(),
             durations.sum(),
@@ -57,5 +59,8 @@ def main():
             format_fn(name),
         ))
 
-    stat_df = pd.DataFrame(columns=['Count', 'Sum', 'Mean', 'Std', 'Name'], data=stat_data)
-    print(stat_df.sort_values(by='Sum', ascending=False).to_string())
+    stat_df = pd.DataFrame(
+        columns=['Count', 'Sum (ms)', 'Mean (ms)', 'Std', 'Name'],
+        data=stat_data,
+    )
+    print(stat_df.sort_values(by='Sum (ms)', ascending=False).to_string())

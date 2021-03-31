@@ -1,4 +1,5 @@
 # Copyright 2019 Apex.AI, Inc.
+# Copyright 2021 Christophe Bedard
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +18,7 @@
 import pandas as pd
 
 from . import DataModel
+from . import DataModelIntermediateStorage
 
 
 class MemoryUsageDataModel(DataModel):
@@ -30,11 +32,7 @@ class MemoryUsageDataModel(DataModel):
     def __init__(self) -> None:
         """Create a MemoryUsageDataModel."""
         super().__init__()
-        self.memory_diff = pd.DataFrame(columns=[
-            'timestamp',
-            'tid',
-            'memory_diff',
-        ])
+        self._memory_diff: DataModelIntermediateStorage = []
 
     def add_memory_difference(
         self,
@@ -42,12 +40,14 @@ class MemoryUsageDataModel(DataModel):
         tid: int,
         memory_diff: int,
     ) -> None:
-        data = {
+        self._memory_diff.append({
             'timestamp': timestamp,
             'tid': tid,
             'memory_diff': memory_diff,
-        }
-        self.memory_diff = self.memory_diff.append(data, ignore_index=True)
+        })
+
+    def _finalize(self) -> None:
+        self.memory_diff = pd.DataFrame.from_dict(self._memory_diff)
 
     def print_data(self) -> None:
         print('==================MEMORY USAGE DATA MODEL==================')

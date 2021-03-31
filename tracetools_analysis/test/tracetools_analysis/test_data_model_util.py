@@ -18,7 +18,7 @@ from typing import Dict
 import unittest
 
 from pandas import DataFrame
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 from tracetools_analysis.data_model import DataModel
 from tracetools_analysis.processor import EventHandler

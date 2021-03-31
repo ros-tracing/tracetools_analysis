@@ -2,8 +2,8 @@
 Changelog for package tracetools_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2021-03-31)
+------------------
 * Set callback_instances' timestamp & duration cols to datetime/timedelta
 * Improve performance by using lists of dicts as intermediate storage & converting to dataframes at the end
 * Update callback_duration notebook and pingpong sample data

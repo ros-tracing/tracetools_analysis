@@ -1,5 +1,6 @@
 # Copyright 2019 Robert Bosch GmbH
 # Copyright 2019 Apex.AI, Inc.
+# Copyright 2021 Christophe Bedard
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -134,15 +135,13 @@ class Ros2DataModelUtil(DataModelUtil):
         Get durations of callback instances for a given callback object.
 
         :param callback_obj: the callback object value
-        :return: a dataframe containing the start timestamp (datetime)
-            and duration (ms) of all callback instances for that object
+        :return: a dataframe containing the start timestamp (np.timestamp64)
+            and duration (np.timedelta64) of all callback instances for that object
         """
-        data = self.data.callback_instances.loc[
+        return self.data.callback_instances.loc[
             self.data.callback_instances.loc[:, 'callback_object'] == callback_obj,
             ['timestamp', 'duration']
         ]
-        # Time conversion
-        return self.convert_time_columns(data, ['duration'], ['timestamp'])
 
     def get_node_tid_from_name(
         self,

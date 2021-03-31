@@ -15,6 +15,7 @@
 
 """Module for ROS 2 data model."""
 
+import numpy as np
 import pandas as pd
 
 from . import DataModel
@@ -167,8 +168,8 @@ class Ros2DataModel(DataModel):
     ) -> None:
         self._callback_instances.append({
             'callback_object': callback_object,
-            'timestamp': timestamp,
-            'duration': duration,
+            'timestamp': np.datetime64(timestamp, 'ns'),
+            'duration': np.timedelta64(duration, 'ns'),
             'intra_process': intra_process,
         })
 

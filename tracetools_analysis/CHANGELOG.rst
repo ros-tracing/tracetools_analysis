@@ -2,6 +2,11 @@
 Changelog for package tracetools_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Improve performance by using lists of dicts as intermediate storage & converting to dataframes at the end
+* Contributors: Christophe Bedard
+
 1.0.0 (2020-06-02)
 ------------------
 * Add sphinx documentation for tracetools_analysis

@@ -1,4 +1,5 @@
 # Copyright 2019 Robert Bosch GmbH
+# Copyright 2021 Christophe Bedard
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@ from typing import Optional
 import pandas as pd
 
 from . import DataModel
+from . import DataModelIntermediateStorage
 
 
 class ProfileDataModel(DataModel):
@@ -32,15 +34,7 @@ class ProfileDataModel(DataModel):
     def __init__(self) -> None:
         """Create a ProfileDataModel."""
         super().__init__()
-        self.times = pd.DataFrame(columns=[
-            'tid',
-            'depth',
-            'function_name',
-            'parent_name',
-            'start_timestamp',
-            'duration',
-            'actual_duration',
-        ])
+        self._times: DataModelIntermediateStorage = []
 
     def add_duration(
         self,
@@ -52,7 +46,7 @@ class ProfileDataModel(DataModel):
         duration: int,
         actual_duration: int,
     ) -> None:
-        data = {
+        self._times.append({
             'tid': tid,
             'depth': depth,
             'function_name': function_name,
@@ -60,8 +54,10 @@ class ProfileDataModel(DataModel):
             'start_timestamp': start_timestamp,
             'duration': duration,
             'actual_duration': actual_duration,
-        }
-        self.times = self.times.append(data, ignore_index=True)
+        })
+
+    def _finalize(self) -> None:
+        self.times = pd.DataFrame.from_dict(self._times)
 
     def print_data(self) -> None:
         print('====================PROFILE DATA MODEL====================')

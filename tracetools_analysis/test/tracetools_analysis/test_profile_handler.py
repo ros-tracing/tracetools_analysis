@@ -18,7 +18,7 @@ from typing import List
 import unittest
 
 from pandas import DataFrame
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 from tracetools_analysis.processor import Processor
 from tracetools_analysis.processor.profile import ProfileHandler
@@ -286,17 +286,8 @@ class TestProfileHandler(unittest.TestCase):
 
     @staticmethod
     def build_expected_df(expected_data: List[Dict[str, Any]]) -> DataFrame:
-        # Make sure the columns are in the same order
-        expected_df = DataFrame(columns=[
-            'tid',
-            'depth',
-            'function_name',
-            'parent_name',
-            'start_timestamp',
-            'duration',
-            'actual_duration',
-        ])
-        return expected_df.append(expected_data, ignore_index=True)
+        # Columns should be in the same order
+        return DataFrame.from_dict(expected_data)
 
     @staticmethod
     def transform_fake_fields(events: List[DictEvent]) -> None:

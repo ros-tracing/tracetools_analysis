@@ -1,4 +1,5 @@
 # Copyright 2019 Robert Bosch GmbH
+# Copyright 2021 Christophe Bedard
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +18,7 @@
 import pandas as pd
 
 from . import DataModel
+from . import DataModelIntermediateStorage
 
 
 class CpuTimeDataModel(DataModel):
@@ -29,12 +31,7 @@ class CpuTimeDataModel(DataModel):
     def __init__(self) -> None:
         """Create a CpuTimeDataModel."""
         super().__init__()
-        self.times = pd.DataFrame(columns=[
-            'tid',
-            'start_timestamp',
-            'duration',
-            'cpu_id',
-        ])
+        self._times: DataModelIntermediateStorage = []
 
     def add_duration(
         self,
@@ -43,13 +40,15 @@ class CpuTimeDataModel(DataModel):
         duration: int,
         cpu_id: int,
     ) -> None:
-        data = {
+        self._times.append({
             'tid': tid,
             'start_timestamp': start_timestamp,
             'duration': duration,
             'cpu_id': cpu_id,
-        }
-        self.times = self.times.append(data, ignore_index=True)
+        })
+
+    def _finalize(self) -> None:
+        self.times = pd.DataFrame.from_dict(self._times)
 
     def print_data(self) -> None:
         print('====================CPU TIME DATA MODEL====================')

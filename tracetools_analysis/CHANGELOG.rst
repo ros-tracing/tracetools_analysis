@@ -2,8 +2,8 @@
 Changelog for package tracetools_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.3 (2021-04-02)
+------------------
 * Improve performance by using lists of dicts as intermediate storage & converting to dataframes at the end
 * Contributors: Christophe Bedard
 

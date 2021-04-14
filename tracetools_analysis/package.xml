@@ -16,8 +16,6 @@
   <depend>tracetools_read</depend>
   <depend>python3-pandas</depend>
 
-  <build_depend>ament_package</build_depend>
-
   <exec_depend>jupyter-notebook</exec_depend>
 
   <test_depend>ament_copyright</test_depend>

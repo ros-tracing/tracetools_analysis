@@ -11,9 +11,9 @@ package_info = generate_setuptools_dict(
             ['resource/' + package_name]),
     ],
     install_requires=['ros2cli'],
+    tests_require=['pytest'],
     zip_safe=True,
     keywords=[],
-    tests_require=['pytest'],
     entry_points={
         'ros2cli.command': [
             f'trace-analysis = {package_name}.command.trace_analysis:TraceAnalysisCommand',

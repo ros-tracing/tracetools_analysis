@@ -14,6 +14,7 @@ package_info = generate_setuptools_dict(
             ['resource/' + package_name]),
     ],
     install_requires=['setuptools'],
+    tests_require=['pytest'],
     keywords=[],
     entry_points={
         'console_scripts': [
@@ -24,6 +25,5 @@ package_info = generate_setuptools_dict(
             f'memory_usage = {package_name}.scripts.memory_usage:main',
         ],
     },
-    tests_require=['pytest'],
 )
 setup(**package_info)

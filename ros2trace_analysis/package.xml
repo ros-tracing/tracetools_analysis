@@ -11,10 +11,10 @@
   <url type="bugtracker">https://gitlab.com/ros-tracing/tracetools_analysis/-/issues</url>
   <author email="christophe.bedard@apex.ai">Christophe Bedard</author>
 
+  <buildtool_depend>ament_package</buildtool_depend>
+
   <depend>ros2cli</depend>
   <depend>tracetools_analysis</depend>
-
-  <build_depend>ament_package</build_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

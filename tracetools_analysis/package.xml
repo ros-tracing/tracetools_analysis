@@ -13,8 +13,6 @@
   <author email="ingo.luetkebohle@de.bosch.com">Ingo Lütkebohle</author>
   <author email="fixed-term.christophe.bourquebedard@de.bosch.com">Christophe Bedard</author>
 
-  <buildtool_depend>ament_package</buildtool_depend>
-
   <depend>tracetools_read</depend>
   <depend>python3-pandas</depend>
 

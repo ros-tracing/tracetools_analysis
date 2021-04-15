@@ -11,8 +11,6 @@
   <url type="bugtracker">https://gitlab.com/ros-tracing/tracetools_analysis/-/issues</url>
   <author email="christophe.bedard@apex.ai">Christophe Bedard</author>
 
-  <buildtool_depend>ament_package</buildtool_depend>
-
   <depend>ros2cli</depend>
   <depend>tracetools_analysis</depend>
 

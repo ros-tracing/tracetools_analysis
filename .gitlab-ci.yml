@@ -46,8 +46,8 @@ test:
     - build
   dependencies:
     - build
+  <<: *before_script_build
   script:
-    - . /root/ws/install/local_setup.sh
     - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST
     - colcon test-result --all --verbose
   <<: *test_artifacts

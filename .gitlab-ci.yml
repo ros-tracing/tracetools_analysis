@@ -35,6 +35,7 @@ build:
   image: $BASE_IMAGE_ID:$DISTRO
   <<: *before_script_build
   script:
+    - lttng --version && apt list lttng-tools liblttng-ust-dev python3-lttng python3-babeltrace
     - colcon build --symlink-install --event-handlers console_cohesion+ --packages-up-to $PACKAGES_LIST
   <<: *build_artifacts
 

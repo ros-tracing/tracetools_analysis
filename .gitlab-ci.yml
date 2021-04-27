@@ -6,13 +6,23 @@ variables:
   ROS2TRACING_BRANCH: master
 
 stages:
-  - build_test
+  - build
+  - test
   - report
 
-.global_artifacts: &global_artifacts
+.before_script_build: &before_script_build
+  before_script:
+    - . /root/ws/install/local_setup.sh
+    - python3 get_branch.py --check
+    - git clone https://gitlab.com/ros-tracing/ros2_tracing.git --branch $(python3 get_branch.py)
+.build_artifacts: &build_artifacts
   artifacts:
     paths:
-      - install
+      - install/
+      - build/
+.test_artifacts: &test_artifacts
+  artifacts:
+    paths:
       - build/*/test_results/*/*.xunit.xml
       - build/*/pytest.xml
     reports:
@@ -20,37 +30,45 @@ stages:
         - build/*/test_results/*/*.xunit.xml
         - build/*/pytest.xml
 
-before_script:
-  - . /root/ws/install/local_setup.sh
-  - python3 get_branch.py --check
-  - git clone https://gitlab.com/ros-tracing/ros2_tracing.git --branch $(python3 get_branch.py)
-
 build:
-  stage: build_test
+  stage: build
   image: $BASE_IMAGE_ID:$DISTRO
+  <<: *before_script_build
   script:
     - colcon build --symlink-install --event-handlers console_cohesion+ --packages-up-to $PACKAGES_LIST
+  <<: *build_artifacts
+
+test:
+  stage: test
+  image: $BASE_IMAGE_ID:$DISTRO
+  needs:
+    - build
+  dependencies:
+    - build
+  script:
+    - . /root/ws/install/local_setup.sh
     - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST
     - colcon test-result --all --verbose
-  <<: *global_artifacts
+  <<: *test_artifacts
 
 coverage:
   stage: report
   image: $BASE_IMAGE_ID:$DISTRO
+  needs:
+    - test
+  <<: *before_script_build
   script:
-    - pip3 install -U codecov
     - colcon build --symlink-install --event-handlers console_cohesion+ --packages-up-to $PACKAGES_LIST --mixin coverage-pytest --cmake-args -DBUILD_TESTING=ON --no-warn-unused-cli
     - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST --mixin coverage-pytest
     - colcon test-result --all --verbose
     - colcon coveragepy-result --packages-select $PACKAGES_LIST --verbose --coverage-report-args -m
+    - pip3 install -U codecov
     - codecov --file coveragepy/.coverage
   allow_failure: true
-  <<: *global_artifacts
 
 dco:
   stage: report
   image: $BASE_IMAGE_ID:$DISTRO-base
-  before_script: []
   script:
     - pip3 install -U dco-check
     - dco-check --verbose
@@ -60,5 +78,6 @@ trigger_gen_docs:
   only:
     refs:
       - master
+      - galactic
       - foxy
   trigger: ros-tracing/tracetools_analysis-api

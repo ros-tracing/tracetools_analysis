@@ -2,8 +2,8 @@ variables:
   DOCKER_DRIVER: overlay2
   PACKAGES_LIST: tracetools_analysis ros2trace_analysis
   BASE_IMAGE_ID: registry.gitlab.com/ros-tracing/ci_base
-  DISTRO: rolling
-  ROS2TRACING_BRANCH: master
+  DISTRO: galactic
+  ROS2TRACING_BRANCH: galactic
 
 stages:
   - build
@@ -72,7 +72,7 @@ dco:
   image: $BASE_IMAGE_ID:$DISTRO-base
   script:
     - pip3 install -U dco-check
-    - dco-check --verbose
+    - CI_DEFAULT_BRANCH=$DISTRO dco-check --verbose --default-branch $DISTRO
 
 trigger_gen_docs:
   stage: report

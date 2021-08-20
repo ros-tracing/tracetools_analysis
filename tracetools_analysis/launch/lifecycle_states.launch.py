@@ -26,12 +26,12 @@ def generate_launch_description():
             events_kernel=[],
         ),
         Node(
-            package='tracetools_test',
+            package='test_tracetools',
             executable='test_lifecycle_node',
             output='screen',
         ),
         Node(
-            package='tracetools_test',
+            package='test_tracetools',
             executable='test_lifecycle_client',
             output='screen',
         ),

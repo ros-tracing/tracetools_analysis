@@ -41,13 +41,13 @@ def generate_launch_description():
             ] + DEFAULT_CONTEXT,
         ),
         Node(
-            package='tracetools_test',
+            package='test_tracetools',
             executable='test_ping',
             arguments=['do_more'],
             output='screen',
         ),
         Node(
-            package='tracetools_test',
+            package='test_tracetools',
             executable='test_pong',
             arguments=['do_more'],
             output='screen',

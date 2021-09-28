@@ -18,12 +18,14 @@ from tracetools_analysis.convert import convert
 
 
 class ConvertVerb(VerbExtension):
-    """Convert trace data to a file."""
+    """Convert trace data to a file. DEPRECATED: use the 'process' verb directly."""
 
     def add_arguments(self, parser, cli_name):
         add_args(parser)
 
     def main(self, *, args):
+        import warnings
+        warnings.warn("'convert' is deprecated, use 'process' directly instead", stacklevel=2)
         return convert(
             args.trace_directory,
             args.output_file_name,

@@ -41,7 +41,11 @@ def add_args(parser: argparse.ArgumentParser) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description='Convert trace data to a file.')
+        description=(
+            'Convert trace data to a file. '
+            "DEPRECATED: use the 'process' verb directly."
+        ),
+    )
     add_args(parser)
     return parser.parse_args()
 
@@ -79,4 +83,6 @@ def main():
     trace_directory = args.trace_directory
     output_file_name = args.output_file_name
 
+    import warnings
+    warnings.warn("'convert' is deprecated, use 'process' directly instead", stacklevel=2)
     convert(trace_directory, output_file_name)

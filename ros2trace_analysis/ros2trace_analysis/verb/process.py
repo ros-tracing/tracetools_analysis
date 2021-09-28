@@ -18,7 +18,7 @@ from tracetools_analysis.process import process
 
 
 class ProcessVerb(VerbExtension):
-    """Process a file converted from a trace directory and output model data."""
+    """Process ROS 2 trace data and output model data."""
 
     def add_arguments(self, parser, cli_name):
         add_args(parser)
@@ -28,4 +28,5 @@ class ProcessVerb(VerbExtension):
             args.input_path,
             args.force_conversion,
             args.hide_results,
+            args.convert_only,
         )

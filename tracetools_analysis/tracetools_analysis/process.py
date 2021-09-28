@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright 2019 Robert Bosch GmbH
+# Copyright 2021 Christophe Bedard
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,20 +32,29 @@ def add_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         'input_path',
         help='the path to a converted file to import and process, '
-        'or the path to a CTF directory to convert and process')
+        'or the path to a trace directory to convert and process')
     parser.add_argument(
         '-f', '--force-conversion', dest='force_conversion',
         action='store_true', default=False,
         help='re-convert trace directory even if converted file is found')
-    parser.add_argument(
+    command_group = parser.add_mutually_exclusive_group()
+    command_group.add_argument(
         '-s', '--hide-results', dest='hide_results',
         action='store_true', default=False,
         help='hide/suppress results from being printed')
+    command_group.add_argument(
+        '-c', '--convert-only', dest='convert_only',
+        action='store_true', default=False,
+        help=(
+            'only do the first step of converting the file, without processing it '
+            '(this should not be necessary, since conversion is done automatically and is mostly '
+            'just an implementation detail)'
+        ))
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description='Process a file converted from a trace '
-                                                 'directory and output model data.')
+    parser = argparse.ArgumentParser(
+        description='Process ROS 2 trace data and output model data.')
     add_args(parser)
     return parser.parse_args()
 
@@ -53,13 +63,21 @@ def process(
     input_path: str,
     force_conversion: bool = False,
     hide_results: bool = False,
+    convert_only: bool = False,
 ) -> int:
     """
-    Process converted trace file.
+    Process ROS 2 trace data and output model data.
+
+    The trace data will be automatically converted into
+    an internal intermediate representation if needed.
 
     :param input_path: the path to a converted file or trace directory
     :param force_conversion: whether to re-creating converted file even if it is found
     :param hide_results: whether to hide results and not print them
+    :param convert_only: whether to only convert the file into our internal intermediate
+        representation, without processing it. This should usually not be necessary since
+        conversion is done automatically only when needed or when explicitly requested with
+        force_conversion; conversion is mostly just an implementation detail
     """
     input_path = os.path.expanduser(input_path)
     if not os.path.exists(input_path):
@@ -69,6 +87,11 @@ def process(
     start_time = time.time()
 
     events = load_file(input_path, do_convert_if_needed=True, force_conversion=force_conversion)
+
+    # Return now if we only need to convert the file
+    if convert_only:
+        return 0
+
     processor = Processor(Ros2Handler())
     processor.process(events)
 
@@ -86,4 +109,5 @@ def main():
         args.input_path,
         args.force_conversion,
         args.hide_results,
+        args.convert_only,
     )

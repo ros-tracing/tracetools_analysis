@@ -32,7 +32,7 @@ def add_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         'input_path',
         help='the path to a converted file to import and process, '
-        'or the path to a CTF directory to convert and process')
+        'or the path to a trace directory to convert and process')
     parser.add_argument(
         '-f', '--force-conversion', dest='force_conversion',
         action='store_true', default=False,

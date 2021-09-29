@@ -46,6 +46,9 @@ class Ros2DataModel(DataModel):
         self._callback_symbols: DataModelIntermediateStorage = []
         self._lifecycle_state_machines: DataModelIntermediateStorage = []
         # Events (multiple instances, may not have a meaningful index)
+        self._rclcpp_publish_instances: DataModelIntermediateStorage = []
+        self._rcl_publish_instances: DataModelIntermediateStorage = []
+        self._rmw_publish_instances: DataModelIntermediateStorage = []
         self._callback_instances: DataModelIntermediateStorage = []
         self._lifecycle_transitions: DataModelIntermediateStorage = []
 
@@ -81,6 +84,31 @@ class Ros2DataModel(DataModel):
             'rmw_handle': rmw_handle,
             'topic_name': topic_name,
             'depth': depth,
+        })
+
+    def add_rclcpp_publish_instance(
+        self, timestamp, message,
+    ) -> None:
+        self._rclcpp_publish_instances.append({
+            'timestamp': timestamp,
+            'message': message,
+        })
+
+    def add_rcl_publish_instance(
+        self, publisher_handle, timestamp, message,
+    ) -> None:
+        self._rcl_publish_instances.append({
+            'publisher_handle': publisher_handle,
+            'timestamp': timestamp,
+            'message': message,
+        })
+
+    def add_rmw_publish_instance(
+        self, timestamp, message,
+    ) -> None:
+        self._rmw_publish_instances.append({
+            'timestamp': timestamp,
+            'message': message,
         })
 
     def add_rcl_subscription(
@@ -231,6 +259,9 @@ class Ros2DataModel(DataModel):
         if self._lifecycle_state_machines:
             self.lifecycle_state_machines.set_index(
                 'state_machine_handle', inplace=True, drop=True)
+        self.rclcpp_publish_instances = pd.DataFrame.from_dict(self._rclcpp_publish_instances)
+        self.rcl_publish_instances = pd.DataFrame.from_dict(self._rcl_publish_instances)
+        self.rmw_publish_instances = pd.DataFrame.from_dict(self._rmw_publish_instances)
         self.callback_instances = pd.DataFrame.from_dict(self._callback_instances)
         self.lifecycle_transitions = pd.DataFrame.from_dict(self._lifecycle_transitions)
 
@@ -244,6 +275,15 @@ class Ros2DataModel(DataModel):
         print()
         print('Publishers:')
         print(self.publishers.to_string())
+        print()
+        print('Publish instances (rclcpp):')
+        print(self.rclcpp_publish_instances.to_string())
+        print()
+        print('Publish instances (rcl):')
+        print(self.rcl_publish_instances.to_string())
+        print()
+        print('Publish instances (rmw):')
+        print(self.rmw_publish_instances.to_string())
         print()
         print('Subscriptions:')
         print(self.subscriptions.to_string())

@@ -47,6 +47,12 @@ class Ros2Handler(EventHandler):
                 self._handle_rcl_node_init,
             'ros2:rcl_publisher_init':
                 self._handle_rcl_publisher_init,
+            'ros2:rclcpp_publish':
+                self._handle_rclcpp_publish,
+            'ros2:rcl_publish':
+                self._handle_rcl_publish,
+            'ros2:rmw_publish':
+                self._handle_rmw_publish,
             'ros2:rcl_subscription_init':
                 self._handle_rcl_subscription_init,
             'ros2:rclcpp_subscription_init':
@@ -125,6 +131,28 @@ class Ros2Handler(EventHandler):
         topic_name = get_field(event, 'topic_name')
         depth = get_field(event, 'queue_depth')
         self.data.add_publisher(handle, timestamp, node_handle, rmw_handle, topic_name, depth)
+
+    def _handle_rclcpp_publish(
+        self, event: Dict, metadata: EventMetadata,
+    ) -> None:
+        timestamp = metadata.timestamp
+        message = get_field(event, 'message')
+        self.data.add_rclcpp_publish_instance(timestamp, message)
+
+    def _handle_rcl_publish(
+        self, event: Dict, metadata: EventMetadata,
+    ) -> None:
+        handle = get_field(event, 'publisher_handle')
+        timestamp = metadata.timestamp
+        message = get_field(event, 'message')
+        self.data.add_rcl_publish_instance(handle, timestamp, message)
+
+    def _handle_rmw_publish(
+        self, event: Dict, metadata: EventMetadata,
+    ) -> None:
+        timestamp = metadata.timestamp
+        message = get_field(event, 'message')
+        self.data.add_rmw_publish_instance(timestamp, message)
 
     def _handle_rcl_subscription_init(
         self, event: Dict, metadata: EventMetadata,

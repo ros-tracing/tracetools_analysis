@@ -127,6 +127,56 @@ class Ros2DataModelUtil(DataModelUtil):
         """Get a list of thread ids corresponding to the nodes."""
         return self.data.nodes['tid'].unique().tolist()
 
+    def get_rcl_publish_instances(self, topic_name) -> Optional[DataFrame]:
+        """
+        Get rcl publish instances for all publishers with the given topic name.
+
+        :param topic_name: the topic name
+        :return: dataframe with [publisher handle, publish timestamp, message] columns,
+            or `None` if topic name not found
+        """
+        # We could have more than one publisher for the topic
+        publisher_handles = self.data.publishers.loc[
+            self.data.publishers['topic_name'] == topic_name
+        ].index.values.astype(int)
+        if len(publisher_handles) == 0:
+            return None
+        publish_instances = self.data.rcl_publish_instances.loc[
+            self.data.rcl_publish_instances['publisher_handle'].isin(publisher_handles)
+        ]
+        publish_instances.reset_index(drop=True, inplace=True)
+        self.convert_time_columns(publish_instances, [], ['timestamp'], True)
+        return publish_instances
+
+    def get_publish_instances(self) -> DataFrame:
+        """
+        Get all publish instances (rclcpp, rcl, rmw) in a single dataframe.
+
+        The rows are ordered by publish timestamp, so the order will usually be: rclcpp, rcl, rmw.
+        However, this does not apply to publications from internal publishers, i.e.,
+        publications that originate from below rclcpp (rcl or rmw).
+        TODO(christophebedard) find heuristic to exclude those
+
+        :return: dataframe with [timestamp, message, layer 'rclcpp'|'rcl'|'rmw', publisher handle]
+            columns, ordered by timestamp,
+            and where the publisher handle is only set (non-zero) for 'rcl' publish instances
+        """
+        # Add publisher handle columns with zeros for dataframes that do not have this column,
+        # otherwise NaN is used and the publisher handle values for rcl are converted to float
+        rclcpp_instances = self.data.rclcpp_publish_instances.copy()
+        rclcpp_instances['layer'] = 'rclcpp'
+        rclcpp_instances['publisher_handle'] = 0
+        rcl_instances = self.data.rcl_publish_instances.copy()
+        rcl_instances['layer'] = 'rcl'
+        rmw_instances = self.data.rmw_publish_instances.copy()
+        rmw_instances['layer'] = 'rmw'
+        rmw_instances['publisher_handle'] = 0
+        publish_instances = concat([rclcpp_instances, rcl_instances, rmw_instances], axis=0)
+        publish_instances.sort_values('timestamp', inplace=True)
+        publish_instances.reset_index(drop=True, inplace=True)
+        self.convert_time_columns(publish_instances, [], ['timestamp'], True)
+        return publish_instances
+
     def get_callback_durations(
         self,
         callback_obj: int,

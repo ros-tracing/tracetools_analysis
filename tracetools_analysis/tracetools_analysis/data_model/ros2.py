@@ -35,8 +35,10 @@ class Ros2DataModel(DataModel):
         # Objects (one-time events, usually when something is created)
         self._contexts: DataModelIntermediateStorage = []
         self._nodes: DataModelIntermediateStorage = []
-        self._publishers: DataModelIntermediateStorage = []
-        self._subscriptions: DataModelIntermediateStorage = []
+        self._rmw_publishers: DataModelIntermediateStorage = []
+        self._rcl_publishers: DataModelIntermediateStorage = []
+        self._rmw_subscriptions: DataModelIntermediateStorage = []
+        self._rcl_subscriptions: DataModelIntermediateStorage = []
         self._subscription_objects: DataModelIntermediateStorage = []
         self._services: DataModelIntermediateStorage = []
         self._clients: DataModelIntermediateStorage = []
@@ -49,6 +51,9 @@ class Ros2DataModel(DataModel):
         self._rclcpp_publish_instances: DataModelIntermediateStorage = []
         self._rcl_publish_instances: DataModelIntermediateStorage = []
         self._rmw_publish_instances: DataModelIntermediateStorage = []
+        self._rmw_take_instances: DataModelIntermediateStorage = []
+        self._rcl_take_instances: DataModelIntermediateStorage = []
+        self._rclcpp_take_instances: DataModelIntermediateStorage = []
         self._callback_instances: DataModelIntermediateStorage = []
         self._lifecycle_transitions: DataModelIntermediateStorage = []
 
@@ -74,10 +79,19 @@ class Ros2DataModel(DataModel):
             'namespace': namespace,
         })
 
-    def add_publisher(
+    def add_rmw_publisher(
+        self, handle, timestamp, gid,
+    ) -> None:
+        self._rmw_publishers.append({
+            'publisher_handle': handle,
+            'timestamp': timestamp,
+            'gid': gid,
+        })
+
+    def add_rcl_publisher(
         self, handle, timestamp, node_handle, rmw_handle, topic_name, depth
     ) -> None:
-        self._publishers.append({
+        self._rcl_publishers.append({
             'publisher_handle': handle,
             'timestamp': timestamp,
             'node_handle': node_handle,
@@ -111,10 +125,19 @@ class Ros2DataModel(DataModel):
             'message': message,
         })
 
+    def add_rmw_subscription(
+        self, handle, timestamp, gid
+    ) -> None:
+        self._rcl_subscriptions.append({
+            'subscription_handle': handle,
+            'timestamp': timestamp,
+            'gid': gid,
+        })
+
     def add_rcl_subscription(
         self, handle, timestamp, node_handle, rmw_handle, topic_name, depth
     ) -> None:
-        self._subscriptions.append({
+        self._rcl_subscriptions.append({
             'subscription_handle': handle,
             'timestamp': timestamp,
             'node_handle': node_handle,
@@ -201,6 +224,33 @@ class Ros2DataModel(DataModel):
             'intra_process': intra_process,
         })
 
+    def add_rmw_take_instance(
+        self, subscription_handle, timestamp, message, source_timestamp, taken
+    ) -> None:
+        self._rmw_take_instances.append({
+            'subscription_handle': subscription_handle,
+            'timestamp': timestamp,
+            'message': message,
+            'source_timestamp': source_timestamp,
+            'taken': taken,
+        })
+
+    def add_rcl_take_instance(
+        self, timestamp, message
+    ) -> None:
+        self._rcl_take_instances.append({
+            'timestamp': timestamp,
+            'message': message,
+        })
+
+    def add_rclcpp_take_instance(
+        self, timestamp, message
+    ) -> None:
+        self._rclcpp_take_instances.append({
+            'timestamp': timestamp,
+            'message': message,
+        })
+
     def add_lifecycle_state_machine(
         self, handle, node_handle
     ) -> None:
@@ -228,12 +278,18 @@ class Ros2DataModel(DataModel):
         self.nodes = pd.DataFrame.from_dict(self._nodes)
         if self._nodes:
             self.nodes.set_index('node_handle', inplace=True, drop=True)
-        self.publishers = pd.DataFrame.from_dict(self._publishers)
-        if self._publishers:
-            self.publishers.set_index('publisher_handle', inplace=True, drop=True)
-        self.subscriptions = pd.DataFrame.from_dict(self._subscriptions)
-        if self._subscriptions:
-            self.subscriptions.set_index('subscription_handle', inplace=True, drop=True)
+        self.rmw_publishers = pd.DataFrame.from_dict(self._rmw_publishers)
+        if self._rmw_publishers:
+            self.rmw_publishers.set_index('publisher_handle', inplace=True, drop=True)
+        self.rcl_publishers = pd.DataFrame.from_dict(self._rcl_publishers)
+        if self._rcl_publishers:
+            self.rcl_publishers.set_index('publisher_handle', inplace=True, drop=True)
+        self.rmw_subscriptions = pd.DataFrame.from_dict(self._rmw_subscriptions)
+        if self._rmw_subscriptions:
+            self.rmw_subscriptions.set_index('subscription_handle', inplace=True, drop=True)
+        self.rcl_subscriptions = pd.DataFrame.from_dict(self._rcl_subscriptions)
+        if self._rcl_subscriptions:
+            self.rcl_subscriptions.set_index('subscription_handle', inplace=True, drop=True)
         self.subscription_objects = pd.DataFrame.from_dict(self._subscription_objects)
         if self._subscription_objects:
             self.subscription_objects.set_index('subscription', inplace=True, drop=True)
@@ -262,6 +318,9 @@ class Ros2DataModel(DataModel):
         self.rclcpp_publish_instances = pd.DataFrame.from_dict(self._rclcpp_publish_instances)
         self.rcl_publish_instances = pd.DataFrame.from_dict(self._rcl_publish_instances)
         self.rmw_publish_instances = pd.DataFrame.from_dict(self._rmw_publish_instances)
+        self.rmw_take_instances = pd.DataFrame.from_dict(self._rmw_take_instances)
+        self.rcl_take_instances = pd.DataFrame.from_dict(self._rcl_take_instances)
+        self.rclcpp_take_instances = pd.DataFrame.from_dict(self._rclcpp_take_instances)
         self.callback_instances = pd.DataFrame.from_dict(self._callback_instances)
         self.lifecycle_transitions = pd.DataFrame.from_dict(self._lifecycle_transitions)
 
@@ -273,20 +332,17 @@ class Ros2DataModel(DataModel):
         print('Nodes:')
         print(self.nodes.to_string())
         print()
-        print('Publishers:')
-        print(self.publishers.to_string())
+        print('Publishers (rmw):')
+        print(self.rmw_publishers.to_string())
         print()
-        print('Publish instances (rclcpp):')
-        print(self.rclcpp_publish_instances.to_string())
+        print('Publishers (rcl):')
+        print(self.rcl_publishers.to_string())
         print()
-        print('Publish instances (rcl):')
-        print(self.rcl_publish_instances.to_string())
+        print('Subscriptions (rmw):')
+        print(self.rmw_subscriptions.to_string())
         print()
-        print('Publish instances (rmw):')
-        print(self.rmw_publish_instances.to_string())
-        print()
-        print('Subscriptions:')
-        print(self.subscriptions.to_string())
+        print('Subscriptions (rcl):')
+        print(self.rcl_subscriptions.to_string())
         print()
         print('Subscription objects:')
         print(self.subscription_objects.to_string())
@@ -311,6 +367,24 @@ class Ros2DataModel(DataModel):
         print()
         print('Callback instances:')
         print(self.callback_instances.to_string())
+        print()
+        print('Publish instances (rclcpp):')
+        print(self.rclcpp_publish_instances.to_string())
+        print()
+        print('Publish instances (rcl):')
+        print(self.rcl_publish_instances.to_string())
+        print()
+        print('Publish instances (rmw):')
+        print(self.rmw_publish_instances.to_string())
+        print()
+        print('Take instances (rmw):')
+        print(self.rmw_take_instances.to_string())
+        print()
+        print('Take instances (rcl):')
+        print(self.rcl_take_instances.to_string())
+        print()
+        print('Take instances (rclcpp):')
+        print(self.rclcpp_take_instances.to_string())
         print()
         print('Lifecycle state machines:')
         print(self.lifecycle_state_machines.to_string())

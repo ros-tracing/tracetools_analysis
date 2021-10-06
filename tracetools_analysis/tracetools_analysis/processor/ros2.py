@@ -45,6 +45,8 @@ class Ros2Handler(EventHandler):
                 self._handle_rcl_init,
             'ros2:rcl_node_init':
                 self._handle_rcl_node_init,
+            'ros2:rmw_publisher_init':
+                self._handle_rmw_publisher_init,
             'ros2:rcl_publisher_init':
                 self._handle_rcl_publisher_init,
             'ros2:rclcpp_publish':
@@ -53,12 +55,20 @@ class Ros2Handler(EventHandler):
                 self._handle_rcl_publish,
             'ros2:rmw_publish':
                 self._handle_rmw_publish,
+            'ros2:rmw_subscription_init':
+                self._handle_rmw_subscription_init,
             'ros2:rcl_subscription_init':
                 self._handle_rcl_subscription_init,
             'ros2:rclcpp_subscription_init':
                 self._handle_rclcpp_subscription_init,
             'ros2:rclcpp_subscription_callback_added':
                 self._handle_rclcpp_subscription_callback_added,
+            'ros2:rmw_take':
+                self._handle_rmw_take,
+            'ros2:rcl_take':
+                self._handle_rcl_take,
+            'ros2:rclcpp_take':
+                self._handle_rclcpp_take,
             'ros2:rcl_service_init':
                 self._handle_rcl_service_init,
             'ros2:rclcpp_service_callback_added':
@@ -121,6 +131,14 @@ class Ros2Handler(EventHandler):
         namespace = get_field(event, 'namespace')
         self.data.add_node(handle, timestamp, tid, rmw_handle, name, namespace)
 
+    def _handle_rmw_publisher_init(
+        self, event: Dict, metadata: EventMetadata,
+    ) -> None:
+        handle = get_field(event, 'rmw_publisher_handle')
+        timestamp = metadata.timestamp
+        gid = get_field(event, 'gid')
+        self.data.add_rmw_publisher(handle, timestamp, gid)
+
     def _handle_rcl_publisher_init(
         self, event: Dict, metadata: EventMetadata,
     ) -> None:
@@ -130,7 +148,7 @@ class Ros2Handler(EventHandler):
         rmw_handle = get_field(event, 'rmw_publisher_handle')
         topic_name = get_field(event, 'topic_name')
         depth = get_field(event, 'queue_depth')
-        self.data.add_publisher(handle, timestamp, node_handle, rmw_handle, topic_name, depth)
+        self.data.add_rcl_publisher(handle, timestamp, node_handle, rmw_handle, topic_name, depth)
 
     def _handle_rclcpp_publish(
         self, event: Dict, metadata: EventMetadata,
@@ -153,6 +171,14 @@ class Ros2Handler(EventHandler):
         timestamp = metadata.timestamp
         message = get_field(event, 'message')
         self.data.add_rmw_publish_instance(timestamp, message)
+
+    def _handle_rmw_subscription_init(
+        self, event: Dict, metadata: EventMetadata,
+    ) -> None:
+        handle = get_field(event, 'rmw_subscription_handle')
+        timestamp = metadata.timestamp
+        gid = get_field(event, 'gid')
+        self.data.add_rmw_subscription(handle, timestamp, gid)
 
     def _handle_rcl_subscription_init(
         self, event: Dict, metadata: EventMetadata,
@@ -182,6 +208,32 @@ class Ros2Handler(EventHandler):
         timestamp = metadata.timestamp
         callback_object = get_field(event, 'callback')
         self.data.add_callback_object(subscription_pointer, timestamp, callback_object)
+
+    def _handle_rmw_take(
+        self, event: Dict, metadata: EventMetadata,
+    ) -> None:
+        subscription_handle = get_field(event, 'rmw_subscription_handle')
+        timestamp = metadata.timestamp
+        message = get_field(event, 'message')
+        source_timestamp = get_field(event, 'source_timestamp')
+        taken = bool(get_field(event, 'taken'))
+        self.data.add_rmw_take_instance(
+            subscription_handle, timestamp, message, source_timestamp, taken
+        )
+
+    def _handle_rcl_take(
+        self, event: Dict, metadata: EventMetadata,
+    ) -> None:
+        timestamp = metadata.timestamp
+        message = get_field(event, 'message')
+        self.data.add_rcl_take_instance(timestamp, message)
+
+    def _handle_rclcpp_take(
+        self, event: Dict, metadata: EventMetadata,
+    ) -> None:
+        timestamp = metadata.timestamp
+        message = get_field(event, 'message')
+        self.data.add_rclcpp_take_instance(timestamp, message)
 
     def _handle_rcl_service_init(
         self, event: Dict, metadata: EventMetadata,

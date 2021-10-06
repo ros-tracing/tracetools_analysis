@@ -136,8 +136,8 @@ class Ros2DataModelUtil(DataModelUtil):
             or `None` if topic name not found
         """
         # We could have more than one publisher for the topic
-        publisher_handles = self.data.publishers.loc[
-            self.data.publishers['topic_name'] == topic_name
+        publisher_handles = self.data.rcl_publishers.loc[
+            self.data.rcl_publishers['topic_name'] == topic_name
         ].index.values.astype(int)
         if len(publisher_handles) == 0:
             return None
@@ -155,7 +155,7 @@ class Ros2DataModelUtil(DataModelUtil):
         The rows are ordered by publish timestamp, so the order will usually be: rclcpp, rcl, rmw.
         However, this does not apply to publications from internal publishers, i.e.,
         publications that originate from below rclcpp (rcl or rmw).
-        TODO(christophebedard) find heuristic to exclude those
+        TODO(christophebedard) find heuristic to exclude those?
 
         :return: dataframe with [timestamp, message, layer 'rclcpp'|'rcl'|'rmw', publisher handle]
             columns, ordered by timestamp,
@@ -176,6 +176,44 @@ class Ros2DataModelUtil(DataModelUtil):
         publish_instances.reset_index(drop=True, inplace=True)
         self.convert_time_columns(publish_instances, [], ['timestamp'], True)
         return publish_instances
+
+    def get_take_instances(self) -> DataFrame:
+        """
+        Get all take instances (rmw, rcl, rclcpp) in a single dataframe.
+
+        The rows are ordered by take timestamp, so the order will usually be: rmw, rcl, rclcpp.
+        However, thsi does not apply to takes from internal subscriptions, i.e.,
+        takes that originate from below rclcpp (rcl or rmw).
+        TODO(christophebedard) find heuristic to exclude those?
+
+        :return: dataframe with
+            [timestamp, message, source timestamp,
+                layer 'rmw'|'rcl'|'rmw', rmw subscription handle, taken]
+            columns, ordered by timestamp,
+            and where the rmw subscription handle, source timestamp, and taken flag are only set
+            (non-zero, non-False) for 'rmw' take instances
+        """
+        rmw_instances = self.data.rmw_take_instances.copy()
+        rmw_instances['layer'] = 'rmw'
+        rmw_instances.rename(
+            columns={'subscription_handle': 'rmw_subscription_handle'},
+            inplace=True,
+        )
+        rcl_instances = self.data.rcl_take_instances.copy()
+        rcl_instances['layer'] = 'rcl'
+        rcl_instances['rmw_subscription_handle'] = 0
+        rcl_instances['source_timestamp'] = 0
+        rcl_instances['taken'] = False
+        rclcpp_instances = self.data.rclcpp_take_instances.copy()
+        rclcpp_instances['layer'] = 'rclcpp'
+        rclcpp_instances['rmw_subscription_handle'] = 0
+        rclcpp_instances['source_timestamp'] = 0
+        rclcpp_instances['taken'] = False
+        take_instances = concat([rmw_instances, rcl_instances, rclcpp_instances], axis=0)
+        take_instances.sort_values('timestamp', inplace=True)
+        take_instances.reset_index(drop=True, inplace=True)
+        self.convert_time_columns(take_instances, [], ['timestamp', 'source_timestamp'], True)
+        return take_instances
 
     def get_callback_durations(
         self,
@@ -250,7 +288,7 @@ class Ros2DataModelUtil(DataModelUtil):
         if reference in self.data.timers.index:
             type_name = 'Timer'
             info = self.get_timer_handle_info(reference)
-        elif reference in self.data.publishers.index:
+        elif reference in self.data.rcl_publishers.index:
             type_name = 'Publisher'
             info = self.get_publisher_handle_info(reference)
         elif reference in self.data.subscription_objects.index:
@@ -300,14 +338,14 @@ class Ros2DataModelUtil(DataModelUtil):
         :param publisher_handle: the publisher handle value
         :return: a dictionary with name:value info, or `None` if it fails
         """
-        if publisher_handle not in self.data.publishers.index:
+        if publisher_handle not in self.data.rcl_publishers.index:
             return None
 
-        node_handle = self.data.publishers.loc[publisher_handle, 'node_handle']
+        node_handle = self.data.rcl_publishers.loc[publisher_handle, 'node_handle']
         node_handle_info = self.get_node_handle_info(node_handle)
         if node_handle_info is None:
             return None
-        topic_name = self.data.publishers.loc[publisher_handle, 'topic_name']
+        topic_name = self.data.rcl_publishers.loc[publisher_handle, 'topic_name']
         publisher_info = {'topic': topic_name}
         return {**node_handle_info, **publisher_info}
 
@@ -338,7 +376,7 @@ class Ros2DataModelUtil(DataModelUtil):
             columns=['timestamp'],
             axis=1,
         )
-        subscriptions_simple = self.data.subscriptions.drop(
+        subscriptions_simple = self.data.rcl_subscriptions.drop(
             columns=['timestamp', 'rmw_handle'],
             inplace=False,
         )

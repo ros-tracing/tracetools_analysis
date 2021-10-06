@@ -36,9 +36,10 @@ def generate_launch_description():
             events_kernel=[
                 'sched_switch',
             ],
-            context_names=[
-                'ip',
-            ] + DEFAULT_CONTEXT,
+            context_names={
+                'kernel': DEFAULT_CONTEXT,
+                'userspace': DEFAULT_CONTEXT + ['ip'],
+            },
         ),
         Node(
             package='test_tracetools',

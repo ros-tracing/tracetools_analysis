@@ -128,7 +128,7 @@ class Ros2DataModel(DataModel):
     def add_rmw_subscription(
         self, handle, timestamp, gid
     ) -> None:
-        self._rcl_subscriptions.append({
+        self._rmw_subscriptions.append({
             'subscription_handle': handle,
             'timestamp': timestamp,
             'gid': gid,

@@ -36,7 +36,7 @@ def generate_launch_description():
             events_kernel=[
                 'sched_switch',
             ],
-            context_names={
+            context_fields={
                 'kernel': DEFAULT_CONTEXT,
                 'userspace': DEFAULT_CONTEXT + ['ip'],
             },

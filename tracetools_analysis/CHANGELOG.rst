@@ -2,6 +2,18 @@
 Changelog for package tracetools_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.0 (2022-01-21)
+------------------
+* Update context_fields option name in profile example launch file
+* Fix both rcl and rmw subscriptions being added to the rcl dataframe
+* Support rmw pub/sub init and take instrumentation
+* Support publishing instrumentation
+* Change 'input_path' arg help message wording
+* Add 'process --convert-only' option
+* Deprecate 'convert' verb since it is just an implementation detail
+* Simplify jupyter notebooks and add way to use Debian packages
+* Contributors: Christophe Bedard
+
 2.0.0 (2021-03-31)
 ------------------
 * Set callback_instances' timestamp & duration cols to datetime/timedelta

@@ -2,8 +2,8 @@
 Changelog for package tracetools_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2022-01-21)
+------------------
 * Update context_fields option name in profile example launch file
 * Fix both rcl and rmw subscriptions being added to the rcl dataframe
 * Support rmw pub/sub init and take instrumentation

@@ -2,8 +2,8 @@
 Changelog for package ros2trace_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2022-01-21)
+------------------
 * Add 'process --convert-only' option
 * Deprecate 'convert' verb since it is just an implementation detail
 * Contributors: Christophe Bedard

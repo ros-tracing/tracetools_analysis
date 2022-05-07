@@ -5,6 +5,8 @@
 
 Analysis tools for [ROS 2 tracing](https://gitlab.com/ros-tracing/ros2_tracing).
 
+**Note**: make sure to use the right branch, depending on the ROS 2 distro: [use `master` for Rolling, `galactic` for Galactic, etc.](https://docs.ros.org/en/rolling/Contributing/Developer-Guide.html#branches)
+
 ## Trace analysis
 
 After generating a trace (see [`ros2_tracing`](https://gitlab.com/ros-tracing/ros2_tracing#tracing)), we can analyze it to extract useful execution data.
@@ -13,7 +15,7 @@ After generating a trace (see [`ros2_tracing`](https://gitlab.com/ros-tracing/ro
 
 Then we can process a trace to create a data model which could be queried for analysis.
 
-```
+```shell
 $ ros2 trace-analysis process /path/to/trace/directory
 ```
 

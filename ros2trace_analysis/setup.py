@@ -22,7 +22,7 @@ setup(
     ),
     author='Christophe Bedard',
     author_email='christophe.bedard@apex.ai',
-    url='https://gitlab.com/ros-tracing/tracetools_analysis',
+    url='https://github.com/ros-tracing/tracetools_analysis',
     keywords=[],
     description='The trace-analysis command for ROS 2 command line tools.',
     long_description=(

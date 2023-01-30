@@ -3,7 +3,7 @@ variables:
   PACKAGES_LIST: tracetools_analysis ros2trace_analysis
   BASE_IMAGE_ID: registry.gitlab.com/ros-tracing/ci_base
   DISTRO: rolling
-  ROS2TRACING_BRANCH: master
+  ROS2TRACING_BRANCH: rolling
 
 stages:
   - build
@@ -78,7 +78,5 @@ trigger_gen_docs:
   stage: report
   only:
     refs:
-      - master
-      - galactic
-      - foxy
+      - rolling
   trigger: ros-tracing/tracetools_analysis-api

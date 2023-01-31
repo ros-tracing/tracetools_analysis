@@ -41,9 +41,9 @@ class EventMetadata():
         event_name: str,
         timestamp: int,
         cpu_id: int,
-        procname: str = None,
-        pid: int = None,
-        tid: int = None,
+        procname: Optional[str] = None,
+        pid: Optional[int] = None,
+        tid: Optional[int] = None,
     ) -> None:
         """
         Create an EventMetadata.

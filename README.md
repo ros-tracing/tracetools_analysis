@@ -84,7 +84,7 @@ $ pip3 install bokeh
 
 ## Design
 
-See the [`ros2_tracing` design document](https://github.com/ros2/ros2_tracing/blob/master/doc/design_ros_2.md), especially the [*Goals and requirements*](https://github.com/ros2/ros2_tracing/blob/master/doc/design_ros_2.md#goals-and-requirements) and [*Analysis*](https://github.com/ros2/ros2_tracing/blob/master/doc/design_ros_2.md#analysis) sections.
+See the [`ros2_tracing` design document](https://github.com/ros2/ros2_tracing/blob/rolling/doc/design_ros_2.md), especially the [*Goals and requirements*](https://github.com/ros2/ros2_tracing/blob/rolling/doc/design_ros_2.md#goals-and-requirements) and [*Analysis*](https://github.com/ros2/ros2_tracing/blob/rolling/doc/design_ros_2.md#analysis) sections.
 
 ## Packages
 
@@ -96,4 +96,4 @@ Package containing a `ros2cli` extension to perform trace analysis.
 
 Package containing tools for analyzing trace data.
 
-See the [API documentation](https://ros-tracing.gitlab.io/tracetools_analysis-api/).
+See the [API documentation](https://docs.ros.org/en/rolling/p/tracetools_analysis/).

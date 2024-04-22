@@ -23,6 +23,7 @@ from typing import Optional
 from typing import Union
 
 import numpy as np
+import pandas as pd
 from pandas import concat
 from pandas import DataFrame
 
@@ -119,9 +120,15 @@ class Ros2DataModelUtil(DataModelUtil):
         # Get a list of callback objects
         callback_objects = set(callback_instances['callback_object'])
         # Get their symbol
-        return {
-            obj: self._prettify(callback_symbols.loc[obj, 'symbol']) for obj in callback_objects
-        }
+        pretty_symbols = {}
+        for obj in callback_objects:
+            # There could be multiple callback symbols for the same callback object (pointer), e.g.,
+            # if we create and destroy subscriptions dynamically
+            symbols = callback_symbols.loc[obj, 'symbol']
+            symbols = symbols if isinstance(symbols, pd.Series) else [symbols]
+            # In that case, just combine the symbols
+            pretty_symbols[obj] = ' and '.join(self._prettify(symbol) for symbol in symbols)
+        return pretty_symbols
 
     def get_tids(self) -> List[str]:
         """Get a list of thread ids corresponding to the nodes."""
@@ -303,7 +310,8 @@ class Ros2DataModelUtil(DataModelUtil):
 
         if info is None:
             return None
-        return f'{type_name} -- {self.format_info_dict(info)}'
+        info_str = self.format_info_dict(info, sep='\n')
+        return f'{type_name}\n{info_str}'
 
     def get_timer_handle_info(
         self,
@@ -395,12 +403,27 @@ class Ros2DataModelUtil(DataModelUtil):
             right_index=True,
         )
 
-        node_handle = subscriptions_info.loc[subscription_reference, 'node_handle']
-        node_handle_info = self.get_node_handle_info(node_handle)
-        if node_handle_info is None:
-            return None
-        topic_name = subscriptions_info.loc[subscription_reference, 'topic_name']
+        # There could be multiple subscriptions for the same subscription object pointer, e.g., if
+        # we create and destroy subscriptions dynamically, so this subscription could belong to more
+        # than one node
+        # In that case, just combine the information
+        node_handles = subscriptions_info.loc[subscription_reference, 'node_handle']
+        node_handles = node_handles if isinstance(node_handles, pd.Series) else [node_handles]
+        topic_names = subscriptions_info.loc[subscription_reference, 'topic_name']
+        topic_names = topic_names if isinstance(topic_names, pd.Series) else [topic_names]
+        nodes_handle_info = []
+        for node_handle in node_handles:
+            node_handle_info = self.get_node_handle_info(node_handle)
+            if node_handle_info is None:
+                return None
+            nodes_handle_info.append(node_handle_info)
+        topic_name = ' and '.join(topic_names)
         subscription_info = {'topic': topic_name}
+        # Turn list of dicts into dict of combined values
+        node_handle_info = {
+            key: ' and '.join(set(str(info[key]) for info in nodes_handle_info))
+            for key in nodes_handle_info[0]
+        }
         return {**node_handle_info, **subscription_info}
 
     def get_service_handle_info(
@@ -540,5 +563,6 @@ class Ros2DataModelUtil(DataModelUtil):
     def format_info_dict(
         self,
         info_dict: Mapping[str, Any],
+        sep: str = ', ',
     ) -> str:
-        return ', '.join([f'{key}: {val}' for key, val in info_dict.items()])
+        return sep.join(f'{key}: {val}' for key, val in info_dict.items())

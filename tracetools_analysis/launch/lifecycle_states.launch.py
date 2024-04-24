@@ -14,13 +14,13 @@
 
 """Example launch file for a lifecycle node state analysis."""
 
-from launch import LaunchDescription
+import launch
 from launch_ros.actions import Node
 from tracetools_launch.action import Trace
 
 
 def generate_launch_description():
-    return LaunchDescription([
+    return launch.LaunchDescription([
         Trace(
             session_name='lifecycle-node-state',
             events_kernel=[],

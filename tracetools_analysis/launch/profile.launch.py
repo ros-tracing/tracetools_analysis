@@ -14,7 +14,7 @@
 
 """Example launch file for a profiling analysis."""
 
-from launch import LaunchDescription
+import launch
 from launch_ros.actions import Node
 from tracetools_launch.action import Trace
 from tracetools_trace.tools.names import DEFAULT_CONTEXT
@@ -22,7 +22,7 @@ from tracetools_trace.tools.names import DEFAULT_EVENTS_ROS
 
 
 def generate_launch_description():
-    return LaunchDescription([
+    return launch.LaunchDescription([
         Trace(
             session_name='profile',
             events_ust=[

@@ -122,8 +122,8 @@ class Ros2DataModelUtil(DataModelUtil):
         # Get their symbol
         pretty_symbols = {}
         for obj in callback_objects:
-            # There could be multiple callback symbols for the same callback object (pointer), e.g.,
-            # if we create and destroy subscriptions dynamically
+            # There could be multiple callback symbols for the same callback object (pointer),
+            # e.g., if we create and destroy subscriptions dynamically
             symbols = callback_symbols.loc[obj, 'symbol']
             symbols = symbols if isinstance(symbols, pd.Series) else [symbols]
             # In that case, just combine the symbols
@@ -404,8 +404,8 @@ class Ros2DataModelUtil(DataModelUtil):
         )
 
         # There could be multiple subscriptions for the same subscription object pointer, e.g., if
-        # we create and destroy subscriptions dynamically, so this subscription could belong to more
-        # than one node
+        # we create and destroy subscriptions dynamically, so this subscription could belong to
+        # more than one node
         # In that case, just combine the information
         node_handles = subscriptions_info.loc[subscription_reference, 'node_handle']
         node_handles = node_handles if isinstance(node_handles, pd.Series) else [node_handles]
@@ -421,7 +421,7 @@ class Ros2DataModelUtil(DataModelUtil):
         subscription_info = {'topic': topic_name}
         # Turn list of dicts into dict of combined values
         node_handle_info = {
-            key: ' and '.join(set(str(info[key]) for info in nodes_handle_info))
+            key: ' and '.join({str(info[key]) for info in nodes_handle_info})
             for key in nodes_handle_info[0]
         }
         return {**node_handle_info, **subscription_info}

@@ -17,6 +17,8 @@ from datetime import timezone
 from typing import Dict
 import unittest
 
+from packaging.version import Version
+from pandas import __version__ as pandas_version
 from pandas import DataFrame
 from pandas.testing import assert_frame_equal
 
@@ -34,6 +36,10 @@ class TestDataModelUtil(unittest.TestCase):
             *args,
         )
 
+    @unittest.skipIf(
+        Version(pandas_version) < Version('2.2.0'),
+        'skip due to missing fix: pandas-dev/pandas#55812',
+    )
     def test_convert_time_columns(self) -> None:
         input_df = DataFrame(
             data=[

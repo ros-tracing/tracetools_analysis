@@ -20,6 +20,7 @@ from typing import Set
 from typing import Tuple
 
 from tracetools_read import get_field
+from tracetools_trace.tools import tracepoints as tp
 
 from . import EventHandler
 from . import EventMetadata
@@ -41,55 +42,55 @@ class Ros2Handler(EventHandler):
         """Create a Ros2Handler."""
         # Link a ROS trace event to its corresponding handling method
         handler_map: HandlerMap = {
-            'ros2:rcl_init':
+            tp.rcl_init:
                 self._handle_rcl_init,
-            'ros2:rcl_node_init':
+            tp.rcl_node_init:
                 self._handle_rcl_node_init,
-            'ros2:rmw_publisher_init':
+            tp.rmw_publisher_init:
                 self._handle_rmw_publisher_init,
-            'ros2:rcl_publisher_init':
+            tp.rcl_publisher_init:
                 self._handle_rcl_publisher_init,
-            'ros2:rclcpp_publish':
+            tp.rclcpp_publish:
                 self._handle_rclcpp_publish,
-            'ros2:rcl_publish':
+            tp.rcl_publish:
                 self._handle_rcl_publish,
-            'ros2:rmw_publish':
+            tp.rmw_publish:
                 self._handle_rmw_publish,
-            'ros2:rmw_subscription_init':
+            tp.rmw_subscription_init:
                 self._handle_rmw_subscription_init,
-            'ros2:rcl_subscription_init':
+            tp.rcl_subscription_init:
                 self._handle_rcl_subscription_init,
-            'ros2:rclcpp_subscription_init':
+            tp.rclcpp_subscription_init:
                 self._handle_rclcpp_subscription_init,
-            'ros2:rclcpp_subscription_callback_added':
+            tp.rclcpp_subscription_callback_added:
                 self._handle_rclcpp_subscription_callback_added,
-            'ros2:rmw_take':
+            tp.rmw_take:
                 self._handle_rmw_take,
-            'ros2:rcl_take':
+            tp.rcl_take:
                 self._handle_rcl_take,
-            'ros2:rclcpp_take':
+            tp.rclcpp_take:
                 self._handle_rclcpp_take,
-            'ros2:rcl_service_init':
+            tp.rcl_service_init:
                 self._handle_rcl_service_init,
-            'ros2:rclcpp_service_callback_added':
+            tp.rclcpp_service_callback_added:
                 self._handle_rclcpp_service_callback_added,
-            'ros2:rcl_client_init':
+            tp.rcl_client_init:
                 self._handle_rcl_client_init,
-            'ros2:rcl_timer_init':
+            tp.rcl_timer_init:
                 self._handle_rcl_timer_init,
-            'ros2:rclcpp_timer_callback_added':
+            tp.rclcpp_timer_callback_added:
                 self._handle_rclcpp_timer_callback_added,
-            'ros2:rclcpp_timer_link_node':
+            tp.rclcpp_timer_link_node:
                 self._handle_rclcpp_timer_link_node,
-            'ros2:rclcpp_callback_register':
+            tp.rclcpp_callback_register:
                 self._handle_rclcpp_callback_register,
-            'ros2:callback_start':
+            tp.callback_start:
                 self._handle_callback_start,
-            'ros2:callback_end':
+            tp.callback_end:
                 self._handle_callback_end,
-            'ros2:rcl_lifecycle_state_machine_init':
+            tp.rcl_lifecycle_state_machine_init:
                 self._handle_rcl_lifecycle_state_machine_init,
-            'ros2:rcl_lifecycle_transition':
+            tp.rcl_lifecycle_transition:
                 self._handle_rcl_lifecycle_transition,
         }
         super().__init__(
@@ -104,7 +105,7 @@ class Ros2Handler(EventHandler):
     @staticmethod
     def required_events() -> Set[str]:
         return {
-            'ros2:rcl_init',
+            tp.rcl_init,
         }
 
     @property

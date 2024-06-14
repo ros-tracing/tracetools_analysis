@@ -14,6 +14,7 @@
   <author email="fixed-term.christophe.bourquebedard@de.bosch.com">Christophe Bedard</author>
 
   <depend>tracetools_read</depend>
+  <depend>tracetools_trace</depend>
   <depend>python3-pandas</depend>
 
   <exec_depend>jupyter-notebook</exec_depend>

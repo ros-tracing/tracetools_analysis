@@ -2,8 +2,8 @@
 Changelog for package tracetools_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.1.0 (2024-06-15)
+------------------
 * Use tracepoint names from tracetools_trace and add tests (`#25 <https://github.com/ros-tracing/tracetools_analysis/issues/25>`_)
 * Use underscores in setup.cfg (`#21 <https://github.com/ros-tracing/tracetools_analysis/issues/21>`_)
 * Skip TestDataModelUtil.test_convert_time_columns if pandas < 2.2.0 (`#20 <https://github.com/ros-tracing/tracetools_analysis/issues/20>`_)

@@ -2,6 +2,18 @@
 Changelog for package tracetools_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Use tracepoint names from tracetools_trace and add tests (`#25 <https://github.com/ros-tracing/tracetools_analysis/issues/25>`_)
+* Use underscores in setup.cfg (`#21 <https://github.com/ros-tracing/tracetools_analysis/issues/21>`_)
+* Skip TestDataModelUtil.test_convert_time_columns if pandas < 2.2.0 (`#20 <https://github.com/ros-tracing/tracetools_analysis/issues/20>`_)
+* Fix warnings when using mypy>=1.8.0 (`#16 <https://github.com/ros-tracing/tracetools_analysis/issues/16>`_)
+* Support traces with multiple callbacks for same pointer (`#13 <https://github.com/ros-tracing/tracetools_analysis/issues/13>`_) (`#15 <https://github.com/ros-tracing/tracetools_analysis/issues/15>`_)
+* Update path to ros2_tracing in notebooks (`#8 <https://github.com/ros-tracing/tracetools_analysis/issues/8>`_)
+* Refactored for compatibility with Bokeh 3.2.0 (`#7 <https://github.com/ros-tracing/tracetools_analysis/issues/7>`_)
+* Fix mypy errors (`#4 <https://github.com/ros-tracing/tracetools_analysis/issues/4>`_)
+* Contributors: Christophe Bedard, Oren Bell
+
 3.0.0 (2022-01-21)
 ------------------
 * Update context_fields option name in profile example launch file

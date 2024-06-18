@@ -39,3 +39,9 @@ class TestUtils(unittest.TestCase):
         data_model.finalize()
         util = Ros2DataModelUtil(data_model)
         self.assertEqual({}, util.get_callback_symbols())
+
+    def test_ros2_no_lifecycle_transitions(self) -> None:
+        data_model = Ros2DataModel()
+        data_model.finalize()
+        util = Ros2DataModelUtil(data_model)
+        self.assertEqual({}, util.get_lifecycle_node_state_intervals())

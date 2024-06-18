@@ -117,6 +117,9 @@ class Ros2DataModelUtil(DataModelUtil):
         callback_instances = self.data.callback_instances
         callback_symbols = self.data.callback_symbols
 
+        if 'callback_object' not in callback_instances.columns:
+            return {}
+
         # Get a list of callback objects
         callback_objects = set(callback_instances['callback_object'])
         # Get their symbol

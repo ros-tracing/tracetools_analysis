@@ -16,6 +16,8 @@
 import unittest
 
 from tracetools_analysis import time_diff_to_str
+from tracetools_analysis.data_model.ros2 import Ros2DataModel
+from tracetools_analysis.utils.ros2 import Ros2DataModelUtil
 
 
 class TestUtils(unittest.TestCase):
@@ -31,3 +33,9 @@ class TestUtils(unittest.TestCase):
         self.assertEqual('1 m 10 s', time_diff_to_str(69.6969))
         self.assertEqual('6 m 10 s', time_diff_to_str(369.6969))
         self.assertEqual('2 m 0 s', time_diff_to_str(120.499999999))
+
+    def test_ros2_no_callbacks(self) -> None:
+        data_model = Ros2DataModel()
+        data_model.finalize()
+        util = Ros2DataModelUtil(data_model)
+        self.assertEqual({}, util.get_callback_symbols())

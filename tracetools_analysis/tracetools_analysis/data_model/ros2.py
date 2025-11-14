@@ -159,7 +159,7 @@ class Ros2DataModel(DataModel):
         self, handle, timestamp, node_handle, rmw_handle, service_name
     ) -> None:
         self._services.append({
-            'service_handle': timestamp,
+            'service_handle': handle,
             'timestamp': timestamp,
             'node_handle': node_handle,
             'rmw_handle': rmw_handle,
